@@ -22,6 +22,10 @@ public class App extends Application {
   public void start(Stage stage) throws Exception {
     instance = this;
     this.stage = stage;
+    StackPane root = new StackPane();
+    Scene scene = new Scene(root, 800, 600);
+    stage.setScene(scene);
+    stage.show();
 
   }
 
