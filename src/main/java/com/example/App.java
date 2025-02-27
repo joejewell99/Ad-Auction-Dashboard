@@ -1,6 +1,7 @@
 package com.example;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.application.Application;
@@ -23,10 +24,12 @@ public class App extends Application {
     instance = this;
     this.stage = stage;
     StackPane root = new StackPane();
+    Label welcomeMessage = new Label("Ad Auction");
+    root.getChildren().add(welcomeMessage);
     Scene scene = new Scene(root, 800, 600);
     stage.setScene(scene);
     stage.show();
-
+    logger.info("App started");
   }
 
   public static App getInstance() {
