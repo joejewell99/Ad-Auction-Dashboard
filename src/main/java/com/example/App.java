@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 
 public class App extends Application {
-
   private static App instance;
   private static final Logger logger = LogManager.getLogger(App.class);
   private Stage stage;
