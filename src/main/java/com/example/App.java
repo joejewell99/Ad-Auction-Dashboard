@@ -14,7 +14,7 @@ public class App extends Application {
   private static final Logger logger = LogManager.getLogger(App.class);
   private Stage stage;
 
-  private ServerLog serverLog;
+
   public static void main(String[] args){
     logger.info("Launching app");
     launch();
@@ -27,8 +27,6 @@ public class App extends Application {
     StackPane root = new StackPane();
     Label welcomeMessage = new Label("Ad Auction");
     root.getChildren().add(welcomeMessage);
-    Label serverStats = new Label("Number of Bounces: " + this.serverLog.getNumberOfBounces() + "\nNumber of Conversions: " + this.serverLog.getNumberOfConversions());
-    root.getChildren().add(serverStats);
     Scene scene = new Scene(root, 800, 600);
     stage.setScene(scene);
     stage.show();
@@ -42,9 +40,6 @@ public class App extends Application {
     InputFilesPage inputFilesPage = new InputFilesPage(stage);
     inputFilesPage.show();
     logger.info("Input files page");
-  }
-  public void init() {
-    this.serverLog = new ServerLog("../../server_log.csv");
   }
 
   public static App getInstance() {
