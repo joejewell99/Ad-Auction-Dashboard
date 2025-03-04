@@ -19,6 +19,9 @@ public class InputFilesPage {
     private File clickLogFile;
     private File serverLogFile;
 
+    // Log manager to be passed around the system (Use it in constructors for new scenes), essentially containing all the files and data
+    public LogManager logManager = new LogManager();
+
     InputFilesPage(Stage stage) {
         this.stage = stage;
         initialize();
@@ -58,21 +61,34 @@ public class InputFilesPage {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Log File");
 
+        // Store the impression log in logManager
         impressionLogButton.setOnAction(e -> {
-            clickLogFile = fileChooser.showOpenDialog(stage);
-            if (clickLogFile != null) {
+            impressionLogFile = fileChooser.showOpenDialog(stage);
+            logManager.assignImpressionLog(impressionLogFile);
+            logManager.convertImpressionLog();
+            logManager.printImpressionData();
+            if (impressionLogFile != null) {
                 System.out.println("Impression Log Selected: " + impressionLogFile.getAbsolutePath());
             }
         });
 
+        // Store the click log in LogManager
         clickLogButton.setOnAction(e -> {
             clickLogFile = fileChooser.showOpenDialog(stage);
+            logManager.assignClickLog(clickLogFile);
+            logManager.convertClickLog();
+            logManager.printClickData();
             if (clickLogFile != null) {
                 System.out.println("Click Log Selected: " + clickLogFile.getAbsolutePath());
             }
         });
+
+        // Store the server log in LogManager
         serverLogButton.setOnAction(e -> {
             serverLogFile = fileChooser.showOpenDialog(stage);
+            logManager.assignServerLog(serverLogFile);
+            logManager.convertServerLog();
+            logManager.printServerData();
             if (serverLogFile != null) {
                 System.out.println("Server Log Selected: " + serverLogFile.getAbsolutePath());
             }
