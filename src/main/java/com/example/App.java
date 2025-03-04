@@ -33,6 +33,15 @@ public class App extends Application {
     stage.setScene(scene);
     stage.show();
     logger.info("App started");
+    Login login = new Login(stage);
+    login.show();
+    logger.info("Login completed");
+  }
+
+  public void showInputFilesPage(){
+    InputFilesPage inputFilesPage = new InputFilesPage(stage);
+    inputFilesPage.show();
+    logger.info("Input files page");
   }
   public void init() {
     this.serverLog = new ServerLog("../../server_log.csv");
