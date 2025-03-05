@@ -95,6 +95,8 @@ public class InputFilesPage {
 
         proceedButton.setOnAction(e -> {
             System.out.println("Proceed Button clicked");
+            ChartPage chartPage = new ChartPage(stage, logManager);
+            chartPage.show();
         });
 
         overallMetricsButton.setOnAction(e -> {
