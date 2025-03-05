@@ -49,9 +49,10 @@ public class ChartPage {
 
 
         var buttonHolder = new HBox();
-        var backButton = new Button("BACK");
+        var backButton = new Button("Back");
+        var logOutButton = new Button("Logout");
         var overallMetricsButton = new Button("Overall Metrics");
-        buttonHolder.getChildren().addAll(backButton,overallMetricsButton);
+        buttonHolder.getChildren().addAll(backButton,overallMetricsButton,logOutButton);
 
         backButton.setOnAction(e -> {
             App.getInstance().showInputFilesPage();
@@ -60,6 +61,11 @@ public class ChartPage {
         overallMetricsButton.setOnAction(e -> {
             OverallMetricsPage metricsPage = new OverallMetricsPage(stage,logManager);
             metricsPage.show();
+        });
+
+        logOutButton.setOnAction(e -> {
+            Login login = new Login(stage);
+            login.show();
         });
 
         StackPane root = new StackPane(chartViewer);
