@@ -21,10 +21,10 @@ public class LogManager {
 
     /**
      * Stores impression csv
-     * @param serverLog
+     * @param impressionLog
      */
-    public void assignImpressionLog(File serverLog) {
-        this.serverLog = serverLog;
+    public void assignImpressionLog(File impressionLog) {
+        this.impressionLog = impressionLog;
     }
 
     /**
