@@ -1,6 +1,8 @@
 package com.example;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.jfree.chart.ChartFactory;
@@ -43,8 +45,25 @@ public class ChartPage {
         );
 
         ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.setMaxSize(400,300);
+
+
+        var buttonHolder = new HBox();
+        var backButton = new Button("BACK");
+        var overallMetricsButton = new Button("Overall Metrics");
+        buttonHolder.getChildren().addAll(backButton,overallMetricsButton);
+
+        backButton.setOnAction(e -> {
+            App.getInstance().showInputFilesPage();
+        });
+
+        overallMetricsButton.setOnAction(e -> {
+            OverallMetricsPage metricsPage = new OverallMetricsPage(stage,logManager);
+            metricsPage.show();
+        });
 
         StackPane root = new StackPane(chartViewer);
+        root.getChildren().add(buttonHolder);
         Scene scene = new Scene(root, 800, 600);
         stage.setScene(scene);
         stage.show();

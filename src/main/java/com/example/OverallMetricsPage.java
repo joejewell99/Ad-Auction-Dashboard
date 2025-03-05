@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -42,16 +43,23 @@ public class OverallMetricsPage {
         grid.add(titleLabel, 0, 0, 3, 1);
         GridPane.setHalignment(titleLabel, HPos.CENTER);
 
-        //Logout Button
-        Button logoutButton = new Button("Logout");
-        grid.add(logoutButton, 2, 2);
-        GridPane.setHalignment(logoutButton, HPos.RIGHT);
+        var buttonHolder = new HBox();
+        var logoutButton = new Button("Logout");
+        var backButton = new Button("BACK");
+        buttonHolder.getChildren().addAll(logoutButton,backButton);
+        grid.add(buttonHolder,1,2);
 
         //Logout Button action
         logoutButton.setOnAction(e -> {
             System.out.println("Logout Button clicked");
             Login login = new Login(stage);
             login.show();
+        });
+
+        //Back Button action
+        backButton.setOnAction(e -> {
+            ChartPage chartPage = new ChartPage(stage, logManager);
+            chartPage.show();
         });
 
 

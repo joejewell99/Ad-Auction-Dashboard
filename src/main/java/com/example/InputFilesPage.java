@@ -1,5 +1,7 @@
 package com.example;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -38,34 +40,51 @@ public class InputFilesPage {
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
         grid.add(titleLabel, 0, 0, 2, 1);
 
+        String impressionFile = "";
+        String clickFile = "";
+        String serverFile = "";
+        StringProperty impressionProperty = new SimpleStringProperty(impressionFile);
+        StringProperty clickProperty = new SimpleStringProperty(clickFile);
+        StringProperty serverProperty = new SimpleStringProperty(serverFile);
+        var impressionFileName = new Label();
+        impressionFileName.textProperty().bind(impressionProperty);
+        var clickFileName = new Label();
+        clickFileName.textProperty().bind(clickProperty);
+        var serverFileName = new Label();
+        serverFileName.textProperty().bind(serverProperty);
+
         Label impressionLogLabel = new Label("Impression Log:");
         grid.add(impressionLogLabel, 0, 1);
         Button impressionLogButton = new Button("Select File");
         grid.add(impressionLogButton, 1, 1);
+        grid.add(impressionFileName,2,1);
 
         Label clickLogLabel = new Label("Click Log:");
         grid.add(clickLogLabel, 0, 2);
         Button clickLogButton = new Button("Select File");
         grid.add(clickLogButton, 1, 2);
+        grid.add(clickFileName,2,2);
 
         Label serverLogLabel = new Label("Server Log:");
         grid.add(serverLogLabel, 0, 3);
         Button serverLogButton = new Button("Select File");
         grid.add(serverLogButton, 1, 3);
+        grid.add(serverFileName,2,3);
 
         Button proceedButton = new Button("Proceed");
         grid.add(proceedButton, 0, 4);
         Button logoutButton = new Button("Logout");
         grid.add(logoutButton, 1, 4);
-        var overallMetricsButton = new Button("OverallMetrics");
-        grid.add(overallMetricsButton,2,4);
+
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Log File");
 
+
         // Store the impression log in logManager
         impressionLogButton.setOnAction(e -> {
             impressionLogFile = fileChooser.showOpenDialog(stage);
+            impressionProperty.set(impressionLogFile.getName());
             logManager.assignImpressionLog(impressionLogFile);
             logManager.convertImpressionLog();
             if (impressionLogFile != null) {
@@ -76,6 +95,7 @@ public class InputFilesPage {
         // Store the click log in LogManager
         clickLogButton.setOnAction(e -> {
             clickLogFile = fileChooser.showOpenDialog(stage);
+            clickProperty.set(clickLogFile.getName());
             logManager.assignClickLog(clickLogFile);
             logManager.convertClickLog();
             if (clickLogFile != null) {
@@ -86,6 +106,7 @@ public class InputFilesPage {
         // Store the server log in LogManager
         serverLogButton.setOnAction(e -> {
             serverLogFile = fileChooser.showOpenDialog(stage);
+            serverProperty.set(serverLogFile.getName());
             logManager.assignServerLog(serverLogFile);
             logManager.convertServerLog();
             if (serverLogFile != null) {
@@ -99,10 +120,6 @@ public class InputFilesPage {
             chartPage.show();
         });
 
-        overallMetricsButton.setOnAction(e -> {
-            OverallMetricsPage metricsPage = new OverallMetricsPage(stage,logManager);
-            metricsPage.show();
-        });
 
         logoutButton.setOnAction(e -> {
             System.out.println("Logout Button clicked");
