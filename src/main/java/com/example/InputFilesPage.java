@@ -68,7 +68,6 @@ public class InputFilesPage {
             impressionLogFile = fileChooser.showOpenDialog(stage);
             logManager.assignImpressionLog(impressionLogFile);
             logManager.convertImpressionLog();
-            logManager.printImpressionData();
             if (impressionLogFile != null) {
                 System.out.println("Impression Log Selected: " + impressionLogFile.getAbsolutePath());
             }
@@ -79,7 +78,6 @@ public class InputFilesPage {
             clickLogFile = fileChooser.showOpenDialog(stage);
             logManager.assignClickLog(clickLogFile);
             logManager.convertClickLog();
-            logManager.printClickData();
             if (clickLogFile != null) {
                 System.out.println("Click Log Selected: " + clickLogFile.getAbsolutePath());
             }
@@ -90,7 +88,6 @@ public class InputFilesPage {
             serverLogFile = fileChooser.showOpenDialog(stage);
             logManager.assignServerLog(serverLogFile);
             logManager.convertServerLog();
-            logManager.printServerData();
             if (serverLogFile != null) {
                 System.out.println("Server Log Selected: " + serverLogFile.getAbsolutePath());
             }
