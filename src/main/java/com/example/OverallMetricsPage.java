@@ -8,14 +8,18 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.io.File;
+
 
 public class OverallMetricsPage {
     private Stage stage;
     private Scene scene;
 
-    OverallMetricsPage(Stage stage) {
+    public LogManager logManager;
+    private OverallMetricsCalculator metricsCalculator = new OverallMetricsCalculator();
+
+    OverallMetricsPage(Stage stage,LogManager logManager) {
         this.stage = stage;
+        this.logManager = logManager;
         initialize();
     }
 

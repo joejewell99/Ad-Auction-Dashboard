@@ -48,7 +48,7 @@ public class LogManager {
      */
     public void convertClickLog() {
         String line;
-        String delimiter = ",";  // Assuming the CSV is comma-separated
+        String delimiter = ",";
         try (BufferedReader br = new BufferedReader(new FileReader(this.clickLog))) {
             while ((line = br.readLine()) != null) {
                 String[] row = line.split(delimiter);
