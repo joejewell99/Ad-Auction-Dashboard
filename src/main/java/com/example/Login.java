@@ -61,8 +61,9 @@ public class Login {
         loginScene = new Scene(grid, 600, 400);
 
     }
+    // removed password and user just to make things simpler
     private boolean authenticate(String username, String password) {
-        return "admin".equals(username) && "password".equals(password);
+        return "".equals(username) && "".equals(password);
     }
     public void show(){
         stage.setScene(loginScene);
