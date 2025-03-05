@@ -57,6 +57,8 @@ public class InputFilesPage {
         grid.add(proceedButton, 0, 4);
         Button logoutButton = new Button("Logout");
         grid.add(logoutButton, 1, 4);
+        var overallMetricsButton = new Button("OverallMetrics");
+        grid.add(overallMetricsButton,2,4);
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Log File");
@@ -96,6 +98,11 @@ public class InputFilesPage {
 
         proceedButton.setOnAction(e -> {
             System.out.println("Proceed Button clicked");
+        });
+
+        overallMetricsButton.setOnAction(e -> {
+            OverallMetricsPage metricsPage = new OverallMetricsPage(stage,logManager);
+            metricsPage.show();
         });
 
         logoutButton.setOnAction(e -> {

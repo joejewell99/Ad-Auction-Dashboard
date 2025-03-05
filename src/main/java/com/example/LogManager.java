@@ -48,10 +48,16 @@ public class LogManager {
      */
     public void convertClickLog() {
         String line;
-        String delimiter = ",";
+        String comma = ",";
+        boolean headerLine = true;
+
         try (BufferedReader br = new BufferedReader(new FileReader(this.clickLog))) {
             while ((line = br.readLine()) != null) {
-                String[] row = line.split(delimiter);
+                if (headerLine) {
+                    headerLine = false;
+                    continue;
+                }
+                String[] row = line.split(comma);
                 this.clickData.add(row);
             }
         } catch (IOException e) {
@@ -64,10 +70,16 @@ public class LogManager {
      */
     public void convertServerLog() {
         String line;
-        String delimiter = ",";
+        String comma = ",";
+        boolean headerLine = true;
+
         try (BufferedReader br = new BufferedReader(new FileReader(this.serverLog))) {
             while ((line = br.readLine()) != null) {
-                String[] row = line.split(delimiter);
+                if (headerLine) {
+                    headerLine = false;
+                    continue;
+                }
+                String[] row = line.split(comma);
                 this.serverData.add(row);
             }
         } catch (IOException e) {
@@ -80,10 +92,16 @@ public class LogManager {
      */
     public void convertImpressionLog() {
         String line;
-        String delimiter = ",";
+        String comma = ",";
+        boolean headerLine = true;
+
         try (BufferedReader br = new BufferedReader(new FileReader(this.impressionLog))) {
             while ((line = br.readLine()) != null) {
-                String[] row = line.split(delimiter);
+                if (headerLine) {
+                    headerLine = false;
+                    continue;
+                }
+                String[] row = line.split(comma);
                 this.impressionData.add(row);
             }
         } catch (IOException e) {
