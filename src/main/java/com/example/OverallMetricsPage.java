@@ -88,6 +88,7 @@ public class OverallMetricsPage {
 
     public void show() {
         stage.setScene(scene);
+        stage.setTitle("Overall Metrics");
         stage.show();
     }
 }

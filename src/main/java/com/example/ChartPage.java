@@ -111,6 +111,7 @@ public class ChartPage {
         root.getChildren().add(box);
         Scene scene = new Scene(root, 800, 600);
         stage.setScene(scene);
+        stage.setTitle("Graphs");
         stage.show();
 
 

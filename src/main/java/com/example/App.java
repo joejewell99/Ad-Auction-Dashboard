@@ -29,6 +29,7 @@ public class App extends Application {
     root.getChildren().add(welcomeMessage);
     Scene scene = new Scene(root, 800, 600);
     stage.setScene(scene);
+    stage.setTitle("Login");
     stage.show();
     logger.info("App started");
     Login login = new Login(stage);

@@ -131,6 +131,7 @@ public class InputFilesPage {
 
     }
     public void show() {
+        stage.setTitle("File Selection");
         stage.setScene(scene);
         stage.show();
     }

@@ -67,6 +67,7 @@ public class Login {
     }
     public void show(){
         stage.setScene(loginScene);
+        stage.setTitle("Login");
         stage.show();
     }
 }
