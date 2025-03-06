@@ -34,30 +34,6 @@ public class ChartPage {
     }
 
     public void show() {
-        /**
-        DefaultCategoryDataset dst = new DefaultCategoryDataset();
-        OverallMetricsCalculator calc = new OverallMetricsCalculator();
-
-        int impressions = calc.calcImpressions(logManager.getImpressionData());
-        int clicks = calc.calcClicks(logManager.getClickData());
-        int conversions = calc.calcConversions(logManager.getServerData());
-
-        dst.addValue(impressions, "Metrics", "Impressions");
-        dst.addValue(clicks, "Metrics", "Clicks");
-        dst.addValue(conversions, "Metrics", "Conversions");
-
-        JFreeChart chart = ChartFactory.createBarChart(
-                "Campaign Metrics",
-                "Metric",
-                "Value",
-                dst,
-                PlotOrientation.VERTICAL,
-                false,
-                true,
-                false
-        );
-
-         */
 
         //Holder for chart
         ChartViewer chartViewer = new ChartViewer(genClickChart());
