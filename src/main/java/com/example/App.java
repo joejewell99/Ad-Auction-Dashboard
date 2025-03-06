@@ -14,11 +14,19 @@ public class App extends Application {
   private static final Logger logger = LogManager.getLogger(App.class);
   private Stage stage;
 
+  /**
+   * Main method to enter the app.
+   * @param args
+   */
 
   public static void main(String[] args){
     logger.info("Launching app");
     launch();
   }
+
+  /**
+   * Start method called when JavaFX is launched.
+   */
 
   @Override
   public void start(Stage stage) throws Exception {
@@ -37,12 +45,19 @@ public class App extends Application {
     logger.info("Login completed");
   }
 
+  /**
+   * Display input files page after login.
+   */
+
   public void showInputFilesPage(){
     InputFilesPage inputFilesPage = new InputFilesPage(stage);
     inputFilesPage.show();
     logger.info("Input files page");
   }
 
+  /**
+   * A getter method to globally access the app instance.
+   */
   public static App getInstance() {
     return instance;
   }
