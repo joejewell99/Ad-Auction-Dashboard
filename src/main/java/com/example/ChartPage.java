@@ -135,12 +135,19 @@ public class ChartPage {
             chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
         });
 
+        RadioButton monthlyButton = new RadioButton("Monthly");
+        monthlyButton.setToggleGroup(timeOptions);
+        monthlyButton.setOnAction(e -> {
+            this.timeFlag = "Monthly";
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag));
+        });
+
 
         var metricsHeader = new Label("Metrics");
         var timeLabel = new Label("Time Granularity");
         var metricOptionHolder = new VBox();
         metricOptionHolder.getChildren().addAll(metricsHeader, clickMetric, impressionMetric, uniqueMetric, bouncesMetric, conversionMetric, costMetric, ctrMetric, cpaMetric, cpcMetric, cpmMetric, bounceRateMetric);
-        metricOptionHolder.getChildren().addAll(timeLabel, dailyButton, weeklyButton);
+        metricOptionHolder.getChildren().addAll(timeLabel, dailyButton, weeklyButton,monthlyButton);
 
         //Navigation Buttons
         var buttonHolder = new HBox();

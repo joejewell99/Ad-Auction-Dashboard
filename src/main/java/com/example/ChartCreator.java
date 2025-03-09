@@ -6,9 +6,11 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -34,6 +36,8 @@ public class ChartCreator {
             clickMap = getDailyClicks(this.clicks);
         } else if (time.equals("Weekly")) {
             clickMap = getWeeklyClicks(this.clicks);
+        } else if (time.equals("Monthly")) {
+            clickMap = getMonthlyClicks(this.clicks);
         }
 
         var dataset = createIntegerDataset(clickMap);
@@ -50,6 +54,8 @@ public class ChartCreator {
             impressionMap = getDailyImpressions(this.impressions);
         } else if (timeFlag.equals("Weekly")) {
             impressionMap = getWeeklyImpressions(this.impressions);
+        } else if (timeFlag.equals("Monthly")) {
+            impressionMap = getMonthlyImpressions(this.impressions);
         }
 
         var dataset = createIntegerDataset(impressionMap);
@@ -67,6 +73,8 @@ public class ChartCreator {
             clickMap = getDailyUniques(this.clicks);
         } else if (timeFlag.equals("Weekly")) {
             clickMap = getWeeklyUniques(this.clicks);
+        } else if (timeFlag.equals("Monthly")) {
+            clickMap = getMonthlyUniques(this.clicks);
         }
 
         var dataset = createIntegerDataset(clickMap);
@@ -84,6 +92,8 @@ public class ChartCreator {
             interactionMap = getDailyBounces(this.interactions);
         } else if (timeFlag.equals("Weekly")) {
             interactionMap = getWeeklyBounces(this.interactions);
+        } else if (timeFlag.equals("Monthly")) {
+            interactionMap = getMonthlyBounces(this.interactions);
         }
 
         var dataset = createIntegerDataset(interactionMap);
@@ -99,7 +109,10 @@ public class ChartCreator {
             conversionMap = getDailyConversions(this.interactions);
         } else if (timeFlag.equals("Weekly")) {
             conversionMap = getWeeklyConversions(this.interactions);
+        }else if (timeFlag.equals("Monthly")) {
+            conversionMap = getMonthlyConversions(this.interactions);
         }
+
         var dataset = createIntegerDataset(conversionMap);
         return(createChart("Total conversions","Conversions",dataset));
     }
@@ -115,6 +128,8 @@ public class ChartCreator {
             costMap = getDailyCost(this.clicks,this.impressions);
         } else if (timeFlag.equals("Weekly")) {
             costMap = getWeeklyCost(this.clicks,this.impressions);
+        } else if (timeFlag.equals("Monthly")) {
+            costMap = getMonthlyCost(this.clicks,this.impressions);
         }
 
         var dataset = createFloatDataset(costMap);
@@ -137,6 +152,9 @@ public class ChartCreator {
         } else if (timeFlag.equals("Weekly")){
             clickMap = getWeeklyClicks(this.clicks);
             impressionMap = getWeeklyImpressions(this.impressions);
+        } else if (timeFlag.equals("Monthly")){
+            clickMap = getMonthlyClicks(this.clicks);
+            impressionMap = getMonthlyImpressions(this.impressions);
         }
 
         for(String date : impressionMap.keySet()) {
@@ -165,6 +183,9 @@ public class ChartCreator {
         } else if (timeFlag.equals("Weekly")) {
             conversionMap = getWeeklyConversions(this.interactions);
             costMap = getWeeklyCost(this.clicks,this.impressions);
+        } else if (timeFlag.equals("Monthly")) {
+            conversionMap = getMonthlyConversions(this.interactions);
+            costMap = getMonthlyCost(this.clicks,this.impressions);
         }
 
         for(String date : conversionMap.keySet()) {
@@ -193,6 +214,9 @@ public class ChartCreator {
         } else if (timeFlag.equals("Weekly")) {
             clickMap = getWeeklyClicks(this.clicks);
             costMap = getWeeklyCost(this.clicks,this.impressions);
+        } else if (timeFlag.equals("Monthly")) {
+            clickMap = getMonthlyClicks(this.clicks);
+            costMap = getMonthlyCost(this.clicks,this.impressions);
         }
 
         for(String date : clickMap.keySet()) {
@@ -221,6 +245,9 @@ public class ChartCreator {
         } else if (timeFlag.equals("Weekly")) {
             impressionMap = getWeeklyImpressions(this.impressions);
             costMap = getWeeklyCost(this.clicks,this.impressions);
+        } else if (timeFlag.equals("Monthly")) {
+            impressionMap = getMonthlyImpressions(this.impressions);
+            costMap = getMonthlyCost(this.clicks,this.impressions);
         }
 
         //Convert impressions into thousands
@@ -255,6 +282,9 @@ public class ChartCreator {
         } else if (timeFlag.equals("Weekly")) {
             clickMap = getWeeklyClicks(this.clicks);
             bounceMap = getWeeklyBounces(this.interactions);
+        } else if (timeFlag.equals("Monthly")) {
+            clickMap = getMonthlyClicks(this.clicks);
+            bounceMap = getMonthlyBounces(this.interactions);
         }
 
         for (String date : clickMap.keySet()) {
@@ -293,6 +323,14 @@ public class ChartCreator {
         CategoryAxis xAxis = plot.getDomainAxis();
         xAxis.setTickLabelFont(new Font("Arial", Font.PLAIN, 9));  // Change font size here
         xAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+
+        //Creating marker dot at plot points
+        LineAndShapeRenderer renderer = new LineAndShapeRenderer();
+        renderer.setSeriesShapesVisible(0, true);
+        renderer.setSeriesLinesVisible(0, true);
+        Shape dot = new Ellipse2D.Double(-5, -5, 10, 10);
+        renderer.setSeriesShape(0, dot);
+        plot.setRenderer(renderer);
 
         return chart;
     }
@@ -356,6 +394,25 @@ public class ChartCreator {
         return clickMap;
     }
 
+    /**
+     * Accumulate monthly clicks
+     * @param clicks
+     * @return
+     */
+    public Map<String,Integer> getMonthlyClicks (ArrayList<String[]> clicks) {
+        Map<String,Integer> clickMap = new TreeMap<>();
+
+        LocalDate earliestDate = getEarliestDate(clicks);
+        for (String[] click : clicks) {
+            LocalDate date = LocalDate.parse(click[0].split(" ")[0]);
+            int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+            String month = "Month " + Integer.toString(monthNumber);
+            clickMap.put(month,clickMap.getOrDefault(month,1) + 1);
+        }
+
+        return clickMap;
+    }
+
 
     /**
      * Accumulate daily impressions
@@ -388,6 +445,25 @@ public class ChartCreator {
         }
         return impressionMap;
     }
+
+    /**
+     * Accumulate monthly impressions
+     * @param impressions
+     * @return
+     */
+    public Map<String,Integer> getMonthlyImpressions (ArrayList<String[]> impressions) {
+        Map<String,Integer> impressionMap = new TreeMap<>();
+
+        LocalDate earliestDate = getEarliestDate(impressions);
+        for (String[] impression : impressions) {
+            LocalDate date = LocalDate.parse(impression[0].split(" ")[0]);
+            int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+            String month = "Month " + Integer.toString(monthNumber);
+            impressionMap.put(month,impressionMap.getOrDefault(month,1) + 1);
+        }
+        return impressionMap;
+    }
+
 
     /**
      * Accumulate daily uniques
@@ -439,6 +515,32 @@ public class ChartCreator {
     }
 
     /**
+     * Accumulate monthly uniques
+     * @param clicks
+     * @return
+     */
+    public Map<String,Integer> getMonthlyUniques (ArrayList<String[]> clicks) {
+        Map<String,Integer> clickMap = new TreeMap<>();
+        Set<String> uniqueIDs = new HashSet<>();
+
+        LocalDate earliestDate = getEarliestDate(clicks);
+
+        for(String[] click : clicks) {
+            LocalDate date = LocalDate.parse(click[0].split(" ")[0]);
+            int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+            String month = "Month " + Integer.toString(monthNumber);
+            String id = click[1];
+
+            if (!uniqueIDs.contains(id)) {
+                uniqueIDs.add(id);
+                clickMap.put(month,clickMap.getOrDefault(month,1)+1);
+            }
+        }
+        return clickMap;
+
+    }
+
+    /**
      * Accumulate daily conversions
      * @param interactions
      * @return
@@ -469,6 +571,26 @@ public class ChartCreator {
                 int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
                 String week = "Week " + Integer.toString(weekNumber);
                 conversionMap.put(week,conversionMap.getOrDefault(week,1) + 1);
+            }
+        }
+        return conversionMap;
+    }
+
+    /**
+     * Accumulate monthly conversions
+     * @param interactions
+     * @return
+     */
+    public Map<String,Integer> getMonthlyConversions(ArrayList<String[]> interactions) {
+        Map<String,Integer> conversionMap = new TreeMap<>();
+
+        LocalDate earliestDate = getEarliestDate(interactions);
+        for (String[] interaction : interactions) {
+            if (interaction[4].equals("Yes")) {
+                LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+                String month = "Month " + Integer.toString(monthNumber);
+                conversionMap.put(month,conversionMap.getOrDefault(month,1) + 1);
             }
         }
         return conversionMap;
@@ -530,6 +652,34 @@ public class ChartCreator {
     }
 
     /**
+     * Accumulate monthly cost
+     * @param clicks
+     * @param impressions
+     * @return
+     */
+    public Map<String,Float> getMonthlyCost (ArrayList<String[]> clicks, ArrayList<String[]> impressions) {
+        Map<String,Float> costMap = new TreeMap<>();
+
+        LocalDate earliestDate = getEarliestDate(impressions);
+        for (String[] click : clicks) {
+            LocalDate date = LocalDate.parse(click[0].split(" ")[0]);
+            int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+            String month = "Month " + Integer.toString(monthNumber);
+            float cost = Float.parseFloat(click[2]);
+            costMap.put(month,costMap.getOrDefault(month,cost) + cost);
+        }
+
+        for (String[] impression : impressions) {
+            LocalDate date = LocalDate.parse(impression[0].split(" ")[0]);
+            int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+            String month = "Month " + Integer.toString(monthNumber);
+            float cost = Float.parseFloat(impression[6]);
+            costMap.put(month,costMap.getOrDefault(month,cost) + cost);
+        }
+        return costMap;
+    }
+
+    /**
      * Accumulate daily bounces
      * @param interactions
      * @return
@@ -567,6 +717,28 @@ public class ChartCreator {
         }
         return bounceMap;
     }
+
+    /**
+     * Accumulate monthly bounces
+     * @param interactions
+     * @return
+     */
+    public Map<String, Integer> getMonthlyBounces(ArrayList<String[]> interactions) {
+        Map<String,Integer> bounceMap = new TreeMap<>();
+
+        LocalDate earliestDate = getEarliestDate(interactions);
+        for (String[] interaction : interactions) {
+            if (interaction[3].equals("1")) {
+                LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+                String month = "Month " + Integer.toString(monthNumber);
+                bounceMap.put(month,bounceMap.getOrDefault(month,1) + 1);
+            }
+        }
+        return bounceMap;
+    }
+
+
 
     /**
      * Get earliest date from set of data entries
