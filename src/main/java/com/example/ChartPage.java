@@ -3,10 +3,7 @@ package com.example;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -22,18 +19,29 @@ public class ChartPage {
     private String timeFlag;
     private String currentChart;
 
+    private String gender;
+    private String age;
+    private String income;
+    private  String context;
+
+
     public ChartPage(Stage stage, LogManager logManager) {
         this.stage = stage;
         this.logManager = logManager;
         this.chartCreator = new ChartCreator(logManager);
         this.timeFlag = "Daily";
         this.currentChart = "Clicks";
+
+        this.gender = null;
+        this.age = null;
+        this.income = null;
+        this.context = null;
     }
 
     public void show() {
 
         //Holder for chart
-        ChartViewer chartViewer = new ChartViewer(chartCreator.updateChart(currentChart,timeFlag));
+        ChartViewer chartViewer = new ChartViewer(chartCreator.updateChart(currentChart,timeFlag,gender,income));
         chartViewer.setMaxSize(600, 450);
 
 
@@ -45,77 +53,77 @@ public class ChartPage {
         clickMetric.setSelected(true);
         clickMetric.setOnAction(e -> {
             this.currentChart = "Clicks";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton impressionMetric = new RadioButton("Total Impressions");
         impressionMetric.setToggleGroup(metricOptions);
         impressionMetric.setOnAction(e -> {
             this.currentChart = "Impressions";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton uniqueMetric = new RadioButton("Total uniques");
         uniqueMetric.setToggleGroup(metricOptions);
         uniqueMetric.setOnAction(e -> {
             this.currentChart = "Uniques";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton bouncesMetric = new RadioButton("Total bounces");
         bouncesMetric.setToggleGroup(metricOptions);
         bouncesMetric.setOnAction(e -> {
             this.currentChart = "Bounces";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton conversionMetric = new RadioButton("Total conversions");
         conversionMetric.setToggleGroup(metricOptions);
         conversionMetric.setOnAction(e -> {
             this.currentChart = "Conversions";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton costMetric = new RadioButton("Total cost");
         costMetric.setToggleGroup(metricOptions);
         costMetric.setOnAction(e -> {
             this.currentChart = "Cost";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton ctrMetric = new RadioButton("CTR");
         ctrMetric.setToggleGroup(metricOptions);
         ctrMetric.setOnAction(e -> {
             this.currentChart = "CTR";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton cpaMetric = new RadioButton("CPA");
         cpaMetric.setToggleGroup(metricOptions);
         cpaMetric.setOnAction(e -> {
             this.currentChart = "CPA";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton cpcMetric = new RadioButton("CPC");
         cpcMetric.setToggleGroup(metricOptions);
         cpcMetric.setOnAction(e -> {
             this.currentChart = "CPC";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton cpmMetric = new RadioButton("CPM");
         cpmMetric.setToggleGroup(metricOptions);
         cpmMetric.setOnAction(e -> {
             this.currentChart = "CPM";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton bounceRateMetric = new RadioButton("Bounce Rate");
         bounceRateMetric.setToggleGroup(metricOptions);
         bounceRateMetric.setOnAction(e -> {
             this.currentChart = "BounceRate";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         ToggleGroup timeOptions = new ToggleGroup();
@@ -125,29 +133,90 @@ public class ChartPage {
         dailyButton.setToggleGroup(timeOptions);
         dailyButton.setOnAction(e -> {
             this.timeFlag = "Daily";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton weeklyButton = new RadioButton("Weekly");
         weeklyButton.setToggleGroup(timeOptions);
         weeklyButton.setOnAction(e -> {
             this.timeFlag = "Weekly";
-            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag,gender,income));
         });
 
         RadioButton monthlyButton = new RadioButton("Monthly");
         monthlyButton.setToggleGroup(timeOptions);
         monthlyButton.setOnAction(e -> {
             this.timeFlag = "Monthly";
-            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag));
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income));
+        });
+
+        ToggleGroup genderOptions = new ToggleGroup();
+
+        RadioButton bothGenderButton = new RadioButton("Both");
+        bothGenderButton.setSelected(true);
+        bothGenderButton.setToggleGroup(genderOptions);
+        bothGenderButton.setOnAction(e -> {
+            this.gender = null;
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income));
+        });
+
+        RadioButton maleButton = new RadioButton("Male");
+        maleButton.setToggleGroup(genderOptions);
+        maleButton.setOnAction(e -> {
+            this.gender = "Male";
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income));
+        });
+
+        RadioButton femaleButton = new RadioButton("Female");
+        femaleButton.setToggleGroup(genderOptions);
+        femaleButton.setOnAction(e -> {
+            this.gender = "Female";
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income));
+        });
+
+        ToggleGroup incomeOptions = new ToggleGroup();
+
+        RadioButton anyIncomeButton = new RadioButton("Any");
+        anyIncomeButton.setSelected(true);
+        anyIncomeButton.setToggleGroup(incomeOptions);
+        anyIncomeButton.setOnAction(e -> {
+            this.income = null;
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income));
+        });
+
+        RadioButton lowButton = new RadioButton("Low");
+        lowButton.setToggleGroup(incomeOptions);
+        lowButton.setOnAction(e -> {
+            this.income = "Low";
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income));
+        });
+
+        RadioButton mediumButton = new RadioButton("Medium");
+        mediumButton.setToggleGroup(incomeOptions);
+        mediumButton.setOnAction(e -> {
+            this.income = "Medium";
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income));
+        });
+
+        RadioButton highButton = new RadioButton("High");
+        highButton.setToggleGroup(incomeOptions);
+        highButton.setOnAction(e -> {
+            this.income = "High";
+            chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income));
         });
 
 
+        // Metric options
         var metricsHeader = new Label("Metrics");
         var timeLabel = new Label("Time Granularity");
+        var genderLabel = new Label("Gender");
+        var incomeLabel = new Label("Income");
         var metricOptionHolder = new VBox();
         metricOptionHolder.getChildren().addAll(metricsHeader, clickMetric, impressionMetric, uniqueMetric, bouncesMetric, conversionMetric, costMetric, ctrMetric, cpaMetric, cpcMetric, cpmMetric, bounceRateMetric);
         metricOptionHolder.getChildren().addAll(timeLabel, dailyButton, weeklyButton,monthlyButton);
+        metricOptionHolder.getChildren().addAll(genderLabel,bothGenderButton,maleButton,femaleButton);
+        metricOptionHolder.getChildren().addAll(incomeLabel,anyIncomeButton,lowButton,mediumButton,highButton);
+
 
         //Navigation Buttons
         var buttonHolder = new HBox();

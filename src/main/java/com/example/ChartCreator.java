@@ -20,24 +20,27 @@ public class ChartCreator {
     private ArrayList<String[]> clicks;
     private ArrayList<String[]> impressions;
     private ArrayList<String[]> interactions;
+    private Filter filter;
 
     public ChartCreator(LogManager logManager) {
         this.clicks = logManager.getClickData();
         this.impressions = logManager.getImpressionData();
         this.interactions = logManager.getServerData();
+        this.filter = new Filter();
     }
 
     /**
      * Generates chart for total clicks
      */
-    public JFreeChart genClickChart(String time) {
+    public JFreeChart genClickChart(String time,String gender,String income) {
         Map<String,Integer> clickMap = new TreeMap<>();
+        ArrayList<String[]> filteredClicks= filter.filterPipeline(clicks,impressions,interactions,gender,income)[0];
         if (time.equals("Daily")) {
-            clickMap = getDailyClicks(this.clicks);
+            clickMap = getDailyClicks(filteredClicks);
         } else if (time.equals("Weekly")) {
-            clickMap = getWeeklyClicks(this.clicks);
+            clickMap = getWeeklyClicks(filteredClicks);
         } else if (time.equals("Monthly")) {
-            clickMap = getMonthlyClicks(this.clicks);
+            clickMap = getMonthlyClicks(filteredClicks);
         }
 
         var dataset = createIntegerDataset(clickMap);
@@ -48,14 +51,16 @@ public class ChartCreator {
      * Generates chart for total impressions
      * @return
      */
-    public JFreeChart genImpressionChart(String timeFlag) {
+    public JFreeChart genImpressionChart(String timeFlag,String gender,String income) {
         Map<String,Integer> impressionMap = new TreeMap<>();
+        ArrayList<String[]> filteredImpressions= filter.filterPipeline(clicks,impressions,interactions,gender,income)[1];
+
         if (timeFlag.equals("Daily")) {
-            impressionMap = getDailyImpressions(this.impressions);
+            impressionMap = getDailyImpressions(filteredImpressions);
         } else if (timeFlag.equals("Weekly")) {
-            impressionMap = getWeeklyImpressions(this.impressions);
+            impressionMap = getWeeklyImpressions(filteredImpressions);
         } else if (timeFlag.equals("Monthly")) {
-            impressionMap = getMonthlyImpressions(this.impressions);
+            impressionMap = getMonthlyImpressions(filteredImpressions);
         }
 
         var dataset = createIntegerDataset(impressionMap);
@@ -66,15 +71,16 @@ public class ChartCreator {
      * Create chart for total uniques
      * @return
      */
-    public JFreeChart genUniquesChart(String timeFlag) {
+    public JFreeChart genUniquesChart(String timeFlag,String gender,String income) {
         Map<String,Integer> clickMap = new TreeMap<>();
+        ArrayList<String[]> filteredClicks= filter.filterPipeline(clicks,impressions,interactions,gender,income)[0];
 
         if (timeFlag.equals("Daily")) {
-            clickMap = getDailyUniques(this.clicks);
+            clickMap = getDailyUniques(filteredClicks);
         } else if (timeFlag.equals("Weekly")) {
-            clickMap = getWeeklyUniques(this.clicks);
+            clickMap = getWeeklyUniques(filteredClicks);
         } else if (timeFlag.equals("Monthly")) {
-            clickMap = getMonthlyUniques(this.clicks);
+            clickMap = getMonthlyUniques(filteredClicks);
         }
 
         var dataset = createIntegerDataset(clickMap);
@@ -85,15 +91,16 @@ public class ChartCreator {
      * Create chart for total bounces
      * @return
      */
-    public JFreeChart genBounceChart(String timeFlag) {
+    public JFreeChart genBounceChart(String timeFlag,String gender,String income) {
         Map<String,Integer> interactionMap = new TreeMap<>();
+        ArrayList<String[]> filteredInteractions= filter.filterPipeline(clicks,impressions,interactions,gender,income)[2];
 
         if (timeFlag.equals("Daily")) {
-            interactionMap = getDailyBounces(this.interactions);
+            interactionMap = getDailyBounces(filteredInteractions);
         } else if (timeFlag.equals("Weekly")) {
-            interactionMap = getWeeklyBounces(this.interactions);
+            interactionMap = getWeeklyBounces(filteredInteractions);
         } else if (timeFlag.equals("Monthly")) {
-            interactionMap = getMonthlyBounces(this.interactions);
+            interactionMap = getMonthlyBounces(filteredInteractions);
         }
 
         var dataset = createIntegerDataset(interactionMap);
@@ -103,14 +110,16 @@ public class ChartCreator {
      * Create chart for total conversions
      * @return
      */
-    public JFreeChart genConversionChart(String timeFlag) {
+    public JFreeChart genConversionChart(String timeFlag,String gender,String income) {
         Map<String,Integer> conversionMap = new TreeMap<>();
+        ArrayList<String[]> filteredInteractions= filter.filterPipeline(clicks,impressions,interactions,gender,income)[2];
+
         if (timeFlag.equals("Daily")) {
-            conversionMap = getDailyConversions(this.interactions);
+            conversionMap = getDailyConversions(filteredInteractions);
         } else if (timeFlag.equals("Weekly")) {
-            conversionMap = getWeeklyConversions(this.interactions);
+            conversionMap = getWeeklyConversions(filteredInteractions);
         }else if (timeFlag.equals("Monthly")) {
-            conversionMap = getMonthlyConversions(this.interactions);
+            conversionMap = getMonthlyConversions(filteredInteractions);
         }
 
         var dataset = createIntegerDataset(conversionMap);
@@ -122,14 +131,18 @@ public class ChartCreator {
      * Create chart for total cost
      * @return
      */
-    public JFreeChart genCostChart(String timeFlag) {
+    public JFreeChart genCostChart(String timeFlag,String gender,String income) {
         Map<String,Float> costMap = new TreeMap<>();
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> filteredClicks = filteredLogs[0];
+        ArrayList<String[]> filteredImpressions = filteredLogs[1];
+
         if (timeFlag.equals("Daily")) {
-            costMap = getDailyCost(this.clicks,this.impressions);
+            costMap = getDailyCost(filteredClicks,filteredImpressions);
         } else if (timeFlag.equals("Weekly")) {
-            costMap = getWeeklyCost(this.clicks,this.impressions);
+            costMap = getWeeklyCost(filteredClicks,filteredImpressions);
         } else if (timeFlag.equals("Monthly")) {
-            costMap = getMonthlyCost(this.clicks,this.impressions);
+            costMap = getMonthlyCost(filteredClicks,filteredImpressions);
         }
 
         var dataset = createFloatDataset(costMap);
@@ -141,20 +154,23 @@ public class ChartCreator {
      * Create chart for CTR
      * @return
      */
-    public JFreeChart genCTRChart(String timeFlag) {
+    public JFreeChart genCTRChart(String timeFlag,String gender, String income) {
         Map<String,Integer> clickMap = new TreeMap<>();
         Map<String,Integer> impressionMap = new TreeMap<>();
         Map<String,Float> ctrMap = new TreeMap<>();
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> filteredClicks = filteredLogs[0];
+        ArrayList<String[]> filteredImpressions = filteredLogs[1];
 
         if(timeFlag.equals("Daily")) {
-            clickMap = getDailyClicks(this.clicks);
-            impressionMap = getDailyImpressions(this.impressions);
+            clickMap = getDailyClicks(filteredClicks);
+            impressionMap = getDailyImpressions(filteredImpressions);
         } else if (timeFlag.equals("Weekly")){
-            clickMap = getWeeklyClicks(this.clicks);
-            impressionMap = getWeeklyImpressions(this.impressions);
+            clickMap = getWeeklyClicks(filteredClicks);
+            impressionMap = getWeeklyImpressions(filteredImpressions);
         } else if (timeFlag.equals("Monthly")){
-            clickMap = getMonthlyClicks(this.clicks);
-            impressionMap = getMonthlyImpressions(this.impressions);
+            clickMap = getMonthlyClicks(filteredClicks);
+            impressionMap = getMonthlyImpressions(filteredImpressions);
         }
 
         for(String date : impressionMap.keySet()) {
@@ -172,20 +188,25 @@ public class ChartCreator {
      * Create chart for CPA
      * @return
      */
-    public JFreeChart genCPAChart(String timeFlag) {
+    public JFreeChart genCPAChart(String timeFlag,String gender,String income) {
         Map<String,Integer> conversionMap = new TreeMap<>();
         Map<String,Float> costMap = new TreeMap<>();
         Map<String,Float> cpaMap = new TreeMap<>();
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> filteredClicks = filteredLogs[0];
+        ArrayList<String[]> filteredImpressions = filteredLogs[1];
+        ArrayList<String[]> filteredInteractions = filteredLogs[2];
+
 
         if (timeFlag.equals("Daily")) {
-            conversionMap = getDailyConversions(this.interactions);
-            costMap = getDailyCost(this.clicks, this.impressions);
+            conversionMap = getDailyConversions(filteredInteractions);
+            costMap = getDailyCost(filteredClicks, filteredImpressions);
         } else if (timeFlag.equals("Weekly")) {
-            conversionMap = getWeeklyConversions(this.interactions);
-            costMap = getWeeklyCost(this.clicks,this.impressions);
+            conversionMap = getWeeklyConversions(filteredInteractions);
+            costMap = getWeeklyCost(filteredClicks,filteredImpressions);
         } else if (timeFlag.equals("Monthly")) {
-            conversionMap = getMonthlyConversions(this.interactions);
-            costMap = getMonthlyCost(this.clicks,this.impressions);
+            conversionMap = getMonthlyConversions(filteredInteractions);
+            costMap = getMonthlyCost(filteredClicks,filteredImpressions);
         }
 
         for(String date : conversionMap.keySet()) {
@@ -203,20 +224,24 @@ public class ChartCreator {
      * Create chart for CPC
      * @return
      */
-    public JFreeChart genCPCChart(String timeFlag) {
+    public JFreeChart genCPCChart(String timeFlag, String gender,String income) {
         Map<String,Integer> clickMap = new TreeMap<>();
         Map<String,Float> costMap = new TreeMap<>();
         Map<String,Float> cpcMap = new TreeMap<>();
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> filteredClicks = filteredLogs[0];
+        ArrayList<String[]> filteredImpressions = filteredLogs[1];
+
 
         if (timeFlag.equals("Daily")) {
-            clickMap = getDailyClicks(this.clicks);
-            costMap = getDailyCost(this.clicks, this.impressions);
+            clickMap = getDailyClicks(filteredClicks);
+            costMap = getDailyCost(filteredClicks, filteredImpressions);
         } else if (timeFlag.equals("Weekly")) {
-            clickMap = getWeeklyClicks(this.clicks);
-            costMap = getWeeklyCost(this.clicks,this.impressions);
+            clickMap = getWeeklyClicks(filteredClicks);
+            costMap = getWeeklyCost(filteredClicks,filteredImpressions);
         } else if (timeFlag.equals("Monthly")) {
-            clickMap = getMonthlyClicks(this.clicks);
-            costMap = getMonthlyCost(this.clicks,this.impressions);
+            clickMap = getMonthlyClicks(filteredClicks);
+            costMap = getMonthlyCost(filteredClicks,filteredImpressions);
         }
 
         for(String date : clickMap.keySet()) {
@@ -234,20 +259,24 @@ public class ChartCreator {
      * Generate chart for CPM
      * @return
      */
-    public JFreeChart genCPMChart(String timeFlag) {
+    public JFreeChart genCPMChart(String timeFlag,String gender,String income) {
         Map<String,Integer> impressionMap = new TreeMap<>();
         Map<String,Float> costMap = new TreeMap<>();
         Map<String,Float> cpmMap = new TreeMap<>();
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> filteredClicks = filteredLogs[0];
+        ArrayList<String[]> filteredImpressions = filteredLogs[1];
+
 
         if (timeFlag.equals("Daily")) {
-            impressionMap = getDailyImpressions(this.impressions);
-            costMap = getDailyCost(this.clicks, this.impressions);
+            impressionMap = getDailyImpressions(filteredImpressions);
+            costMap = getDailyCost(filteredClicks, filteredImpressions);
         } else if (timeFlag.equals("Weekly")) {
-            impressionMap = getWeeklyImpressions(this.impressions);
-            costMap = getWeeklyCost(this.clicks,this.impressions);
+            impressionMap = getWeeklyImpressions(filteredImpressions);
+            costMap = getWeeklyCost(filteredClicks,filteredImpressions);
         } else if (timeFlag.equals("Monthly")) {
-            impressionMap = getMonthlyImpressions(this.impressions);
-            costMap = getMonthlyCost(this.clicks,this.impressions);
+            impressionMap = getMonthlyImpressions(filteredImpressions);
+            costMap = getMonthlyCost(filteredClicks,filteredImpressions);
         }
 
         //Convert impressions into thousands
@@ -271,20 +300,23 @@ public class ChartCreator {
      * Create chart for bounce rate
      * @return
      */
-    public JFreeChart genBounceRateChart(String timeFlag) {
+    public JFreeChart genBounceRateChart(String timeFlag, String gender,String income) {
         Map<String,Integer> clickMap = new TreeMap<>();
         Map<String,Integer> bounceMap = new TreeMap<>();
         Map<String,Float> bounceRateMap = new TreeMap<>();
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> filteredClicks = filteredLogs[0];
+        ArrayList<String[]> filteredInteractions = filteredLogs[2];
 
         if (timeFlag.equals("Daily")) {
-            clickMap = getDailyClicks(this.clicks);
-            bounceMap = getDailyBounces(this.interactions);
+            clickMap = getDailyClicks(filteredClicks);
+            bounceMap = getDailyBounces(filteredInteractions);
         } else if (timeFlag.equals("Weekly")) {
-            clickMap = getWeeklyClicks(this.clicks);
-            bounceMap = getWeeklyBounces(this.interactions);
+            clickMap = getWeeklyClicks(filteredClicks);
+            bounceMap = getWeeklyBounces(filteredInteractions);
         } else if (timeFlag.equals("Monthly")) {
-            clickMap = getMonthlyClicks(this.clicks);
-            bounceMap = getMonthlyBounces(this.interactions);
+            clickMap = getMonthlyClicks(filteredClicks);
+            bounceMap = getMonthlyBounces(filteredInteractions);
         }
 
         for (String date : clickMap.keySet()) {
@@ -763,29 +795,29 @@ public class ChartCreator {
      * @param timeFlag
      * @return
      */
-    public JFreeChart updateChart(String currentChart, String timeFlag) {
+    public JFreeChart updateChart(String currentChart, String timeFlag, String gender,String income) {
         if (currentChart.equals("Clicks")) {
-            return (genClickChart(timeFlag));
+            return (genClickChart(timeFlag,gender,income));
         } else if (currentChart.equals("Impressions")) {
-            return (genImpressionChart(timeFlag));
+            return (genImpressionChart(timeFlag,gender,income));
         } else if (currentChart.equals("Conversions")) {
-            return (genConversionChart(timeFlag));
+            return (genConversionChart(timeFlag,gender,income));
         } else if (currentChart.equals("Bounces")) {
-            return (genBounceChart(timeFlag));
+            return (genBounceChart(timeFlag,gender,income));
         } else if (currentChart.equals("Cost")) {
-            return (genCostChart(timeFlag));
+            return (genCostChart(timeFlag,gender,income));
         } else if (currentChart.equals("Uniques")) {
-            return (genUniquesChart(timeFlag));
+            return (genUniquesChart(timeFlag,gender,income));
         } else if (currentChart.equals("BounceRate")){
-            return (genBounceRateChart(timeFlag));
+            return (genBounceRateChart(timeFlag,gender,income));
         } else if (currentChart.equals("CTR")) {
-            return (genCTRChart(timeFlag));
+            return (genCTRChart(timeFlag,gender,income));
         } else if (currentChart.equals("CPA")) {
-            return (genCPAChart(timeFlag));
+            return (genCPAChart(timeFlag,gender,income));
         } else if (currentChart.equals("CPC")) {
-            return (genCPCChart(timeFlag));
+            return (genCPCChart(timeFlag,gender,income));
         } else {
-            return (genCPMChart(timeFlag));
+            return (genCPMChart(timeFlag,gender,income));
         }
 
     }
