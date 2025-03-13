@@ -32,9 +32,9 @@ public class ChartCreator {
     /**
      * Generates chart for total clicks
      */
-    public JFreeChart genClickChart(String time,String gender,String income) {
+    public JFreeChart genClickChart(String time,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> clickMap = new TreeMap<>();
-        ArrayList<String[]> filteredClicks= filter.filterPipeline(clicks,impressions,interactions,gender,income)[0];
+        ArrayList<String[]> filteredClicks= filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age)[0];
         if (time.equals("Daily")) {
             clickMap = getDailyClicks(filteredClicks);
         } else if (time.equals("Weekly")) {
@@ -51,9 +51,9 @@ public class ChartCreator {
      * Generates chart for total impressions
      * @return
      */
-    public JFreeChart genImpressionChart(String timeFlag,String gender,String income) {
+    public JFreeChart genImpressionChart(String timeFlag,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> impressionMap = new TreeMap<>();
-        ArrayList<String[]> filteredImpressions= filter.filterPipeline(clicks,impressions,interactions,gender,income)[1];
+        ArrayList<String[]> filteredImpressions= filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age)[1];
 
         if (timeFlag.equals("Daily")) {
             impressionMap = getDailyImpressions(filteredImpressions);
@@ -71,9 +71,9 @@ public class ChartCreator {
      * Create chart for total uniques
      * @return
      */
-    public JFreeChart genUniquesChart(String timeFlag,String gender,String income) {
+    public JFreeChart genUniquesChart(String timeFlag,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> clickMap = new TreeMap<>();
-        ArrayList<String[]> filteredClicks= filter.filterPipeline(clicks,impressions,interactions,gender,income)[0];
+        ArrayList<String[]> filteredClicks= filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age)[0];
 
         if (timeFlag.equals("Daily")) {
             clickMap = getDailyUniques(filteredClicks);
@@ -91,9 +91,9 @@ public class ChartCreator {
      * Create chart for total bounces
      * @return
      */
-    public JFreeChart genBounceChart(String timeFlag,String gender,String income) {
+    public JFreeChart genBounceChart(String timeFlag,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> interactionMap = new TreeMap<>();
-        ArrayList<String[]> filteredInteractions= filter.filterPipeline(clicks,impressions,interactions,gender,income)[2];
+        ArrayList<String[]> filteredInteractions= filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age)[2];
 
         if (timeFlag.equals("Daily")) {
             interactionMap = getDailyBounces(filteredInteractions);
@@ -110,9 +110,9 @@ public class ChartCreator {
      * Create chart for total conversions
      * @return
      */
-    public JFreeChart genConversionChart(String timeFlag,String gender,String income) {
+    public JFreeChart genConversionChart(String timeFlag,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> conversionMap = new TreeMap<>();
-        ArrayList<String[]> filteredInteractions= filter.filterPipeline(clicks,impressions,interactions,gender,income)[2];
+        ArrayList<String[]> filteredInteractions= filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age)[2];
 
         if (timeFlag.equals("Daily")) {
             conversionMap = getDailyConversions(filteredInteractions);
@@ -131,9 +131,9 @@ public class ChartCreator {
      * Create chart for total cost
      * @return
      */
-    public JFreeChart genCostChart(String timeFlag,String gender,String income) {
+    public JFreeChart genCostChart(String timeFlag,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Float> costMap = new TreeMap<>();
-        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age);
         ArrayList<String[]> filteredClicks = filteredLogs[0];
         ArrayList<String[]> filteredImpressions = filteredLogs[1];
 
@@ -154,11 +154,11 @@ public class ChartCreator {
      * Create chart for CTR
      * @return
      */
-    public JFreeChart genCTRChart(String timeFlag,String gender, String income) {
+    public JFreeChart genCTRChart(String timeFlag,String gender, String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> clickMap = new TreeMap<>();
         Map<String,Integer> impressionMap = new TreeMap<>();
         Map<String,Float> ctrMap = new TreeMap<>();
-        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age);
         ArrayList<String[]> filteredClicks = filteredLogs[0];
         ArrayList<String[]> filteredImpressions = filteredLogs[1];
 
@@ -188,11 +188,11 @@ public class ChartCreator {
      * Create chart for CPA
      * @return
      */
-    public JFreeChart genCPAChart(String timeFlag,String gender,String income) {
+    public JFreeChart genCPAChart(String timeFlag,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> conversionMap = new TreeMap<>();
         Map<String,Float> costMap = new TreeMap<>();
         Map<String,Float> cpaMap = new TreeMap<>();
-        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age);
         ArrayList<String[]> filteredClicks = filteredLogs[0];
         ArrayList<String[]> filteredImpressions = filteredLogs[1];
         ArrayList<String[]> filteredInteractions = filteredLogs[2];
@@ -224,11 +224,11 @@ public class ChartCreator {
      * Create chart for CPC
      * @return
      */
-    public JFreeChart genCPCChart(String timeFlag, String gender,String income) {
+    public JFreeChart genCPCChart(String timeFlag, String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> clickMap = new TreeMap<>();
         Map<String,Float> costMap = new TreeMap<>();
         Map<String,Float> cpcMap = new TreeMap<>();
-        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age);
         ArrayList<String[]> filteredClicks = filteredLogs[0];
         ArrayList<String[]> filteredImpressions = filteredLogs[1];
 
@@ -259,11 +259,11 @@ public class ChartCreator {
      * Generate chart for CPM
      * @return
      */
-    public JFreeChart genCPMChart(String timeFlag,String gender,String income) {
+    public JFreeChart genCPMChart(String timeFlag,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> impressionMap = new TreeMap<>();
         Map<String,Float> costMap = new TreeMap<>();
         Map<String,Float> cpmMap = new TreeMap<>();
-        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age);
         ArrayList<String[]> filteredClicks = filteredLogs[0];
         ArrayList<String[]> filteredImpressions = filteredLogs[1];
 
@@ -300,11 +300,11 @@ public class ChartCreator {
      * Create chart for bounce rate
      * @return
      */
-    public JFreeChart genBounceRateChart(String timeFlag, String gender,String income) {
+    public JFreeChart genBounceRateChart(String timeFlag, String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> clickMap = new TreeMap<>();
         Map<String,Integer> bounceMap = new TreeMap<>();
         Map<String,Float> bounceRateMap = new TreeMap<>();
-        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income);
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age);
         ArrayList<String[]> filteredClicks = filteredLogs[0];
         ArrayList<String[]> filteredInteractions = filteredLogs[2];
 
@@ -795,29 +795,29 @@ public class ChartCreator {
      * @param timeFlag
      * @return
      */
-    public JFreeChart updateChart(String currentChart, String timeFlag, String gender,String income) {
+    public JFreeChart updateChart(String currentChart, String timeFlag, String gender,String income, ArrayList<String> context, ArrayList<String> age) {
         if (currentChart.equals("Clicks")) {
-            return (genClickChart(timeFlag,gender,income));
+            return (genClickChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("Impressions")) {
-            return (genImpressionChart(timeFlag,gender,income));
+            return (genImpressionChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("Conversions")) {
-            return (genConversionChart(timeFlag,gender,income));
+            return (genConversionChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("Bounces")) {
-            return (genBounceChart(timeFlag,gender,income));
+            return (genBounceChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("Cost")) {
-            return (genCostChart(timeFlag,gender,income));
+            return (genCostChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("Uniques")) {
-            return (genUniquesChart(timeFlag,gender,income));
+            return (genUniquesChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("BounceRate")){
-            return (genBounceRateChart(timeFlag,gender,income));
+            return (genBounceRateChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("CTR")) {
-            return (genCTRChart(timeFlag,gender,income));
+            return (genCTRChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("CPA")) {
-            return (genCPAChart(timeFlag,gender,income));
+            return (genCPAChart(timeFlag,gender,income,context,age));
         } else if (currentChart.equals("CPC")) {
-            return (genCPCChart(timeFlag,gender,income));
+            return (genCPCChart(timeFlag,gender,income,context,age));
         } else {
-            return (genCPMChart(timeFlag,gender,income));
+            return (genCPMChart(timeFlag,gender,income,context,age));
         }
 
     }

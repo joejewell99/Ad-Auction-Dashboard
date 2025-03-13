@@ -1,10 +1,10 @@
 package com.example;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 public class Filter {
-
 
     /**
      * Filters impression data by gender
@@ -47,6 +47,44 @@ public class Filter {
         }
     }
 
+    /**
+     * Filter impressions by context
+     * @param impressions
+     * @param context
+     * @return
+     */
+    public ArrayList<String[]> contextFilter(ArrayList<String[]> impressions, ArrayList<String> context) {
+        if (context.size() == 0) {
+            return impressions;
+        } else {
+            ArrayList<String[]> filteredImpressions = new ArrayList<>();
+            for (String[] row : impressions) {
+                if (context.contains(row[5])) {
+                    filteredImpressions.add(row);
+                }
+            } return filteredImpressions;
+        }
+    }
+
+    /**
+     * Filter impressions by age
+     * @param impressions
+     * @param age
+     * @return
+     */
+    public ArrayList<String[]> ageFilter(ArrayList<String[]>  impressions, ArrayList<String> age) {
+        if (age.size() == 0) {
+            return impressions;
+        } else {
+            ArrayList<String[]> filteredImpressions = new ArrayList<>();
+            for (String[] row : impressions) {
+                if (age.contains(row[3])) {
+                    filteredImpressions.add(row);
+                }
+            } return filteredImpressions;
+        }
+    }
+
 
     /**
      * Applies all filters to data
@@ -57,12 +95,12 @@ public class Filter {
      * @param income
      * @return
      */
-    public ArrayList<String[]> [] filterPipeline(ArrayList<String[]> clicks, ArrayList<String[]> impressions, ArrayList<String[]> interactions, String gender, String income ){
+    public ArrayList<String[]> [] filterPipeline(ArrayList<String[]> clicks, ArrayList<String[]> impressions, ArrayList<String[]> interactions, String gender, String income, ArrayList<String> context,ArrayList<String> age){
         ArrayList<String[]> [] filteredLogs = new ArrayList[3];
         HashSet<String> users = new HashSet<>();
 
         // Get filtered impressions and unique IDs
-        ArrayList<String[]> filteredImpressions = incomeFilter(genderFilter(impressions,gender),income);
+        ArrayList<String[]> filteredImpressions = ageFilter(contextFilter(incomeFilter(genderFilter(impressions,gender),income),context),age);
         for (String [] entry : filteredImpressions) {
             users.add(entry[1]);
         }
@@ -80,7 +118,7 @@ public class Filter {
     }
 
     /**
-     * Matches click log or server log to click log
+     * Matches click log or server log to impression log
      * @param log
      * @param users
      * @return
