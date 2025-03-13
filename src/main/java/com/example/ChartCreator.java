@@ -29,6 +29,10 @@ public class ChartCreator {
         this.filter = new Filter();
     }
 
+    public void getClicks() {
+        System.out.println(this.clicks);
+    }
+
     /**
      * Generates chart for total clicks
      */
@@ -43,7 +47,9 @@ public class ChartCreator {
             clickMap = getMonthlyClicks(filteredClicks);
         }
 
-        var dataset = createIntegerDataset(clickMap);
+        DefaultCategoryDataset dataset = createIntegerDataset(clickMap);
+        System.out.println("Row count: " + dataset.getRowCount());
+        System.out.println("Column count: " + dataset.getColumnCount());
         return(createChart("Total Clicks","Clicks",dataset));
     }
 

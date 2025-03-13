@@ -14,7 +14,7 @@ public class Filter {
      */
     public ArrayList<String[]> genderFilter(ArrayList<String[]> impressions, String gender) {
         //No gender filters
-        if (gender == null) {
+        if (gender.equals("")) {
             return impressions;
         } else {
             //Filter impressions
@@ -34,7 +34,7 @@ public class Filter {
      * @return
      */
     public ArrayList<String[]> incomeFilter(ArrayList<String[]>impressions, String income) {
-        if (income == null) {
+        if (income.equals("")) {
             return impressions;
         } else {
             //Filter impressions

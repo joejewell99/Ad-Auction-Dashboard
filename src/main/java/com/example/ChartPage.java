@@ -15,6 +15,7 @@ import org.jfree.chart.fx.ChartViewer;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ChartPage {
@@ -37,9 +38,9 @@ public class ChartPage {
         this.timeFlag = "Daily";
         this.currentChart = "Clicks";
 
-        this.gender = null;
+        this.gender = "";
         this.age = new ArrayList<>();
-        this.income = null;
+        this.income = "";
         this.context = new ArrayList<>();
     }
 
@@ -151,7 +152,7 @@ public class ChartPage {
         bothGenderButton.setSelected(true);
         bothGenderButton.setToggleGroup(genderOptions);
         bothGenderButton.setOnAction(e -> {
-            this.gender = null;
+            this.gender = "";
             chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income,context,age));
         });
         RadioButton maleButton = new RadioButton("Male");
@@ -174,7 +175,7 @@ public class ChartPage {
         anyIncomeButton.setSelected(true);
         anyIncomeButton.setToggleGroup(incomeOptions);
         anyIncomeButton.setOnAction(e -> {
-            this.income = null;
+            this.income = "";
             chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income,context,age));
         });
         RadioButton lowButton = new RadioButton("Low");
@@ -320,7 +321,8 @@ public class ChartPage {
         var backButton = new Button("Back");
         var logOutButton = new Button("Logout");
         var overallMetricsButton = new Button("Overall Metrics");
-        buttonHolder.getChildren().addAll(backButton, overallMetricsButton, logOutButton);
+        var multiChartButton = new Button("MultiChart");
+        buttonHolder.getChildren().addAll(backButton, overallMetricsButton,multiChartButton, logOutButton);
 
         backButton.setOnAction(e -> {
             App.getInstance().showInputFilesPage();
@@ -334,6 +336,29 @@ public class ChartPage {
         logOutButton.setOnAction(e -> {
             Login login = new Login(stage);
             login.show();
+        });
+
+        multiChartButton.setOnAction(e -> {
+            ArrayList<String> currentCharts = new ArrayList<>(List.of("Clicks","Clicks"));
+            ArrayList<String> timeFlags = new ArrayList<>(List.of("Daily","Daily"));
+            ArrayList<String> genders = new ArrayList<>(List.of("",""));
+            ArrayList<String> incomes = new ArrayList<>(List.of("",""));
+
+            ArrayList<String> contexts1 = new ArrayList<>();
+            ArrayList<String> contexts2 = new ArrayList<>();
+            ArrayList<ArrayList<String>> contexts = new ArrayList<>();
+            contexts.add(contexts1);
+            contexts.add(contexts2);
+
+            ArrayList<String> ages1 = new ArrayList<>();
+            ArrayList<String> ages2 = new ArrayList<>();
+            ArrayList<ArrayList<String>> ages = new ArrayList<>();
+            ages.add(ages1);
+            ages.add(ages2);
+
+            MultiChartPage multiChartPage = new MultiChartPage(stage,logManager,currentCharts,timeFlags,genders,incomes,contexts,ages);
+            multiChartPage.show();
+
         });
 
         //Layout
