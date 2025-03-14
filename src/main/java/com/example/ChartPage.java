@@ -48,7 +48,7 @@ public class ChartPage {
 
         //Holder for chart
         ChartViewer chartViewer = new ChartViewer(chartCreator.updateChart(currentChart,timeFlag,gender,income,context,age));
-        chartViewer.setMaxSize(600, 450);
+        chartViewer.setMaxSize(800, 600);
 
 
         //Metric buttons
@@ -371,7 +371,7 @@ public class ChartPage {
         BorderPane.setMargin(timeOptionHolder, new Insets(0,0,50,0));
 
 
-        Scene scene = new Scene(root, 900, 700);
+        Scene scene = new Scene(root, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Graphs");
         stage.show();

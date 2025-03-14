@@ -13,16 +13,10 @@ public abstract class EditPage {
     private ArrayList<String> context;
 
     private LogManager logManager;
+    private Stage stage;
 
 
-    public EditPage(Stage stage, LogManager logManager, String currentChart, String timeFlag, String gender, String income, ArrayList<String> context, ArrayList<String> age)  {
-        this.currentChart = currentChart;
-        this.timeFlag = timeFlag;
-        this.gender = gender;
-        this.income = income;
-        this.context = context;
-        this.age = age;
-        this.logManager = logManager;
+    public EditPage(){
     }
 
     /**

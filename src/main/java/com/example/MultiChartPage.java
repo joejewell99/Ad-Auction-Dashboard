@@ -15,18 +15,12 @@ import java.util.ArrayList;
 
 public class MultiChartPage {
     private Stage stage;
-    private String currentChart1;
-    private String currentChart2;
-    private String timeFlag1;
-    private String timeFlag2;
-    private String gender1;
-    private String gender2;
-    private String income1;
-    private String income2;
-    private ArrayList<String> context1;
-    private ArrayList<String> context2;
-    private ArrayList<String> age1;
-    private ArrayList<String> age2;
+    private ArrayList<String> currentCharts;
+    private ArrayList<String> timeFlags;
+    private ArrayList<String> genders;
+    private ArrayList<String> incomes;
+    private ArrayList<ArrayList<String>> contexts;
+    private ArrayList<ArrayList<String>> ages;
 
     private ChartCreator chartCreator;
     private LogManager logManager;
@@ -40,26 +34,22 @@ public class MultiChartPage {
         this.logManager = logManager;
         this.chartCreator = new ChartCreator(logManager);
 
-        this.currentChart1 = currentCharts.get(0);
-        this.currentChart2 = currentCharts.get(1);
-        this.timeFlag1 = timeFlags.get(0);
-        this.timeFlag2 = timeFlags.get(1);
-        this.gender1 = genders.get(0);
-        this.gender2 = genders.get(1);
-        this.income1 = incomes.get(0);
-        this.income2 = incomes.get(1);
-        this.context1 = contexts.get(0);
-        this.context2 = contexts.get(1);
-        this.age1 = ages.get(0);
-        this.age2 = ages.get(1);
+        this.currentCharts = currentCharts;
+        this.timeFlags = timeFlags;
+        this.genders = genders;
+        this.incomes = incomes;
+        this.contexts = contexts;
+        this.ages = ages;
     }
 
     public void show() {
         //Chart Holder
-        ChartViewer chartViewer1 = new ChartViewer(chartCreator.updateChart(currentChart1,timeFlag1,gender1,income1,context1,age1));
+        ChartViewer chartViewer1 = new ChartViewer(chartCreator.updateChart(currentCharts.get(0),timeFlags.get(0),
+                genders.get(0),incomes.get(0),contexts.get(0),ages.get(0)));
         chartViewer1.setMinSize(500,300);
         chartViewer1.setMaxSize(500,300);
-        ChartViewer chartViewer2 = new ChartViewer(chartCreator.updateChart(currentChart2,timeFlag2,gender2,income2,context2,age2));
+        ChartViewer chartViewer2 = new ChartViewer(chartCreator.updateChart(currentCharts.get(1),timeFlags.get(1),
+                genders.get(1),incomes.get(1),contexts.get(1),ages.get(1)));
         chartViewer2.setMinSize(500,300);
         chartViewer2.setMaxSize(500,300);
         HBox chartHolder = new HBox(20);
@@ -74,6 +64,16 @@ public class MultiChartPage {
         editHolder.getChildren().addAll(editChart1Button,editChart2Button);
         BorderPane.setMargin(editHolder,new Insets(0,0,100,0));
 
+        editChart1Button.setOnAction(e -> {
+            EditPage1 editPage = new EditPage1(stage,logManager,currentCharts,timeFlags,genders,incomes,contexts,ages);
+            editPage.show();
+        });
+
+        editChart2Button.setOnAction(e -> {
+            EditPage2 editPage2 = new EditPage2(stage,logManager,currentCharts,timeFlags,genders,incomes,contexts,ages);
+            editPage2.show();
+        });
+
         //Navigation Buttons
         var buttonHolder = new HBox();
         var backButton = new Button("Back");
@@ -83,7 +83,8 @@ public class MultiChartPage {
 
 
         backButton.setOnAction(e -> {
-            App.getInstance().showInputFilesPage();
+            ChartPage chartPage = new ChartPage(stage,logManager);
+            chartPage.show();
         });
 
         overallMetricsButton.setOnAction(e -> {

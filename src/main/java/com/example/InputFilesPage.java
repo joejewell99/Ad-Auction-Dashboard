@@ -127,7 +127,7 @@ public class InputFilesPage {
             login.show();
         });
 
-        scene = new Scene(grid, 600, 400);
+        scene = new Scene(grid, 1300, 800);
 
     }
     public void show() {

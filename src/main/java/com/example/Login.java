@@ -78,7 +78,7 @@ public class Login {
         /**
          * Creating a scene containing a grid layout.
          */
-        loginScene = new Scene(grid, 600, 400);
+        loginScene = new Scene(grid, 1300, 800);
 
     }
 
