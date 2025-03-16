@@ -14,11 +14,19 @@ public class App extends Application {
   private static final Logger logger = LogManager.getLogger(App.class);
   private Stage stage;
 
-  private ServerLog serverLog;
+  /**
+   * Main method to enter the app.
+   * @param args
+   */
+
   public static void main(String[] args){
     logger.info("Launching app");
     launch();
   }
+
+  /**
+   * Start method called when JavaFX is launched.
+   */
 
   @Override
   public void start(Stage stage) throws Exception {
@@ -27,10 +35,9 @@ public class App extends Application {
     StackPane root = new StackPane();
     Label welcomeMessage = new Label("Ad Auction");
     root.getChildren().add(welcomeMessage);
-    Label serverStats = new Label("Number of Bounces: " + this.serverLog.getNumberOfBounces() + "\nNumber of Conversions: " + this.serverLog.getNumberOfConversions());
-    root.getChildren().add(serverStats);
     Scene scene = new Scene(root, 800, 600);
     stage.setScene(scene);
+    stage.setTitle("Login");
     stage.show();
     logger.info("App started");
     Login login = new Login(stage);
@@ -38,15 +45,19 @@ public class App extends Application {
     logger.info("Login completed");
   }
 
+  /**
+   * Display input files page after login.
+   */
+
   public void showInputFilesPage(){
     InputFilesPage inputFilesPage = new InputFilesPage(stage);
     inputFilesPage.show();
     logger.info("Input files page");
   }
-  public void init() {
-    this.serverLog = new ServerLog("../../server_log.csv");
-  }
 
+  /**
+   * A getter method to globally access the app instance.
+   */
   public static App getInstance() {
     return instance;
   }
