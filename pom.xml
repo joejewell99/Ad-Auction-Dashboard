@@ -90,7 +90,7 @@
           <mainClass>com.example.App</mainClass>
           <options>
             <option>--add-modules</option>
-            <option>javafx.controls,javafx.fxml,javafx.graphics,javafx.web</option>
+            <option>javafx.controls,javafx.fxml,javafx.graphics</option>
           </options>
         </configuration>
       </plugin>
