@@ -1,4 +1,6 @@
 package com.example;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,27 +43,30 @@ public class LoginDatabase {
     }
 
     public boolean authenticate(String username, String password) {
-        String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+        String query = "SELECT password FROM users WHERE username = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
             try (ResultSet rs = pstmt.executeQuery()){
-                return  rs.next();
+                if (rs.next()) {
+                    String storedHash = rs.getString("password");
+
+                    return BCrypt.checkpw(password, storedHash);
+                }
             }
-        }
-        catch (SQLException e){
+        } catch (SQLException e){
             e.printStackTrace();
         }
         return false;
     }
 
     public boolean addUser(String username, String password) {
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         String insertSQL = "INSERT INTO users (username, password) VALUES (?,?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
+            pstmt.setString(2, hashedPassword);
             pstmt.executeUpdate();
             return true;
         }
@@ -99,10 +104,11 @@ public class LoginDatabase {
     }
 
     public boolean updateUserPassword(String username, String newPassword) {
+        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         String updateSQL = "UPDATE users SET password = ? WHERE username = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(updateSQL)) {
-            pstmt.setString(1, newPassword);
+            pstmt.setString(1, hashedPassword);
             pstmt.setString(2, username);
             int affected = pstmt.executeUpdate();
             return affected > 0;
