@@ -147,7 +147,7 @@ public class Login {
         footerBox.setAlignment(Pos.CENTER);
         footerBox.setPadding(new Insets(20, 0, 20, 0));
         
-        Label footerLabel = new Label("© 2023 Ad Auction Dashboard System");
+        Label footerLabel = new Label("©2025 Ad Auction Dashboard System");
         footerLabel.setTextFill(Color.web("#999999"));
         footerLabel.setFont(Font.font("Arial", 12));
         
@@ -186,6 +186,14 @@ public class Login {
             }
         });
 
+        //Button to manage the users
+        Button manageUsersButton = new Button("Manage Users");
+        //grid.add(manageUsersButton, 1, 4);
+        loginBox.getChildren().add(manageUsersButton);
+        manageUsersButton.setOnAction(event -> {
+            new UserManagementPage(stage).show();
+        });
+
         // Set Enter key to trigger login button
         passwordField.setOnAction(loginButton.getOnAction());
         userName.setOnAction(loginButton.getOnAction());
@@ -204,7 +212,13 @@ public class Login {
      * Kept the login info as empty for the time being.
      */
     private boolean authenticate(String username, String password) {
-        return "".equals(username) && "".equals(password);
+
+        if (username == null ||  username.isEmpty() || password == null || password.isEmpty()) {
+            return false;
+        }
+
+        LoginDatabase db = new LoginDatabase();
+        return db.authenticate(username, password);
     }
 
     /**
