@@ -133,7 +133,8 @@ public class Login {
         loginButton.setOnMouseExited(e -> loginButton.setStyle(buttonStyle));
         
         // Tip information
-        Label tipLabel = new Label("Tip: Create an account or use the default login credentials 'user', 'pass'");
+        Label tipLabel = new Label("Tip: Create an account or " +
+                "use the default login credentials 'user', 'pass'");
         tipLabel.setFont(Font.font("Arial", 12));
         tipLabel.setTextFill(Color.web("#888888"));
         tipLabel.setAlignment(Pos.CENTER);
