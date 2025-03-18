@@ -11,6 +11,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.io.BufferedReader;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -29,8 +30,8 @@ public class ChartCreator {
         this.filter = new Filter();
     }
 
-    public void getClicks() {
-        System.out.println(this.clicks);
+    public ArrayList<String[]> getClicks() {
+        return clicks;
     }
 
     /**

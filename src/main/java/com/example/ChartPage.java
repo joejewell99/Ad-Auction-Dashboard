@@ -1,5 +1,7 @@
 package com.example;
 
+import com.itextpdf.text.DocumentException;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -7,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -14,8 +17,19 @@ import javafx.stage.Stage;
 import org.jfree.chart.fx.ChartViewer;
 
 
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Map;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.pdf.PdfWriter;
+
 
 
 public class ChartPage {
@@ -256,6 +270,8 @@ public class ChartPage {
         CheckBox age4Button = new CheckBox("45-54");
         CheckBox age5Button = new CheckBox(">54");
 
+
+
         age1Button.setOnAction(e -> {
             if (age1Button.isSelected()) {
                 this.age.add("<25");
@@ -292,7 +308,24 @@ public class ChartPage {
             } chartViewer.setChart(chartCreator.updateChart(currentChart,timeFlag,gender,income,context,age));
         });
 
+        //Save graph to PDF button
+        var pdfButton = new Button("Save to pdf");
 
+        pdfButton.setOnAction(e -> {
+            try {
+                // Convert JavaFX Chart to BufferedImage
+                WritableImage writableImage = chartViewer.snapshot(null, null);
+                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
+
+                // Save image as PDF
+                saveChartAsPdf(bufferedImage);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (DocumentException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         //Labels for filters
         var metricsHeader = new Label("Metrics");
@@ -309,6 +342,7 @@ public class ChartPage {
         metricOptionHolder.getChildren().addAll(incomeLabel,anyIncomeButton,lowButton,mediumButton,highButton);
         metricOptionHolder.getChildren().addAll(contextLabel,newsButton,shoppingButton,socialButton,blogButton,hobbyButton,travelButton);
         metricOptionHolder.getChildren().addAll(ageLabel,age1Button,age2Button,age3Button,age4Button,age5Button);
+        metricOptionHolder.getChildren().add(pdfButton);
 
         //Holder for time granularity options
         var timeOptionHolder = new HBox();
@@ -375,6 +409,36 @@ public class ChartPage {
         stage.setScene(scene);
         stage.setTitle("Graphs");
         stage.show();
+    }
+    // Method to save chart as PDF
+    private void saveChartAsPdf(BufferedImage chartImage) throws IOException, DocumentException {
+
+        Document document = new Document();
+
+        PdfWriter.getInstance(document, new FileOutputStream("chart.pdf"));
+
+        document.open();
+
+        File chartPdfFile = File.createTempFile("chart", ".png");
+        ImageIO.write(chartImage, "PNG", chartPdfFile);
+
+        Image pdfImage = Image.getInstance(chartPdfFile.getAbsolutePath());
+
+        pdfImage.scaleToFit(500, 500);  // Adjust the size as needed
+        document.add(pdfImage);
+
+        document.close();
+        ArrayList<String[]> chartList = chartCreator.getClicks();
+         Map<String, Integer> clickMap = chartCreator.getDailyClicks(chartList);
+        for (String[] clickImpression: chartList){
+            String date = clickImpression[0];
+            String id = clickImpression[1];
+            String cc = clickImpression[2];
+            System.out.println(date + " " + id + " " + cc + " " + clickMap);
+
+        }
+
+        System.out.println("Chart saved as PDF!");
     }
 }
 
