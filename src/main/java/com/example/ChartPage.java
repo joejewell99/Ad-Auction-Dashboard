@@ -12,10 +12,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.fx.ChartViewer;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.App.logger;
 
 public class ChartPage {
     private Stage stage;
@@ -54,46 +57,93 @@ public class ChartPage {
         // Create main layout
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
-        
+
         // Chart display area
-        ChartViewer chartViewer = new ChartViewer(chartCreator.updateChart(currentChart, timeFlag, gender, income, context, age));
+        ChartViewer chartViewer = null;
+        try {
+            // Create chart using current settings
+            chartViewer = new ChartViewer(chartCreator.updateChart(currentChart, timeFlag, gender, income, context, age));
+            // Check for empty dataset and set no-data message if needed
+            if (chartViewer.getChart() != null && chartViewer.getChart().getCategoryPlot() != null) {
+                if (chartViewer.getChart().getCategoryPlot().getDataset() == null ||
+                  chartViewer.getChart().getCategoryPlot().getDataset().getRowCount() == 0 ||
+                  chartViewer.getChart().getCategoryPlot().getDataset().getColumnCount() == 0) {
+                    chartViewer.getChart().getCategoryPlot().setNoDataMessage("No data available");
+                }
+            }
+        } catch (Exception ex) {
+            showAlert("Error loading chart.");
+            logger.error("Error loading chart", ex);
+            // Fallback: create an empty ChartViewer
+            chartViewer = new ChartViewer();
+        }
         chartViewer.setMaxSize(800, 600);
-        
+
         // Create a container for the chart, add styling
         BorderPane chartContainer = new BorderPane();
         chartContainer.setCenter(chartViewer);
         chartContainer.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+          "-fx-background-radius: 10; " +
+          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
         chartContainer.setPadding(new Insets(15));
-        
+
         // ===== Top navigation bar =====
-        HBox navBar = createNavigationBar();
-        
+        HBox navBar = null;
+        try {
+            navBar = createNavigationBar();
+        } catch (Exception ex) {
+            showAlert("Error creating navigation bar.");
+            logger.error("Error in createNavigationBar", ex);
+            navBar = new HBox();
+        }
+
         // ===== Right side metrics and filter panel =====
-        ScrollPane filterPanel = createFilterPanel(chartViewer);
-        
+        ScrollPane filterPanel = null;
+        try {
+            filterPanel = createFilterPanel(chartViewer);
+        } catch (Exception ex) {
+            showAlert("Error creating filter panel.");
+            logger.error("Error in createFilterPanel", ex);
+            filterPanel = new ScrollPane();
+        }
+
         // ===== Bottom time granularity selector =====
-        HBox timeGranularityBar = createTimeGranularityBar(chartViewer);
-        
+        HBox timeGranularityBar = null;
+        try {
+            timeGranularityBar = createTimeGranularityBar(chartViewer);
+        } catch (Exception ex) {
+            showAlert("Error creating time granularity selector.");
+            logger.error("Error in createTimeGranularityBar", ex);
+            timeGranularityBar = new HBox();
+        }
+
         // Set layout positions
         root.setTop(navBar);
         root.setCenter(chartContainer);
         root.setRight(filterPanel);
         root.setBottom(timeGranularityBar);
-        
+
         // Set margins
         BorderPane.setMargin(chartContainer, new Insets(10, 10, 10, 10));
         BorderPane.setMargin(filterPanel, new Insets(10, 10, 10, 5));
         BorderPane.setMargin(timeGranularityBar, new Insets(5, 10, 15, 10));
-        
+
         // Create scene
         Scene scene = new Scene(root, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Ad Auction Dashboard - Data Charts");
         stage.show();
     }
-    
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+
     // Create top navigation bar
     private HBox createNavigationBar() {
         HBox navBar = new HBox(15);
@@ -708,8 +758,28 @@ public class ChartPage {
     }
     
     // Update chart
+    // Update chart with error handling and no-data check
     private void updateChart(ChartViewer chartViewer) {
-        chartViewer.setChart(chartCreator.updateChart(currentChart, timeFlag, gender, income, context, age));
+        try {
+            JFreeChart chart = chartCreator.updateChart(currentChart, timeFlag, gender, income, context, age);
+            // Check if the chart's dataset is empty and set no-data message if needed
+            if (chart != null && chart.getCategoryPlot() != null) {
+                if (chart.getCategoryPlot().getDataset() == null ||
+                  chart.getCategoryPlot().getDataset().getRowCount() == 0 ||
+                  chart.getCategoryPlot().getDataset().getColumnCount() == 0) {
+                    chart.getCategoryPlot().setNoDataMessage("No data available");
+                }
+            }
+            chartViewer.setChart(chart);
+        } catch (NullPointerException ex) {
+            // Handle cases where a metric value is missing (e.g., in genBounceRateChart)
+            showAlert("No data available");
+            logger.error("Null pointer exception in updateChart", ex);
+        } catch (Exception ex) {
+            showAlert("Error updating chart.");
+            logger.error("Error updating chart", ex);
+        }
     }
+
 }
 
