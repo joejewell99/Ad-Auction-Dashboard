@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
+import static com.example.App.logger;
+
 public class EditPage1 extends EditPage {
 
     private ArrayList<String> timeFlag;
@@ -198,273 +200,446 @@ public class EditPage1 extends EditPage {
     private VBox createMetricsContent() {
         VBox content = new VBox(10);
         ToggleGroup metricOptions = new ToggleGroup();
-        
+
         // Create radio buttons for different metrics
         RadioButton clickMetric = createStyledRadioButton("Total Clicks", metricOptions);
         clickMetric.setSelected(true);
         clickMetric.setOnAction(e -> {
-            this.currentChart.set(0, "Clicks");
+            try {
+                this.currentChart.set(0, "Clicks");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'Clicks'.");
+                logger.error("Error in Click Metric selection", ex);
+            }
         });
-        
+
         RadioButton impressionMetric = createStyledRadioButton("Total Impressions", metricOptions);
         impressionMetric.setOnAction(e -> {
-            this.currentChart.set(0, "Impressions");
+            try {
+                this.currentChart.set(0, "Impressions");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'Impressions'.");
+                logger.error("Error in Impression Metric selection", ex);
+            }
         });
-        
+
         RadioButton uniqueMetric = createStyledRadioButton("Unique Visitors", metricOptions);
         uniqueMetric.setOnAction(e -> {
-            this.currentChart.set(0, "Uniques");
+            try {
+                this.currentChart.set(0, "Uniques");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'Uniques'.");
+                logger.error("Error in Uniques Metric selection", ex);
+            }
         });
-        
+
         RadioButton bouncesMetric = createStyledRadioButton("Bounces", metricOptions);
         bouncesMetric.setOnAction(e -> {
-            this.currentChart.set(0, "Bounces");
+            try {
+                this.currentChart.set(0, "Bounces");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'Bounces'.");
+                logger.error("Error in Bounces Metric selection", ex);
+            }
         });
-        
+
         RadioButton conversionMetric = createStyledRadioButton("Conversions", metricOptions);
         conversionMetric.setOnAction(e -> {
-            this.currentChart.set(0, "Conversions");
+            try {
+                this.currentChart.set(0, "Conversions");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'Conversions'.");
+                logger.error("Error in Conversions Metric selection", ex);
+            }
         });
-        
+
         RadioButton costMetric = createStyledRadioButton("Total Cost", metricOptions);
         costMetric.setOnAction(e -> {
-            this.currentChart.set(0, "Cost");
+            try {
+                this.currentChart.set(0, "Cost");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'Cost'.");
+                logger.error("Error in Cost Metric selection", ex);
+            }
         });
-        
+
         RadioButton ctrMetric = createStyledRadioButton("Click-Through Rate (CTR)", metricOptions);
         ctrMetric.setOnAction(e -> {
-            this.currentChart.set(0, "CTR");
+            try {
+                this.currentChart.set(0, "CTR");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'CTR'.");
+                logger.error("Error in CTR Metric selection", ex);
+            }
         });
-        
+
         RadioButton cpaMetric = createStyledRadioButton("Cost Per Acquisition (CPA)", metricOptions);
         cpaMetric.setOnAction(e -> {
-            this.currentChart.set(0, "CPA");
+            try {
+                this.currentChart.set(0, "CPA");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'CPA'.");
+                logger.error("Error in CPA Metric selection", ex);
+            }
         });
-        
+
         RadioButton cpcMetric = createStyledRadioButton("Cost Per Click (CPC)", metricOptions);
         cpcMetric.setOnAction(e -> {
-            this.currentChart.set(0, "CPC");
+            try {
+                this.currentChart.set(0, "CPC");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'CPC'.");
+                logger.error("Error in CPC Metric selection", ex);
+            }
         });
-        
+
         RadioButton cpmMetric = createStyledRadioButton("Cost Per Mille (CPM)", metricOptions);
         cpmMetric.setOnAction(e -> {
-            this.currentChart.set(0, "CPM");
+            try {
+                this.currentChart.set(0, "CPM");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'CPM'.");
+                logger.error("Error in CPM Metric selection", ex);
+            }
         });
-        
+
         RadioButton bounceRateMetric = createStyledRadioButton("Bounce Rate", metricOptions);
         bounceRateMetric.setOnAction(e -> {
-            this.currentChart.set(0, "BounceRate");
+            try {
+                this.currentChart.set(0, "BounceRate");
+            } catch (Exception ex) {
+                showAlert("Error setting metric to 'Bounce Rate'.");
+                logger.error("Error in Bounce Rate Metric selection", ex);
+            }
         });
-        
+
         content.getChildren().addAll(
-            clickMetric, impressionMetric, uniqueMetric, bouncesMetric, 
-            conversionMetric, costMetric, ctrMetric, cpaMetric, 
-            cpcMetric, cpmMetric, bounceRateMetric
+          clickMetric, impressionMetric, uniqueMetric, bouncesMetric,
+          conversionMetric, costMetric, ctrMetric, cpaMetric,
+          cpcMetric, cpmMetric, bounceRateMetric
         );
-        
+
         return content;
     }
-    
+
+
     // Create time content
     private VBox createTimeContent() {
         VBox content = new VBox(10);
         ToggleGroup timeOptions = new ToggleGroup();
-        
+
         RadioButton dailyButton = createStyledRadioButton("Daily", timeOptions);
         dailyButton.setSelected(true);
         dailyButton.setOnAction(e -> {
-            this.timeFlag.set(0, "Daily");
+            try {
+                this.timeFlag.set(0, "Daily");
+            } catch (Exception ex) {
+                showAlert("Error setting time granularity to 'Daily'.");
+                logger.error("Error in Daily button", ex);
+            }
         });
-        
+
         RadioButton weeklyButton = createStyledRadioButton("Weekly", timeOptions);
         weeklyButton.setOnAction(e -> {
-            this.timeFlag.set(0, "Weekly");
+            try {
+                this.timeFlag.set(0, "Weekly");
+            } catch (Exception ex) {
+                showAlert("Error setting time granularity to 'Weekly'.");
+                logger.error("Error in Weekly button", ex);
+            }
         });
-        
+
         RadioButton monthlyButton = createStyledRadioButton("Monthly", timeOptions);
         monthlyButton.setOnAction(e -> {
-            this.timeFlag.set(0, "Monthly");
+            try {
+                this.timeFlag.set(0, "Monthly");
+            } catch (Exception ex) {
+                showAlert("Error setting time granularity to 'Monthly'.");
+                logger.error("Error in Monthly button", ex);
+            }
         });
-        
+
         content.getChildren().addAll(dailyButton, weeklyButton, monthlyButton);
-        
+
         return content;
     }
-    
+
     // Create gender content
     private VBox createGenderContent() {
         VBox content = new VBox(10);
         ToggleGroup genderOptions = new ToggleGroup();
-        
+
         RadioButton bothGenderButton = createStyledRadioButton("All", genderOptions);
         bothGenderButton.setSelected(true);
         bothGenderButton.setOnAction(e -> {
-            this.gender.set(0, "");
+            try {
+                this.gender.set(0, "");
+            } catch (Exception ex) {
+                showAlert("Error setting gender to 'All'.");
+                logger.error("Error in All gender button", ex);
+            }
         });
-        
+
         RadioButton maleButton = createStyledRadioButton("Male", genderOptions);
         maleButton.setOnAction(e -> {
-            this.gender.set(0, "Male");
+            try {
+                this.gender.set(0, "Male");
+            } catch (Exception ex) {
+                showAlert("Error setting gender to 'Male'.");
+                logger.error("Error in Male gender button", ex);
+            }
         });
-        
+
         RadioButton femaleButton = createStyledRadioButton("Female", genderOptions);
         femaleButton.setOnAction(e -> {
-            this.gender.set(0, "Female");
+            try {
+                this.gender.set(0, "Female");
+            } catch (Exception ex) {
+                showAlert("Error setting gender to 'Female'.");
+                logger.error("Error in Female gender button", ex);
+            }
         });
-        
+
         content.getChildren().addAll(bothGenderButton, maleButton, femaleButton);
-        
+
         return content;
     }
-    
+
+
     // Create income content
     private VBox createIncomeContent() {
         VBox content = new VBox(10);
         ToggleGroup incomeOptions = new ToggleGroup();
-        
+
         RadioButton anyIncomeButton = createStyledRadioButton("All", incomeOptions);
         anyIncomeButton.setSelected(true);
         anyIncomeButton.setOnAction(e -> {
-            this.income.set(0, "");
+            try {
+                this.income.set(0, "");
+            } catch (Exception ex) {
+                showAlert("Error setting income to 'All'.");
+                logger.error("Error in All income button", ex);
+            }
         });
-        
+
         RadioButton lowButton = createStyledRadioButton("Low", incomeOptions);
         lowButton.setOnAction(e -> {
-            this.income.set(0, "Low");
+            try {
+                this.income.set(0, "Low");
+            } catch (Exception ex) {
+                showAlert("Error setting income to 'Low'.");
+                logger.error("Error in Low income button", ex);
+            }
         });
-        
+
         RadioButton mediumButton = createStyledRadioButton("Medium", incomeOptions);
         mediumButton.setOnAction(e -> {
-            this.income.set(0, "Medium");
+            try {
+                this.income.set(0, "Medium");
+            } catch (Exception ex) {
+                showAlert("Error setting income to 'Medium'.");
+                logger.error("Error in Medium income button", ex);
+            }
         });
-        
+
         RadioButton highButton = createStyledRadioButton("High", incomeOptions);
         highButton.setOnAction(e -> {
-            this.income.set(0, "High");
+            try {
+                this.income.set(0, "High");
+            } catch (Exception ex) {
+                showAlert("Error setting income to 'High'.");
+                logger.error("Error in High income button", ex);
+            }
         });
-        
+
         content.getChildren().addAll(anyIncomeButton, lowButton, mediumButton, highButton);
-        
+
         return content;
     }
-    
+
+
     // Create context content
     private VBox createContextContent() {
         VBox content = new VBox(10);
-        
+
         CheckBox newsButton = createStyledCheckBox("News");
         newsButton.setOnAction(e -> {
-            if (newsButton.isSelected()) {
-                this.context.get(0).add("News");
-            } else {
-                this.context.get(0).remove("News");
+            try {
+                if (newsButton.isSelected()) {
+                    this.context.get(0).add("News");
+                } else {
+                    this.context.get(0).remove("News");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating News context.");
+                logger.error("Error in News checkbox", ex);
             }
         });
-        
+
         CheckBox shoppingButton = createStyledCheckBox("Shopping");
         shoppingButton.setOnAction(e -> {
-            if (shoppingButton.isSelected()) {
-                this.context.get(0).add("Shopping");
-            } else {
-                this.context.get(0).remove("Shopping");
+            try {
+                if (shoppingButton.isSelected()) {
+                    this.context.get(0).add("Shopping");
+                } else {
+                    this.context.get(0).remove("Shopping");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating Shopping context.");
+                logger.error("Error in Shopping checkbox", ex);
             }
         });
-        
+
         CheckBox socialButton = createStyledCheckBox("Social Media");
         socialButton.setOnAction(e -> {
-            if (socialButton.isSelected()) {
-                this.context.get(0).add("Social Media");
-            } else {
-                this.context.get(0).remove("Social Media");
+            try {
+                if (socialButton.isSelected()) {
+                    this.context.get(0).add("Social Media");
+                } else {
+                    this.context.get(0).remove("Social Media");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating Social Media context.");
+                logger.error("Error in Social Media checkbox", ex);
             }
         });
-        
+
         CheckBox blogButton = createStyledCheckBox("Blog");
         blogButton.setOnAction(e -> {
-            if (blogButton.isSelected()) {
-                this.context.get(0).add("Blog");
-            } else {
-                this.context.get(0).remove("Blog");
+            try {
+                if (blogButton.isSelected()) {
+                    this.context.get(0).add("Blog");
+                } else {
+                    this.context.get(0).remove("Blog");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating Blog context.");
+                logger.error("Error in Blog checkbox", ex);
             }
         });
-        
+
         CheckBox hobbyButton = createStyledCheckBox("Hobby");
         hobbyButton.setOnAction(e -> {
-            if (hobbyButton.isSelected()) {
-                this.context.get(0).add("Hobby");
-            } else {
-                this.context.get(0).remove("Hobby");
+            try {
+                if (hobbyButton.isSelected()) {
+                    this.context.get(0).add("Hobby");
+                } else {
+                    this.context.get(0).remove("Hobby");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating Hobby context.");
+                logger.error("Error in Hobby checkbox", ex);
             }
         });
-        
+
         CheckBox travelButton = createStyledCheckBox("Travel");
         travelButton.setOnAction(e -> {
-            if (travelButton.isSelected()) {
-                this.context.get(0).add("Travel");
-            } else {
-                this.context.get(0).remove("Travel");
+            try {
+                if (travelButton.isSelected()) {
+                    this.context.get(0).add("Travel");
+                } else {
+                    this.context.get(0).remove("Travel");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating Travel context.");
+                logger.error("Error in Travel checkbox", ex);
             }
         });
-        
+
         content.getChildren().addAll(newsButton, shoppingButton, socialButton, blogButton, hobbyButton, travelButton);
-        
+
         return content;
     }
-    
+
+
     // Create age content
     private VBox createAgeContent() {
         VBox content = new VBox(10);
-        
+
         CheckBox age1Button = createStyledCheckBox("Under 25");
         age1Button.setOnAction(e -> {
-            if (age1Button.isSelected()) {
-                this.age.get(0).add("<25");
-            } else {
-                this.age.get(0).remove("<25");
+            try {
+                if (age1Button.isSelected()) {
+                    this.age.get(0).add("<25");
+                } else {
+                    this.age.get(0).remove("<25");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating age filter Under 25.");
+                logger.error("Error in Under 25 checkbox", ex);
             }
         });
-        
+
         CheckBox age2Button = createStyledCheckBox("25-34");
         age2Button.setOnAction(e -> {
-            if (age2Button.isSelected()) {
-                this.age.get(0).add("25-34");
-            } else {
-                this.age.get(0).remove("25-34");
+            try {
+                if (age2Button.isSelected()) {
+                    this.age.get(0).add("25-34");
+                } else {
+                    this.age.get(0).remove("25-34");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating age filter 25-34.");
+                logger.error("Error in 25-34 checkbox", ex);
             }
         });
-        
+
         CheckBox age3Button = createStyledCheckBox("35-44");
         age3Button.setOnAction(e -> {
-            if (age3Button.isSelected()) {
-                this.age.get(0).add("35-44");
-            } else {
-                this.age.get(0).remove("35-44");
+            try {
+                if (age3Button.isSelected()) {
+                    this.age.get(0).add("35-44");
+                } else {
+                    this.age.get(0).remove("35-44");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating age filter 35-44.");
+                logger.error("Error in 35-44 checkbox", ex);
             }
         });
-        
+
         CheckBox age4Button = createStyledCheckBox("45-54");
         age4Button.setOnAction(e -> {
-            if (age4Button.isSelected()) {
-                this.age.get(0).add("45-54");
-            } else {
-                this.age.get(0).remove("45-54");
+            try {
+                if (age4Button.isSelected()) {
+                    this.age.get(0).add("45-54");
+                } else {
+                    this.age.get(0).remove("45-54");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating age filter 45-54.");
+                logger.error("Error in 45-54 checkbox", ex);
             }
         });
-        
+
         CheckBox age5Button = createStyledCheckBox("Over 54");
         age5Button.setOnAction(e -> {
-            if (age5Button.isSelected()) {
-                this.age.get(0).add(">54");
-            } else {
-                this.age.get(0).remove(">54");
+            try {
+                if (age5Button.isSelected()) {
+                    this.age.get(0).add(">54");
+                } else {
+                    this.age.get(0).remove(">54");
+                }
+            } catch (Exception ex) {
+                showAlert("Error updating age filter Over 54.");
+                logger.error("Error in Over 54 checkbox", ex);
             }
         });
-        
+
         content.getChildren().addAll(age1Button, age2Button, age3Button, age4Button, age5Button);
-        
+
         return content;
     }
-    
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+
     // Create styled radio button
     private RadioButton createStyledRadioButton(String text, ToggleGroup group) {
         RadioButton radioButton = new RadioButton(text);
