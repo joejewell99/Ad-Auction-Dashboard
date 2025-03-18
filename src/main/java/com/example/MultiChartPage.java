@@ -3,6 +3,7 @@ package com.example;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -16,6 +17,8 @@ import javafx.stage.Stage;
 import org.jfree.chart.fx.ChartViewer;
 
 import java.util.ArrayList;
+
+import static com.example.App.logger;
 
 public class MultiChartPage {
     private Stage stage;
@@ -121,44 +124,85 @@ public class MultiChartPage {
         
         return navBar;
     }
-    
-    // Create chart area
+
+    /**
+     * Create chart area with two charts and error handling.
+     */
     private VBox createChartSection() {
         VBox chartSection = new VBox(30);
         chartSection.setAlignment(Pos.CENTER);
-        
+
         // Add description text
         Label descriptionLabel = new Label("Dual Chart View - Compare different metrics or filter conditions simultaneously");
         descriptionLabel.setFont(Font.font("Arial", 14));
         descriptionLabel.setTextFill(Color.web("#666666"));
-        
+
         // Create chart container
         HBox chartContainer = new HBox(30);
         chartContainer.setAlignment(Pos.CENTER);
-        
-        // Create ChartViewer instance for chart 1
-        ChartViewer chartViewer1 = new ChartViewer(chartCreator.updateChart(currentCharts.get(0), timeFlags.get(0), 
-                                    genders.get(0), incomes.get(0), 
-                                    contexts.get(0), ages.get(0)));
-        
-        // Create ChartViewer instance for chart 2
-        ChartViewer chartViewer2 = new ChartViewer(chartCreator.updateChart(currentCharts.get(1), timeFlags.get(1), 
-                                    genders.get(1), incomes.get(1), 
-                                    contexts.get(1), ages.get(1)));
-        
+
+        // Create ChartViewer instance for chart 1 with error handling and no-data check
+        ChartViewer chartViewer1;
+        try {
+            chartViewer1 = new ChartViewer(chartCreator.updateChart(currentCharts.get(0), timeFlags.get(0),
+              genders.get(0), incomes.get(0),
+              contexts.get(0), ages.get(0)));
+            if (chartViewer1.getChart() != null && chartViewer1.getChart().getCategoryPlot() != null) {
+                if (chartViewer1.getChart().getCategoryPlot().getDataset() == null ||
+                  chartViewer1.getChart().getCategoryPlot().getDataset().getRowCount() == 0 ||
+                  chartViewer1.getChart().getCategoryPlot().getDataset().getColumnCount() == 0) {
+                    chartViewer1.getChart().getCategoryPlot().setNoDataMessage("No data available");
+                }
+            }
+        } catch (Exception ex) {
+            showAlert("Error creating Chart 1.");
+            logger.error("Error creating Chart 1", ex);
+            chartViewer1 = new ChartViewer();
+        }
+
+        // Create ChartViewer instance for chart 2 with error handling and no-data check
+        ChartViewer chartViewer2;
+        try {
+            chartViewer2 = new ChartViewer(chartCreator.updateChart(currentCharts.get(1), timeFlags.get(1),
+              genders.get(1), incomes.get(1),
+              contexts.get(1), ages.get(1)));
+            if (chartViewer2.getChart() != null && chartViewer2.getChart().getCategoryPlot() != null) {
+                if (chartViewer2.getChart().getCategoryPlot().getDataset() == null ||
+                  chartViewer2.getChart().getCategoryPlot().getDataset().getRowCount() == 0 ||
+                  chartViewer2.getChart().getCategoryPlot().getDataset().getColumnCount() == 0) {
+                    chartViewer2.getChart().getCategoryPlot().setNoDataMessage("No data available");
+                }
+            }
+        } catch (Exception ex) {
+            showAlert("Error creating Chart 2.");
+            logger.error("Error creating Chart 2", ex);
+            chartViewer2 = new ChartViewer();
+        }
+
         // Create first chart area
         VBox chart1Box = createChartBox("Chart 1", chartViewer1);
-        
+
         // Create second chart area
         VBox chart2Box = createChartBox("Chart 2", chartViewer2);
-        
+
         // Add charts to container
         chartContainer.getChildren().addAll(chart1Box, chart2Box);
-        
+
         // Add all elements to chart section
         chartSection.getChildren().addAll(descriptionLabel, chartContainer);
-        
+
         return chartSection;
+    }
+
+    /**
+     * Helper method to show an alert with a user-friendly error message.
+     */
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
     
     // Create single chart box

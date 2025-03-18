@@ -757,12 +757,11 @@ public class ChartPage {
         return checkBox;
     }
     
-    // Update chart
     // Update chart with error handling and no-data check
     private void updateChart(ChartViewer chartViewer) {
         try {
             JFreeChart chart = chartCreator.updateChart(currentChart, timeFlag, gender, income, context, age);
-            // Check if the chart's dataset is empty and set no-data message if needed
+            // Check if the chart's dataset is empty
             if (chart != null && chart.getCategoryPlot() != null) {
                 if (chart.getCategoryPlot().getDataset() == null ||
                   chart.getCategoryPlot().getDataset().getRowCount() == 0 ||
@@ -772,7 +771,7 @@ public class ChartPage {
             }
             chartViewer.setChart(chart);
         } catch (NullPointerException ex) {
-            // Handle cases where a metric value is missing (e.g., in genBounceRateChart)
+            // Handle cases where a metric value is missing
             showAlert("No data available");
             logger.error("Null pointer exception in updateChart", ex);
         } catch (Exception ex) {

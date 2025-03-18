@@ -19,6 +19,8 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
+import static com.example.App.logger;
+
 
 public class OverallMetricsPage {
     private Stage stage;
@@ -89,91 +91,102 @@ public class OverallMetricsPage {
         
         return topBar;
     }
-    
+
     private VBox createContentBox() {
         VBox contentBox = new VBox(15);
         contentBox.setAlignment(Pos.TOP_CENTER);
         contentBox.setPadding(new Insets(30, 40, 30, 40));
         contentBox.setMaxWidth(540);
         contentBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-background-radius: 10; " + 
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
-        
+          "-fx-background-radius: 10; " +
+          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+
         // Add description text
         Label descriptionLabel = new Label("Below are the overall ad campaign metrics calculated from uploaded data files");
         descriptionLabel.setFont(Font.font("Arial", 14));
         descriptionLabel.setTextFill(Color.web("#666666"));
         descriptionLabel.setWrapText(true);
         descriptionLabel.setTextAlignment(TextAlignment.CENTER);
-        
+
         Separator separator = new Separator();
         separator.setOpacity(0.3);
         separator.setPadding(new Insets(10, 0, 10, 0));
-        
+
         // Create metrics grid
         GridPane metricsGrid = new GridPane();
         metricsGrid.setHgap(20);
         metricsGrid.setVgap(15);
         metricsGrid.setAlignment(Pos.CENTER);
-        
-        // Calculate all metric values
-        int impressionsValue = metricsCalculator.calcImpressions(impressionData);
-        int clicksValue = metricsCalculator.calcClicks(clickData);
-        int uniquesValue = metricsCalculator.calcUniques(clickData);
-        int bouncesValue = metricsCalculator.calcBounces(serverData);
-        int conversionsValue = metricsCalculator.calcConversions(serverData);
-        float costValue = metricsCalculator.calcCost(clickData, impressionData);
-        float ctrValue = metricsCalculator.calcCTR(clickData, impressionData);
-        float cpaValue = metricsCalculator.calcCPA(clickData, impressionData, serverData);
-        float cpcValue = metricsCalculator.calcCPC(clickData, impressionData, serverData);
-        float cpmValue = metricsCalculator.calcCPM(clickData, impressionData);
-        float bounceRateValue = metricsCalculator.calcBounceRate(clickData, serverData);
-        
-        // First column: Basic quantitative metrics
-        Label basicMetricsTitle = new Label("Basic Quantitative Metrics");
-        basicMetricsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        basicMetricsTitle.setTextFill(Color.web(HEADER_COLOR));
-        
-        VBox basicMetricsBox = new VBox(12);
-        basicMetricsBox.getChildren().addAll(
-            basicMetricsTitle,
-            createMetricItem("Total Impressions", impressionsValue + "", false),
-            createMetricItem("Total Clicks", clicksValue + "", false),
-            createMetricItem("Unique Visitors", uniquesValue + "", false),
-            createMetricItem("Bounces", bouncesValue + "", false),
-            createMetricItem("Conversions", conversionsValue + "", false),
-            createMetricItem("Total Cost", String.format("%.2f", costValue) + " ¥", false)
-        );
-        
-        // Second column: Ratio metrics
-        Label ratioMetricsTitle = new Label("Ratio and Performance Metrics");
-        ratioMetricsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        ratioMetricsTitle.setTextFill(Color.web(HEADER_COLOR));
-        
-        VBox ratioMetricsBox = new VBox(12);
-        ratioMetricsBox.getChildren().addAll(
-            ratioMetricsTitle,
-            createMetricItem("Click-Through Rate (CTR)", formatPercentage(ctrValue), true),
-            createMetricItem("Cost Per Acquisition (CPA)", String.format("%.2f", cpaValue) + " ¥", true),
-            createMetricItem("Cost Per Click (CPC)", String.format("%.2f", cpcValue) + " ¥", true),
-            createMetricItem("Cost Per Mille (CPM)", String.format("%.2f", cpmValue) + " ¥", true),
-            createMetricItem("Bounce Rate", formatPercentage(bounceRateValue), true)
-        );
-        
-        // Add to metrics grid
-        metricsGrid.add(basicMetricsBox, 0, 0);
-        metricsGrid.add(ratioMetricsBox, 1, 0);
-        
+
+        try {
+            // Calculate all metric values
+            int impressionsValue = metricsCalculator.calcImpressions(impressionData);
+            int clicksValue = metricsCalculator.calcClicks(clickData);
+            int uniquesValue = metricsCalculator.calcUniques(clickData);
+            int bouncesValue = metricsCalculator.calcBounces(serverData);
+            int conversionsValue = metricsCalculator.calcConversions(serverData);
+            float costValue = metricsCalculator.calcCost(clickData, impressionData);
+            float ctrValue = metricsCalculator.calcCTR(clickData, impressionData);
+            float cpaValue = metricsCalculator.calcCPA(clickData, impressionData, serverData);
+            float cpcValue = metricsCalculator.calcCPC(clickData, impressionData, serverData);
+            float cpmValue = metricsCalculator.calcCPM(clickData, impressionData);
+            float bounceRateValue = metricsCalculator.calcBounceRate(clickData, serverData);
+
+            // First column: Basic quantitative metrics
+            Label basicMetricsTitle = new Label("Basic Quantitative Metrics");
+            basicMetricsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+            basicMetricsTitle.setTextFill(Color.web(HEADER_COLOR));
+
+            VBox basicMetricsBox = new VBox(12);
+            basicMetricsBox.getChildren().addAll(
+              basicMetricsTitle,
+              createMetricItem("Total Impressions", impressionsValue + "", false),
+              createMetricItem("Total Clicks", clicksValue + "", false),
+              createMetricItem("Unique Visitors", uniquesValue + "", false),
+              createMetricItem("Bounces", bouncesValue + "", false),
+              createMetricItem("Conversions", conversionsValue + "", false),
+              createMetricItem("Total Cost", String.format("%.2f", costValue) + " ¥", false)
+            );
+
+            // Second column: Ratio metrics
+            Label ratioMetricsTitle = new Label("Ratio and Performance Metrics");
+            ratioMetricsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+            ratioMetricsTitle.setTextFill(Color.web(HEADER_COLOR));
+
+            VBox ratioMetricsBox = new VBox(12);
+            ratioMetricsBox.getChildren().addAll(
+              ratioMetricsTitle,
+              createMetricItem("Click-Through Rate (CTR)", formatPercentage(ctrValue), true),
+              createMetricItem("Cost Per Acquisition (CPA)", String.format("%.2f", cpaValue) + " ¥", true),
+              createMetricItem("Cost Per Click (CPC)", String.format("%.2f", cpcValue) + " ¥", true),
+              createMetricItem("Cost Per Mille (CPM)", String.format("%.2f", cpmValue) + " ¥", true),
+              createMetricItem("Bounce Rate", formatPercentage(bounceRateValue), true)
+            );
+
+            // Add to metrics grid
+            metricsGrid.add(basicMetricsBox, 0, 0);
+            metricsGrid.add(ratioMetricsBox, 1, 0);
+        } catch (Exception ex) {
+            // If an error occurs during metric calculations, display a "No data available" message
+            Label noDataLabel = new Label("No data available for overall metrics.");
+            noDataLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+            noDataLabel.setTextFill(Color.web(ERROR_COLOR));
+            metricsGrid.getChildren().clear();
+            metricsGrid.add(noDataLabel, 0, 0, 2, 1);
+            logger.error("Error calculating overall metrics", ex);
+        }
+
         // Add all components to content box
         contentBox.getChildren().addAll(
-            descriptionLabel,
-            separator,
-            metricsGrid
+          descriptionLabel,
+          separator,
+          metricsGrid
         );
-        
+
         return contentBox;
     }
-    
+
+
     private HBox createBottomBar() {
         HBox bottomBar = new HBox(15);
         bottomBar.setAlignment(Pos.CENTER);
