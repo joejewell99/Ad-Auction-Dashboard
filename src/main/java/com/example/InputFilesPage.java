@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
+import static com.example.App.logger;
+
 public class InputFilesPage {
     private Stage stage;
     private Scene scene;
@@ -36,113 +38,164 @@ public class InputFilesPage {
         BorderPane mainLayout = new BorderPane();
         mainLayout.setPadding(new Insets(20));
         mainLayout.setStyle("-fx-background-color: #f5f5f7;");
-        
+
         // Create header section
         VBox headerBox = new VBox(15);
         headerBox.setAlignment(Pos.CENTER);
         headerBox.setPadding(new Insets(20, 0, 40, 0));
-        
+
         Label titleLabel = new Label("Input Files");
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 28));
         titleLabel.setTextFill(Color.web("#333333"));
-        
+
         Label subtitleLabel = new Label("Please select data files for analysis");
         subtitleLabel.setFont(Font.font("Arial", 14));
         subtitleLabel.setTextFill(Color.web("#666666"));
-        
+
         headerBox.getChildren().addAll(titleLabel, subtitleLabel);
         mainLayout.setTop(headerBox);
-        
+
         // File selection section using VBox
         VBox fileSelectionBox = new VBox(20);
         fileSelectionBox.setAlignment(Pos.CENTER);
         fileSelectionBox.setPadding(new Insets(10, 30, 30, 30));
         fileSelectionBox.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
-        
+
         // Initialize properties
         StringProperty impressionProperty = new SimpleStringProperty("");
         StringProperty clickProperty = new SimpleStringProperty("");
         StringProperty serverProperty = new SimpleStringProperty("");
-        
+
         // Create file selection rows
         HBox impressionRow = createFileSelectionRow("Impression Log:", impressionProperty);
         HBox clickRow = createFileSelectionRow("Click Log:", clickProperty);
         HBox serverRow = createFileSelectionRow("Server Log:", serverProperty);
-        
+
         // Create button area
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(20, 0, 10, 0));
-        
+
         Button proceedButton = createStyledButton("Proceed", "#4285F4", "#3367d6");
         Button logoutButton = createStyledButton("Logout", "#757575", "#616161");
-        
+
         buttonBox.getChildren().addAll(proceedButton, logoutButton);
-        
+
         // Add all components to file selection box
         fileSelectionBox.getChildren().addAll(
-                impressionRow, 
-                createSeparator(), 
-                clickRow, 
-                createSeparator(), 
-                serverRow, 
-                createSeparator(), 
-                buttonBox);
-        
+          impressionRow,
+          createSeparator(),
+          clickRow,
+          createSeparator(),
+          serverRow,
+          createSeparator(),
+          buttonBox);
+
         mainLayout.setCenter(fileSelectionBox);
-        
+
         // File chooser
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Log File");
-        
+        // Add extension filter for CSV files
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+
         // Get buttons and set click handlers
         Button impressionLogButton = (Button) impressionRow.getChildren().get(1);
         Button clickLogButton = (Button) clickRow.getChildren().get(1);
         Button serverLogButton = (Button) serverRow.getChildren().get(1);
-        
+
         // Store the impression log in logManager
         impressionLogButton.setOnAction(e -> {
-            impressionLogFile = fileChooser.showOpenDialog(stage);
-            if (impressionLogFile != null) {
-                impressionProperty.set(impressionLogFile.getName());
-                logManager.assignImpressionLog(impressionLogFile);
-                logManager.convertImpressionLog();
-                System.out.println("Impression Log Selected: " + impressionLogFile.getAbsolutePath());
+            try {
+                File file = fileChooser.showOpenDialog(stage);
+                if (file == null) {
+                    showAlert("No file selected for Impression Log.");
+                } else if (!file.getName().toLowerCase().endsWith(".csv")) {
+                    showAlert("Invalid file type. Please select a CSV file for Impression Log.");
+                    logger.error("Invalid file type selected for Impression Log: " + file.getName());
+                } else {
+                    impressionLogFile = file;
+                    impressionProperty.set(impressionLogFile.getName());
+                    logManager.assignImpressionLog(impressionLogFile);
+                    logManager.convertImpressionLog();
+                    System.out.println("Impression Log Selected: " + impressionLogFile.getAbsolutePath());
+                }
+            } catch(Exception ex) {
+                showAlert("Error loading Impression Log file. Please try again.");
+                logger.error("Error in Impression Log selection", ex);
             }
         });
 
         // Store the click log in LogManager
         clickLogButton.setOnAction(e -> {
-            clickLogFile = fileChooser.showOpenDialog(stage);
-            if (clickLogFile != null) {
-                clickProperty.set(clickLogFile.getName());
-                logManager.assignClickLog(clickLogFile);
-                logManager.convertClickLog();
-                System.out.println("Click Log Selected: " + clickLogFile.getAbsolutePath());
+            try {
+                File file = fileChooser.showOpenDialog(stage);
+                if (file == null) {
+                    showAlert("No file selected for Click Log.");
+                } else if (!file.getName().toLowerCase().endsWith(".csv")) {
+                    showAlert("Invalid file type. Please select a CSV file for Click Log.");
+                    logger.error("Invalid file type selected for Click Log: " + file.getName());
+                } else {
+                    clickLogFile = file;
+                    clickProperty.set(clickLogFile.getName());
+                    logManager.assignClickLog(clickLogFile);
+                    logManager.convertClickLog();
+                    System.out.println("Click Log Selected: " + clickLogFile.getAbsolutePath());
+                }
+            } catch(Exception ex) {
+                showAlert("Error loading Click Log file. Please try again.");
+                logger.error("Error in Click Log selection", ex);
             }
         });
 
         // Store the server log in LogManager
         serverLogButton.setOnAction(e -> {
-            serverLogFile = fileChooser.showOpenDialog(stage);
-            if (serverLogFile != null) {
-                serverProperty.set(serverLogFile.getName());
-                logManager.assignServerLog(serverLogFile);
-                logManager.convertServerLog();
-                System.out.println("Server Log Selected: " + serverLogFile.getAbsolutePath());
+            try {
+                File file = fileChooser.showOpenDialog(stage);
+                if (file == null) {
+                    showAlert("No file selected for Server Log.");
+                } else if (!file.getName().toLowerCase().endsWith(".csv")) {
+                    showAlert("Invalid file type. Please select a CSV file for Server Log.");
+                    logger.error("Invalid file type selected for Server Log: " + file.getName());
+                } else {
+                    serverLogFile = file;
+                    serverProperty.set(serverLogFile.getName());
+                    logManager.assignServerLog(serverLogFile);
+                    logManager.convertServerLog();
+                    System.out.println("Server Log Selected: " + serverLogFile.getAbsolutePath());
+                }
+            } catch(Exception ex) {
+                showAlert("Error loading Server Log file. Please try again.");
+                logger.error("Error in Server Log selection", ex);
             }
         });
 
+        // Proceed button event handler with check for at least one file selected
         proceedButton.setOnAction(e -> {
-            System.out.println("Proceed Button clicked");
-            ChartPage chartPage = new ChartPage(stage, logManager);
-            chartPage.show();
+            try {
+                if (impressionLogFile == null && clickLogFile == null && serverLogFile == null) {
+                    showAlert("Please select at least one CSV file before proceeding.");
+                    return;
+                }
+                System.out.println("Proceed Button clicked");
+                ChartPage chartPage = new ChartPage(stage, logManager);
+                chartPage.show();
+            } catch(Exception ex) {
+                showAlert("Error proceeding to the chart page. Please check your input files.");
+                logger.error("Error in Proceed Button action", ex);
+            }
         });
 
+        // Logout button event handler
         logoutButton.setOnAction(e -> {
-            System.out.println("Logout Button clicked");
-            Login login = new Login(stage);
-            login.show();
+            try {
+                System.out.println("Logout Button clicked");
+                Login login = new Login(stage);
+                login.show();
+            } catch(Exception ex) {
+                showAlert("Error logging out. Please try again.");
+                logger.error("Error in Logout Button action", ex);
+            }
         });
 
         scene = new Scene(mainLayout, 800, 600);
@@ -219,6 +272,14 @@ public class InputFilesPage {
         
         row.getChildren().addAll(label, selectButton, fileNameLabel, statusIndicator);
         return row;
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
     
     // Create separator
