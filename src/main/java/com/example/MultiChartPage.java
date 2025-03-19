@@ -1,9 +1,12 @@
 package com.example;
 
+import com.itextpdf.text.DocumentException;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -11,6 +14,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.fx.ChartViewer;
 
 import javax.swing.border.Border;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MultiChartPage {
@@ -56,12 +61,13 @@ public class MultiChartPage {
         chartHolder.setAlignment(Pos.CENTER);
         chartHolder.getChildren().addAll(chartViewer1,chartViewer2);
 
-        //Edit buttons holder
+        //Edit buttons holder + save to pdf holder
         var editChart1Button = new Button("Edit Chart 1");
         var editChart2Button = new Button("Edit Chart 2");
+        var saveToPdfButton = new Button(("Save To Pdf"));
         var editHolder = new HBox(20);
         editHolder.setAlignment(Pos.CENTER);
-        editHolder.getChildren().addAll(editChart1Button,editChart2Button);
+        editHolder.getChildren().addAll(editChart1Button,editChart2Button, saveToPdfButton);
         BorderPane.setMargin(editHolder,new Insets(0,0,100,0));
 
         editChart1Button.setOnAction(e -> {
@@ -72,6 +78,22 @@ public class MultiChartPage {
         editChart2Button.setOnAction(e -> {
             EditPage2 editPage2 = new EditPage2(stage,logManager,currentCharts,timeFlags,genders,incomes,contexts,ages);
             editPage2.show();
+        });
+
+        saveToPdfButton.setOnAction(e -> {
+            try {
+                // Convert JavaFX Chart to BufferedImage
+                WritableImage writableImage = chartHolder.snapshot(null, null);
+                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
+
+                // Save image as PDF
+                chartCreator.saveChartAsPdf(bufferedImage);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (DocumentException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         //Navigation Buttons

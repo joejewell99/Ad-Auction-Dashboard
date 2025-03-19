@@ -19,6 +19,8 @@ import org.jfree.chart.fx.ChartViewer;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -318,7 +320,7 @@ public class ChartPage {
                 BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
 
                 // Save image as PDF
-                saveChartAsPdf(bufferedImage);
+                chartCreator.saveChartAsPdf(bufferedImage);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -411,34 +413,5 @@ public class ChartPage {
         stage.show();
     }
     // Method to save chart as PDF
-    private void saveChartAsPdf(BufferedImage chartImage) throws IOException, DocumentException {
-
-        Document document = new Document();
-
-        PdfWriter.getInstance(document, new FileOutputStream("chart.pdf"));
-
-        document.open();
-
-        File chartPdfFile = File.createTempFile("chart", ".png");
-        ImageIO.write(chartImage, "PNG", chartPdfFile);
-
-        Image pdfImage = Image.getInstance(chartPdfFile.getAbsolutePath());
-
-        pdfImage.scaleToFit(500, 500);  // Adjust the size as needed
-        document.add(pdfImage);
-
-        document.close();
-        ArrayList<String[]> chartList = chartCreator.getClicks();
-         Map<String, Integer> clickMap = chartCreator.getDailyClicks(chartList);
-        for (String[] clickImpression: chartList){
-            String date = clickImpression[0];
-            String id = clickImpression[1];
-            String cc = clickImpression[2];
-            System.out.println(date + " " + id + " " + cc + " " + clickMap);
-
-        }
-
-        System.out.println("Chart saved as PDF!");
-    }
 }
 

@@ -1,18 +1,33 @@
 package com.example;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.statistics.HistogramDataset;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -36,7 +51,7 @@ public class ChartCreator {
 
     /**
      * Generates chart for total clicks
-     */
+
     public JFreeChart genClickChart(String time,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
         Map<String,Integer> clickMap = new TreeMap<>();
         ArrayList<String[]> filteredClicks= filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age)[0];
@@ -52,6 +67,163 @@ public class ChartCreator {
         System.out.println("Row count: " + dataset.getRowCount());
         System.out.println("Column count: " + dataset.getColumnCount());
         return(createChart("Total Clicks","Clicks",dataset));
+    }
+     */
+
+    public JFreeChart genClickChart(String time,String gender,String income,ArrayList<String> context,ArrayList<String> age) {
+        // Sample data for the histogram (values just to create a meaningful single bar)
+        // Create a dataset for the histogram with one bin
+        HistogramDataset dataset = new HistogramDataset();
+        // Create the chart
+        JFreeChart chart = ChartFactory.createHistogram(
+                "Total Clicks",  // Chart title
+                "Day",              // X-axis label
+                "Number Of Clicks",           // Y-axis label
+                dataset,               // Dataset
+                PlotOrientation.VERTICAL, // Vertical orientation
+                true,                  // Include legend
+                true,                  // Tooltips
+                false                  // URLs
+        );
+
+        // Customize the chart appearance
+        chart.setBackgroundPaint(Color.white);
+
+        // Get the plot and set the range axis
+        XYPlot plot = chart.getXYPlot();
+
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+
+        NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
+
+        if (time.equals("Daily")) {
+            int numberOfClicks = getIntegerDailyClicks(getClicks(), getFormattedDateTime());
+            double[] data = generateClickArray(numberOfClicks,0.0,24.0);
+            dataset.addSeries(getFormattedDateTime().split(" ")[0], data, 1);  // Only one bin for the histogram
+            rangeAxis.setRange(0, 50);  // Set the range from 0 to 50
+
+            // Set the tick unit for the Y-axis (interval of 5)
+            rangeAxis.setTickUnit(new org.jfree.chart.axis.NumberTickUnit(5));
+
+            domainAxis.setRange(0, 24);  // Set X-axis range from 0 to 8
+            domainAxis.setTickUnit(new NumberTickUnit(24));  // Set tick unit for X-axis
+
+
+        } else if (time.equals("Weekly")) {
+            LocalDate now = LocalDate.now();
+
+            // Loop through the week (0 to 6)
+            for (int i = 0; i < 7; i++) {
+                // Get the Monday of the current week
+                LocalDate monday = now.with(DayOfWeek.MONDAY);
+
+                // Calculate the date for the specific day of the week
+                LocalDate targetDate = monday.plusDays(i);
+                int clicksOnDay = getIntegerDailyClicks(getClicks(), targetDate.toString());
+                if (clicksOnDay > 0) {
+
+                    // Switch statement to handle each day of the week
+                    switch (i) {
+                        case 0: // Monday
+                            dataset.addSeries("Monday", generateClickArray(clicksOnDay, 0.0, 1.0), 1);  // Only one bin for the histogram
+                            break;
+                        case 1: // Tuesday
+                            dataset.addSeries("Tuesday", generateClickArray(clicksOnDay, 1.0, 2.0), 1);  // Only one bin for the histogram
+                            break;
+                        case 2: // Wednesday
+                            dataset.addSeries("Wednesday", generateClickArray(clicksOnDay, 2.0, 3.0), 1);  // Only one bin for the histogram
+                            break;
+                        case 3: // Thursday
+                            dataset.addSeries("Thursday", generateClickArray(clicksOnDay, 3.0, 4.0), 1);  // Only one bin for the histogram
+                            break;
+                        case 4: // Friday
+                            dataset.addSeries("Friday", generateClickArray(clicksOnDay, 4.0, 5.0), 1);  // Only one bin for the histogram
+                            break;
+                        case 5: // Saturday
+                            dataset.addSeries("Saturday", generateClickArray(clicksOnDay, 5.0, 6.0), 1);  // Only one bin for the histogram
+                            break;
+                        case 6: // Sunday
+                            dataset.addSeries("Sunday", generateClickArray(clicksOnDay, 6.0, 7.0), 1);  // Only one bin for the histogram
+                            break;
+                        default:
+                            System.out.println("Invalid day");
+                    }
+                }
+            }
+
+            // Set the tick unit for the Y-axis (interval of 5)
+            rangeAxis.setRange(0, 100);  // Set the range from 0 to 50
+            rangeAxis.setTickUnit(new org.jfree.chart.axis.NumberTickUnit(5));
+
+            domainAxis.setRange(0, 7);  // Set X-axis range from 0 to 8
+            domainAxis.setTickUnit(new NumberTickUnit(1));  // Set tick unit for X-axis
+
+
+        }else if (time.equals("Monthly")) {
+            LocalDate now = LocalDate.now();
+            // Get the current date
+            LocalDate today = LocalDate.now();
+
+            // Get the first day of the current month
+            LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+
+            // Get the number of days in the current month
+            int daysInMonth = today.lengthOfMonth();
+
+            // Loop through the days of the month (1 to max day in month)
+            for (int i = 1; i <= daysInMonth; i++) {
+                // Generate the date for this specific day of the month
+                LocalDate targetDate = firstDayOfMonth.plusDays(i - 1); // i-1 to adjust for the first day
+
+                // Get the day of the week for the target date
+                DayOfWeek dayOfWeek = targetDate.getDayOfWeek();
+
+                // Format the date as "YYYY-MM-dd"
+                String formattedDate = targetDate.toString();
+
+                // Get the number of clicks for this specific day (assuming getClicks() is already defined)
+                int clicksOnDay = getIntegerDailyClicks(getClicks(), formattedDate);
+                double minXToDouble = i - 1.0;
+                double maxXToDouble = i + 0.0;
+                if (clicksOnDay > 0) {
+                    // Switch statement to handle each day of the week
+                    switch (dayOfWeek) {
+                        case MONDAY:
+                            dataset.addSeries("Monday" + formattedDate, generateClickArray(clicksOnDay, minXToDouble, maxXToDouble), 1);  // Only one bin for the histogram
+                            break;
+                        case TUESDAY:
+                            dataset.addSeries("Tuesday", generateClickArray(clicksOnDay, minXToDouble, maxXToDouble), 1);  // Only one bin for the histogram
+                            break;
+                        case WEDNESDAY:
+                            dataset.addSeries("Wednesday", generateClickArray(clicksOnDay, minXToDouble, maxXToDouble), 1);  // Only one bin for the histogram
+                            break;
+                        case THURSDAY:
+                            dataset.addSeries("Thursday", generateClickArray(clicksOnDay, minXToDouble, maxXToDouble), 1);  // Only one bin for the histogram
+                            break;
+                        case FRIDAY:
+                            dataset.addSeries("Friday", generateClickArray(clicksOnDay, minXToDouble, maxXToDouble), 1);  // Only one bin for the histogram
+                            break;
+                        case SATURDAY:
+                            dataset.addSeries("Saturday", generateClickArray(clicksOnDay, minXToDouble, maxXToDouble), 1);  // Only one bin for the histogram
+                            break;
+                        case SUNDAY:
+                            dataset.addSeries("Sunday", generateClickArray(clicksOnDay, minXToDouble, maxXToDouble), 1);  // Only one bin for the histogram
+                            break;
+                        default:
+                            System.out.println("Invalid day");
+                    }
+                }
+            }
+
+            // Set the tick unit for the Y-axis (interval of 5)
+            rangeAxis.setRange(0, 100);  // Set the range from 0 to 50
+            rangeAxis.setTickUnit(new org.jfree.chart.axis.NumberTickUnit(5));
+
+            domainAxis.setRange(0, daysInMonth);  // Set X-axis range from 0 to 8
+            domainAxis.setTickUnit(new NumberTickUnit(1));  // Set tick unit for X-axis
+        }
+
+        return chart;
     }
 
     /**
@@ -412,6 +584,17 @@ public class ChartCreator {
             clickMap.put(date, clickMap.getOrDefault(date, 1) + 1);
         }
         return clickMap;
+    }
+
+    public int getIntegerDailyClicks (ArrayList<String[]> clicks, String date) {
+        int dailyClicks = 0;
+        for(String[] click : clicks) {
+            String dateAndTime = click[0].split(" ")[0];
+            if(dateAndTime.equals(date.split(" ")[0])) {
+                dailyClicks+=1;
+            }
+        }
+       return dailyClicks;
     }
 
     /**
@@ -827,6 +1010,69 @@ public class ChartCreator {
             return (genCPMChart(timeFlag,gender,income,context,age));
         }
 
+    }
+
+    // Method to get the current date and time in the specified format
+    public static String getFormattedDateTime() {
+        // Get the current date and time
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        // Define a date and time format pattern
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // Format the current date and time and return the result
+        return currentDateTime.format(formatter);
+    }
+
+    public static double[] generateClickArray(int numberOfClicks, Double XStart, Double XFinish) {
+        // Check for valid number of clicks
+        if (numberOfClicks == 1){
+            return new double[]{(XStart+XFinish)/2};
+        }else if(numberOfClicks == 0){
+            return new double[]{1000.0};
+        }
+        // Create an array of the desired length (numberOfClicks)
+        double[] data = new double[numberOfClicks];
+
+        // Set the first element to 0.0
+        data[0] = XStart;
+
+        // Set the last element to 24.0
+        data[numberOfClicks - 1] = XFinish;
+
+        // Set the middle elements to 1.0 (numberOfClicks - 2 elements)
+        for (int i = 1; i < numberOfClicks - 1; i++) {
+            data[i] = (XStart + XFinish) / 2;
+        }
+
+        return data;
+    }
+
+    public void saveChartAsPdf(BufferedImage chartImage) throws IOException, DocumentException {
+
+        Document document = new Document();
+
+        PdfWriter.getInstance(document, new FileOutputStream("chart.pdf"));
+
+        document.open();
+
+        File chartPdfFile = File.createTempFile("chart", ".png");
+        ImageIO.write(chartImage, "PNG", chartPdfFile);
+
+        com.itextpdf.text.Image pdfImage = com.itextpdf.text.Image.getInstance(chartPdfFile.getAbsolutePath());
+
+        pdfImage.scaleToFit(500, 500);  // Adjust the size as needed
+        document.add(pdfImage);
+
+        document.close();
+        ArrayList<String[]> chartList = getClicks();
+        for (String[] clickImpression: chartList){
+            String date = clickImpression[0];
+            String id = clickImpression[1];
+            String cc = clickImpression[2];
+            System.out.println(date + " " + id + " " + cc + " ");
+        }
+        System.out.println("Chart saved as PDF!");
     }
 
 }
