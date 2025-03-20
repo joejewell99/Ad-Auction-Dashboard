@@ -1,12 +1,13 @@
 package com.example;
 import org.mindrot.jbcrypt.BCrypt;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class LoginDatabase {
+    // url connection
     private static final String DB_URL = "jdbc:sqlite:login.db";
+    //create a db table
     private static final String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS users ("
             + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
             + "username TEXT UNIQUE, "
@@ -42,6 +43,7 @@ public class LoginDatabase {
         }
     }
 
+    // authenticate method
     public boolean authenticate(String username, String password) {
         String query = "SELECT password FROM users WHERE username = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -50,7 +52,7 @@ public class LoginDatabase {
             try (ResultSet rs = pstmt.executeQuery()){
                 if (rs.next()) {
                     String storedHash = rs.getString("password");
-
+                    // check with hashed password
                     return BCrypt.checkpw(password, storedHash);
                 }
             }
