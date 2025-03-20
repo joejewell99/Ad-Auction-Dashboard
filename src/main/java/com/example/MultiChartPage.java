@@ -1,11 +1,14 @@
 package com.example;
 
+import com.itextpdf.text.DocumentException;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,6 +19,8 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import org.jfree.chart.fx.ChartViewer;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.example.App.logger;
@@ -28,7 +33,7 @@ public class MultiChartPage {
     private ArrayList<String> incomes;
     private ArrayList<ArrayList<String>> contexts;
     private ArrayList<ArrayList<String>> ages;
-
+    private HBox chartContainer = null;
     private ChartCreator chartCreator;
     private LogManager logManager;
 
@@ -138,7 +143,7 @@ public class MultiChartPage {
         descriptionLabel.setTextFill(Color.web("#666666"));
 
         // Create chart container
-        HBox chartContainer = new HBox(30);
+        chartContainer = new HBox(30);
         chartContainer.setAlignment(Pos.CENTER);
 
         // Create ChartViewer instance for chart 1 with error handling and no-data check
@@ -235,6 +240,7 @@ public class MultiChartPage {
         
         Button editChart1Button = createStyledButton("Edit Chart 1", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         Button editChart2Button = createStyledButton("Edit Chart 2", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
+        Button saveToPdfButton = createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         
         // Set button events
         editChart1Button.setOnAction(e -> {
@@ -246,8 +252,24 @@ public class MultiChartPage {
             EditPage2 editPage2 = new EditPage2(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages);
             editPage2.show();
         });
+
+        saveToPdfButton.setOnAction(e -> {
+            try {
+                // Convert JavaFX Chart to BufferedImage
+                WritableImage writableImage = chartContainer.snapshot(null, null);
+                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
+
+                // Save image as PDF
+                chartCreator.saveChartAsPdf(bufferedImage);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (DocumentException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         
-        editBar.getChildren().addAll(editChart1Button, editChart2Button);
+        editBar.getChildren().addAll(editChart1Button, editChart2Button, saveToPdfButton);
         
         return editBar;
     }

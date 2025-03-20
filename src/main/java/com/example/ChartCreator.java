@@ -1,5 +1,8 @@
 package com.example;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -9,8 +12,13 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -792,6 +800,27 @@ public class ChartCreator {
             }
         }
         return firstDate;
+    }
+
+    public void saveChartAsPdf(BufferedImage chartImage) throws IOException, DocumentException {
+
+        Document document = new Document();
+
+        PdfWriter.getInstance(document, new FileOutputStream("chart.pdf"));
+
+        document.open();
+
+        File chartPdfFile = File.createTempFile("chart", ".png");
+        ImageIO.write(chartImage, "PNG", chartPdfFile);
+
+        com.itextpdf.text.Image pdfImage = com.itextpdf.text.Image.getInstance(chartPdfFile.getAbsolutePath());
+
+        pdfImage.scaleToFit(500, 500);  // Adjust the size as needed
+        document.add(pdfImage);
+
+        document.close();
+
+        System.out.println("Chart saved as PDF!");
     }
 
 

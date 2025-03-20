@@ -1,9 +1,13 @@
 package com.example;
 
+import com.itextpdf.awt.geom.Dimension;
+import com.itextpdf.text.DocumentException;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -12,9 +16,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.fx.ChartViewer;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +33,7 @@ public class ChartPage {
     private ChartCreator chartCreator;
     private String timeFlag;
     private String currentChart;
+    ChartViewer chartViewer = null;
 
     private String gender;
     private ArrayList<String> age;
@@ -59,7 +67,6 @@ public class ChartPage {
         root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
 
         // Chart display area
-        ChartViewer chartViewer = null;
         try {
             // Create chart using current settings
             chartViewer = new ChartViewer(chartCreator.updateChart(currentChart, timeFlag, gender, income, context, age));
@@ -170,6 +177,8 @@ public class ChartPage {
         
         // File selection button
         Button fileSelectionButton = createStyledButton("Select Files", "#757575", "#616161");
+
+        Button saveToPdfButton = createStyledButton("Save To Pdf", "#757575", "#616161");
         
         // Set button actions
         overallMetricsButton.setOnAction(e -> {
@@ -215,8 +224,24 @@ public class ChartPage {
             InputFilesPage inputFilesPage = new InputFilesPage(stage);
             inputFilesPage.show();
         });
+
+        saveToPdfButton.setOnAction(e -> {
+            try {
+                // Convert JavaFX Chart to BufferedImage
+                WritableImage writableImage = chartViewer.snapshot(null, null);
+                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
+
+                // Save image as PDF
+                chartCreator.saveChartAsPdf(bufferedImage);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (DocumentException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         
-        navBar.getChildren().addAll(title, spacer, fileSelectionButton, overallMetricsButton, compareChartsButton, logOutButton);
+        navBar.getChildren().addAll(title, spacer, fileSelectionButton,saveToPdfButton, overallMetricsButton, compareChartsButton, logOutButton);
         return navBar;
     }
     
