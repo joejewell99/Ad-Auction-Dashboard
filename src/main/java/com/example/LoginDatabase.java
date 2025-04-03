@@ -104,7 +104,6 @@ public class LoginDatabase {
         }
         return addUser(username, password);
     }
-
     public boolean updateUserPassword(String username, String newPassword) {
         String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         String updateSQL = "UPDATE users SET password = ? WHERE username = ?";

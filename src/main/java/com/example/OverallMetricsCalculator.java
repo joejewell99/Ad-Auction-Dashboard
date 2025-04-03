@@ -14,12 +14,8 @@ public class OverallMetricsCalculator {
      * @param impressionData
      * @return
      */
-    public int calcImpressions (ArrayList<String[]> impressionData) {
-        int impressions = 0;
-        for (String[] impression : impressionData){
-            impressions += 1;
-        }
-        return impressions;
+    public int calcImpressions (ArrayList<String[]> impressionData){
+        return impressionData.size();
     }
 
     /**
@@ -28,11 +24,7 @@ public class OverallMetricsCalculator {
      * @return
      */
     public int calcClicks (ArrayList<String[]> clickData) {
-        int clicks = 0;
-        for (String[] click : clickData){
-            clicks += 1;
-        }
-        return clicks;
+       return clickData.size();
     }
 
     /**

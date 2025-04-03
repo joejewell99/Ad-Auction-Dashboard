@@ -105,6 +105,7 @@ public class MultiChartPage {
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
         
         Button backButton = createStyledButton("Back to Charts", "#757575", "#616161");
+        Button saveToPdfButton = createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         Button overallMetricsButton = createStyledButton("Overall Metrics", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
         
@@ -123,9 +124,25 @@ public class MultiChartPage {
             Login login = new Login(stage);
             login.show();
         });
+
+        saveToPdfButton.setOnAction(e -> {
+            try {
+                // Convert JavaFX Chart to BufferedImage
+                WritableImage writableImage = chartContainer.snapshot(null, null);
+                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
+
+                // Save image as PDF
+                chartCreator.saveChartAsPdf(bufferedImage);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (DocumentException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         
         // Add to navigation bar
-        navBar.getChildren().addAll(title, spacer, backButton, overallMetricsButton, logOutButton);
+        navBar.getChildren().addAll(title, spacer, backButton,saveToPdfButton, overallMetricsButton, logOutButton);
         
         return navBar;
     }
@@ -244,12 +261,12 @@ public class MultiChartPage {
         
         // Set button events
         editChart1Button.setOnAction(e -> {
-            EditPage1 editPage = new EditPage1(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages);
+            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 0);
             editPage.show();
         });
         
         editChart2Button.setOnAction(e -> {
-            EditPage2 editPage2 = new EditPage2(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages);
+            EditPage editPage2 = new EditPage(stage,logManager, currentCharts, timeFlags, genders, incomes, contexts, ages ,1);
             editPage2.show();
         });
 
@@ -269,7 +286,7 @@ public class MultiChartPage {
             }
         });
         
-        editBar.getChildren().addAll(editChart1Button, editChart2Button, saveToPdfButton);
+        editBar.getChildren().addAll(editChart1Button, editChart2Button);
         
         return editBar;
     }

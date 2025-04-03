@@ -113,6 +113,9 @@ public class InputFilesPage {
                 } else if (!file.getName().toLowerCase().endsWith(".csv")) {
                     showAlert("Invalid file type. Please select a CSV file for Impression Log.");
                     logger.error("Invalid file type selected for Impression Log: " + file.getName());
+                } else if(!file.getName().toLowerCase().equals("impression_log.csv")){
+                    showAlert("Invalid file type, Expected input csv: impression_log.csv");
+                    logger.error("Invalid file name selected for server log: " + file.getName());
                 } else {
                     impressionLogFile = file;
                     impressionProperty.set(impressionLogFile.getName());
@@ -135,6 +138,9 @@ public class InputFilesPage {
                 } else if (!file.getName().toLowerCase().endsWith(".csv")) {
                     showAlert("Invalid file type. Please select a CSV file for Click Log.");
                     logger.error("Invalid file type selected for Click Log: " + file.getName());
+                } else if(!file.getName().toLowerCase().equals("clicks_log.csv")){
+                    showAlert("Invalid file type, Expected input csv: clicks_log.csv");
+                    logger.error("Invalid file name selected for server log: " + file.getName());
                 } else {
                     clickLogFile = file;
                     clickProperty.set(clickLogFile.getName());
@@ -157,6 +163,9 @@ public class InputFilesPage {
                 } else if (!file.getName().toLowerCase().endsWith(".csv")) {
                     showAlert("Invalid file type. Please select a CSV file for Server Log.");
                     logger.error("Invalid file type selected for Server Log: " + file.getName());
+                } else if(!file.getName().toLowerCase().equals("server_log.csv")){
+                    showAlert("Invalid file type, Expected input csv: server_log.csv");
+                    logger.error("Invalid file name selected for server log: " + file.getName());
                 } else {
                     serverLogFile = file;
                     serverProperty.set(serverLogFile.getName());
