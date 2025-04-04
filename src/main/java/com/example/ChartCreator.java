@@ -416,7 +416,7 @@ public class ChartCreator {
         Map<String,Integer> clickMap = new TreeMap<>();
         for (String[] click : clicks){
             String date = click[0].split(" ")[0];
-            clickMap.put(date, clickMap.getOrDefault(date, 1) + 1);
+            clickMap.put(date, clickMap.getOrDefault(date, 0) + 1);
         }
         return clickMap;
     }
@@ -434,7 +434,7 @@ public class ChartCreator {
             LocalDate date = LocalDate.parse(click[0].split(" ")[0]);
             int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
             String week = "Week " + Integer.toString(weekNumber);
-            clickMap.put(week,clickMap.getOrDefault(week,1) + 1);
+            clickMap.put(week,clickMap.getOrDefault(week,0) + 1);
         }
 
         return clickMap;
@@ -453,7 +453,7 @@ public class ChartCreator {
             LocalDate date = LocalDate.parse(click[0].split(" ")[0]);
             int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
             String month = "Month " + Integer.toString(monthNumber);
-            clickMap.put(month,clickMap.getOrDefault(month,1) + 1);
+            clickMap.put(month,clickMap.getOrDefault(month,0) + 1);
         }
 
         return clickMap;
@@ -469,7 +469,7 @@ public class ChartCreator {
         Map<String,Integer> impressionMap = new TreeMap<>();
         for (String[] impression : impressions){
             String date = impression[0].split(" ")[0];
-            impressionMap.put(date, impressionMap.getOrDefault(date, 1) + 1);
+            impressionMap.put(date, impressionMap.getOrDefault(date, 0) + 1);
         }
         return impressionMap;
     }
@@ -487,7 +487,7 @@ public class ChartCreator {
             LocalDate date = LocalDate.parse(impression[0].split(" ")[0]);
             int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
             String week = "Week " + Integer.toString(weekNumber);
-            impressionMap.put(week,impressionMap.getOrDefault(week,1) + 1);
+            impressionMap.put(week,impressionMap.getOrDefault(week,0) + 1);
         }
         return impressionMap;
     }
@@ -505,7 +505,7 @@ public class ChartCreator {
             LocalDate date = LocalDate.parse(impression[0].split(" ")[0]);
             int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
             String month = "Month " + Integer.toString(monthNumber);
-            impressionMap.put(month,impressionMap.getOrDefault(month,1) + 1);
+            impressionMap.put(month,impressionMap.getOrDefault(month,0) + 1);
         }
         return impressionMap;
     }
@@ -528,7 +528,7 @@ public class ChartCreator {
                 uniqueIDs.add(id);
                 String date = dateTime.split(" ")[0];
 
-                clickMap.put(date,clickMap.getOrDefault(date,1)+1);
+                clickMap.put(date,clickMap.getOrDefault(date,0)+1);
             }
         }
         return clickMap;
@@ -553,7 +553,7 @@ public class ChartCreator {
 
             if (!uniqueIDs.contains(id)) {
                 uniqueIDs.add(id);
-                clickMap.put(week,clickMap.getOrDefault(week,1)+1);
+                clickMap.put(week,clickMap.getOrDefault(week,0)+1);
             }
         }
         return clickMap;
@@ -579,7 +579,7 @@ public class ChartCreator {
 
             if (!uniqueIDs.contains(id)) {
                 uniqueIDs.add(id);
-                clickMap.put(month,clickMap.getOrDefault(month,1)+1);
+                clickMap.put(month,clickMap.getOrDefault(month,0)+1);
             }
         }
         return clickMap;
@@ -596,7 +596,10 @@ public class ChartCreator {
         for (String[] interaction : interactions){
             if (interaction[4].equals("Yes")) {
                 String date = interaction[0].split(" ")[0];
-                conversionMap.put(date, conversionMap.getOrDefault(date, 1) + 1);
+                conversionMap.put(date, conversionMap.getOrDefault(date, 0) + 1);
+            } else {
+                String date = interaction[0].split(" ")[0];
+                conversionMap.put(date, 0);
             }
         }
         return conversionMap;
@@ -616,7 +619,12 @@ public class ChartCreator {
                 LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
                 int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
                 String week = "Week " + Integer.toString(weekNumber);
-                conversionMap.put(week,conversionMap.getOrDefault(week,1) + 1);
+                conversionMap.put(week,conversionMap.getOrDefault(week,0) + 1);
+            } else {
+                LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
+                String week = "Week " + Integer.toString(weekNumber);
+                conversionMap.put(week,conversionMap.getOrDefault(week,0));
             }
         }
         return conversionMap;
@@ -636,7 +644,12 @@ public class ChartCreator {
                 LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
                 int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
                 String month = "Month " + Integer.toString(monthNumber);
-                conversionMap.put(month,conversionMap.getOrDefault(month,1) + 1);
+                conversionMap.put(month,conversionMap.getOrDefault(month,0) + 1);
+            } else {
+                LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+                String month = "Month " + Integer.toString(monthNumber);
+                conversionMap.put(month,conversionMap.getOrDefault(month,0));
             }
         }
         return conversionMap;
@@ -656,14 +669,14 @@ public class ChartCreator {
             String dateTime = click[0];
             String date = dateTime.split(" ")[0];
             float cost = Float.parseFloat(click[2]);
-            costMap.put(date,costMap.getOrDefault(date,cost) + cost);
+            costMap.put(date,costMap.getOrDefault(date,(float) 0) + cost);
         }
 
         for (String[] impression: impressions) {
             String dateTime = impression[0];
             String date = dateTime.split(" ")[0];
             float cost = Float.parseFloat(impression[6]);
-            costMap.put(date,costMap.getOrDefault(date,cost) + cost);
+            costMap.put(date,costMap.getOrDefault(date,(float) 0) + cost);
         }
 
         return costMap;
@@ -684,7 +697,7 @@ public class ChartCreator {
             int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
             String week = "Week " + Integer.toString(weekNumber);
             float cost = Float.parseFloat(click[2]);
-            costMap.put(week,costMap.getOrDefault(week,cost) + cost);
+            costMap.put(week,costMap.getOrDefault(week,(float) 0) + cost);
         }
 
         for (String[] impression : impressions) {
@@ -692,7 +705,7 @@ public class ChartCreator {
             int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
             String week = "Week " + Integer.toString(weekNumber);
             float cost = Float.parseFloat(impression[6]);
-            costMap.put(week,costMap.getOrDefault(week,cost) + cost);
+            costMap.put(week,costMap.getOrDefault(week,(float) 0) + cost);
         }
         return costMap;
     }
@@ -712,7 +725,7 @@ public class ChartCreator {
             int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
             String month = "Month " + Integer.toString(monthNumber);
             float cost = Float.parseFloat(click[2]);
-            costMap.put(month,costMap.getOrDefault(month,cost) + cost);
+            costMap.put(month,costMap.getOrDefault(month,(float) 0) + cost);
         }
 
         for (String[] impression : impressions) {
@@ -720,7 +733,7 @@ public class ChartCreator {
             int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
             String month = "Month " + Integer.toString(monthNumber);
             float cost = Float.parseFloat(impression[6]);
-            costMap.put(month,costMap.getOrDefault(month,cost) + cost);
+            costMap.put(month,costMap.getOrDefault(month, (float) 0) + cost);
         }
         return costMap;
     }
@@ -738,7 +751,7 @@ public class ChartCreator {
                 String dateTime = interaction[0];
                 String date = dateTime.split(" ")[0];
 
-                interactionMap.put(date, interactionMap.getOrDefault(date, 1) + 1);
+                interactionMap.put(date, interactionMap.getOrDefault(date, 0) + 1);
             }
         }
         return interactionMap;
@@ -758,7 +771,7 @@ public class ChartCreator {
                 LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
                 int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
                 String week = "Week " + Integer.toString(weekNumber);
-                bounceMap.put(week,bounceMap.getOrDefault(week,1) + 1);
+                bounceMap.put(week,bounceMap.getOrDefault(week,0) + 1);
             }
         }
         return bounceMap;
@@ -778,7 +791,7 @@ public class ChartCreator {
                 LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
                 int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
                 String month = "Month " + Integer.toString(monthNumber);
-                bounceMap.put(month,bounceMap.getOrDefault(month,1) + 1);
+                bounceMap.put(month,bounceMap.getOrDefault(month,0) + 1);
             }
         }
         return bounceMap;
