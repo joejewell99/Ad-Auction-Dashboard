@@ -28,7 +28,7 @@ public class Login {
      * Constructors for primary stage + initializes the login class.
      * @param stage
      */
-    Login(Stage stage) {
+    public Login(Stage stage) {
         this.stage = stage;
         initialize();
     }
@@ -201,7 +201,7 @@ public class Login {
         loginBox.getChildren().add(manageUsersButton);
         manageUsersButton.setOnAction(event -> {
             try {
-                new UserManagementPage(stage).show();
+                new UserManagementPage (stage).show();
             } catch(Exception ex) {
                 showAlert("Error opening User Management.");
                 logger.error("Error in Manage Users button", ex);
