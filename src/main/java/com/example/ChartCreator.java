@@ -815,7 +815,11 @@ public class ChartCreator {
         return firstDate;
     }
 
-    public void saveChartAsPdf(BufferedImage chartImage) throws IOException, DocumentException {
+    public void saveChartAsPdf(BufferedImage chartImage) throws IOException, DocumentException, NullPointerException {
+
+        if (chartImage == null) {
+            throw new NullPointerException();
+        }
 
         Document document = new Document();
 
@@ -835,6 +839,21 @@ public class ChartCreator {
 
         System.out.println("Chart saved as PDF!");
     }
+
+    public void saveChartAsPdfToFile(BufferedImage chartImage, String outputPath) throws IOException, DocumentException {
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(outputPath));
+        document.open();
+
+        File chartPdfFile = File.createTempFile("chart", ".png");
+        ImageIO.write(chartImage, "PNG", chartPdfFile);
+        com.itextpdf.text.Image pdfImage = com.itextpdf.text.Image.getInstance(chartPdfFile.getAbsolutePath());
+
+        pdfImage.scaleToFit(500, 500);
+        document.add(pdfImage);
+        document.close();
+    }
+
 
 
     /**
