@@ -72,7 +72,7 @@ public class EditPage{
 
         Scene scene = new Scene(root, 1300, 800);
         stage.setScene(scene);
-        stage.setTitle("Ad Auction Dashboard - Edit Chart 1");
+        stage.setTitle("Ad Auction Dashboard - Edit Chart");
         stage.show();
     }
 
@@ -84,7 +84,7 @@ public class EditPage{
         navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
 
-        Label title = new Label("Edit Chart 1");
+        Label title = new Label("Edit Chart");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         title.setTextFill(Color.web(HEADER_COLOR));
 
