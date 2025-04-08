@@ -127,12 +127,12 @@ public class MultiChartPage {
 
         saveToPdfButton.setOnAction(e -> {
             try {
-                // Convert JavaFX Chart to BufferedImage
+                // Convert JavaFX Chart to image
                 WritableImage writableImage = chartContainer.snapshot(null, null);
-                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
+
 
                 // Save image as PDF
-                chartCreator.saveChartAsPdf(bufferedImage);
+                chartCreator.saveChartAsPdf(writableImage,stage);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -272,12 +272,11 @@ public class MultiChartPage {
 
         saveToPdfButton.setOnAction(e -> {
             try {
-                // Convert JavaFX Chart to BufferedImage
+                // Convert JavaFX Chart to image
                 WritableImage writableImage = chartContainer.snapshot(null, null);
-                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
 
                 // Save image as PDF
-                chartCreator.saveChartAsPdf(bufferedImage);
+                chartCreator.saveChartAsPdf(writableImage,stage);
 
             } catch (IOException ex) {
                 ex.printStackTrace();

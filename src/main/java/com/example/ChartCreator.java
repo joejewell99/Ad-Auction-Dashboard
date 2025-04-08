@@ -3,6 +3,10 @@ package com.example;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfWriter;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.WritableImage;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -815,29 +819,35 @@ public class ChartCreator {
         return firstDate;
     }
 
-    public void saveChartAsPdf(BufferedImage chartImage) throws IOException, DocumentException, NullPointerException {
-
+    public void saveChartAsPdf(WritableImage chartImage, Window window) throws IOException, DocumentException, NullPointerException {
         if (chartImage == null) {
             throw new NullPointerException();
         }
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(chartImage, null);
 
-        Document document = new Document();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Chart as PDF");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf"));
+        File file = fileChooser.showSaveDialog(window);
 
-        PdfWriter.getInstance(document, new FileOutputStream("chart.pdf"));
+        if (file != null) {
+            if (!file.getName().toLowerCase().endsWith(".pdf")) {
+                file = new File(file.getAbsolutePath() + ".pdf");
+            }
 
-        document.open();
+            File chartFile = File.createTempFile("chart", ".png");
+            ImageIO.write(bufferedImage, "png", chartFile);
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream(file));
+            document.open();
 
-        File chartPdfFile = File.createTempFile("chart", ".png");
-        ImageIO.write(chartImage, "PNG", chartPdfFile);
+            com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(chartFile.getAbsolutePath());
+            image.scaleToFit(document.getPageSize().getWidth() - 50, document.getPageSize().getHeight() - 50);
+            document.add(image);
 
-        com.itextpdf.text.Image pdfImage = com.itextpdf.text.Image.getInstance(chartPdfFile.getAbsolutePath());
-
-        pdfImage.scaleToFit(500, 500);  // Adjust the size as needed
-        document.add(pdfImage);
-
-        document.close();
-
-        System.out.println("Chart saved as PDF!");
+            document.close();
+            chartFile.delete();
+        }
     }
 
     public void saveChartAsPdfToFile(BufferedImage chartImage, String outputPath) throws IOException, DocumentException {

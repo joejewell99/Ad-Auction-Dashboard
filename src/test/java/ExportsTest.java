@@ -38,7 +38,7 @@ class ExportsTest {
     @Test
     void testSaveChartAsPdfWithNullImage() {
         assertThrows(NullPointerException.class, () -> {
-            chartCreator.saveChartAsPdf(null);
+            chartCreator.saveChartAsPdf(null,null);
         });
     }
 }
