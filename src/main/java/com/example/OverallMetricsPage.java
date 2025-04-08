@@ -75,7 +75,7 @@ public class OverallMetricsPage {
         BorderPane.setMargin(bottomBar, new Insets(0, 0, 20, 0));
         
         // Create scene
-        scene = new Scene(root, 600, 650);
+        scene = new Scene(root, 1300, 800);
     }
     
     private HBox createTopBar() {
@@ -96,7 +96,7 @@ public class OverallMetricsPage {
         VBox contentBox = new VBox(15);
         contentBox.setAlignment(Pos.TOP_CENTER);
         contentBox.setPadding(new Insets(30, 40, 30, 40));
-        contentBox.setMaxWidth(540);
+        contentBox.setMaxWidth(700);
         contentBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
           "-fx-background-radius: 10; " +
           "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
@@ -145,7 +145,7 @@ public class OverallMetricsPage {
               createMetricItem("Unique Visitors", uniquesValue + "", false),
               createMetricItem("Bounces", bouncesValue + "", false),
               createMetricItem("Conversions", conversionsValue + "", false),
-              createMetricItem("Total Cost", String.format("%.2f", costValue) + " ¥", false)
+              createMetricItem("Total Cost", String.format("%.2f", costValue), false)
             );
 
             // Second column: Ratio metrics
@@ -156,11 +156,11 @@ public class OverallMetricsPage {
             VBox ratioMetricsBox = new VBox(12);
             ratioMetricsBox.getChildren().addAll(
               ratioMetricsTitle,
-              createMetricItem("Click-Through Rate (CTR)", formatPercentage(ctrValue), true),
-              createMetricItem("Cost Per Acquisition (CPA)", String.format("%.2f", cpaValue) + " ¥", true),
-              createMetricItem("Cost Per Click (CPC)", String.format("%.2f", cpcValue) + " ¥", true),
-              createMetricItem("Cost Per Mille (CPM)", String.format("%.2f", cpmValue) + " ¥", true),
-              createMetricItem("Bounce Rate", formatPercentage(bounceRateValue), true)
+              createMetricItem("Click-Through Rate (CTR)",Float.toString(ctrValue), true),
+              createMetricItem("Cost Per Acquisition (CPA)", String.format("%.2f", cpaValue),true),
+              createMetricItem("Cost Per Click (CPC)", String.format("%.2f", cpcValue), true),
+              createMetricItem("Cost Per Mille (CPM)", String.format("%.2f", cpmValue), true),
+              createMetricItem("Bounce Rate", Float.toString(bounceRateValue), true)
             );
 
             // Add to metrics grid
