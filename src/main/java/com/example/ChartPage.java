@@ -165,6 +165,9 @@ public class ChartPage {
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        // Button to access overall metrics
+        Button histogramButton = createStyledButton("Histogram View", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         
         // Button to access overall metrics
         Button overallMetricsButton = createStyledButton("Overall Metrics", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
@@ -179,11 +182,17 @@ public class ChartPage {
         Button fileSelectionButton = createStyledButton("Select Files", "#757575", "#616161");
 
         Button saveToPdfButton = createStyledButton("Save To Pdf", "#757575", "#616161");
+
         
         // Set button actions
         overallMetricsButton.setOnAction(e -> {
             OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager);
             metricsPage.show();
+        });
+
+        histogramButton.setOnAction(e -> {
+            HistogramChart histogramChart = new HistogramChart(stage,this);
+            histogramChart.show();
         });
         
         compareChartsButton.setOnAction(e -> {
@@ -240,7 +249,7 @@ public class ChartPage {
             }
         });
         
-        navBar.getChildren().addAll(title, spacer, fileSelectionButton,saveToPdfButton, overallMetricsButton, compareChartsButton, logOutButton);
+        navBar.getChildren().addAll(title, spacer, histogramButton, fileSelectionButton,saveToPdfButton, overallMetricsButton, compareChartsButton, logOutButton);
         return navBar;
     }
     
@@ -735,7 +744,7 @@ public class ChartPage {
     }
     
     // Create styled button
-    private Button createStyledButton(String text, String bgColor, String hoverColor) {
+    public Button createStyledButton(String text, String bgColor, String hoverColor) {
         Button button = new Button(text);
         button.setPrefSize(140, 35);
         button.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
