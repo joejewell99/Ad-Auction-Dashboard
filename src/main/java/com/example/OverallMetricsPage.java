@@ -42,6 +42,8 @@ public class OverallMetricsPage {
     private final String TEXT_COLOR = "#555555";
     private final String ERROR_COLOR = "#F44336";
     private final String SUCCESS_COLOR = "#4CAF50";
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
 
     OverallMetricsPage(Stage stage, LogManager logManager,ChartCreator chartCreator) {
         this.stage = stage;

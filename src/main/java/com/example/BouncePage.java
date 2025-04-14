@@ -17,6 +17,8 @@ public class BouncePage {
     private final String BACKGROUND_COLOR = "#f5f5f7";
     private final String PRIMARY_COLOR = "#4285F4";
     private final String PRIMARY_DARK_COLOR = "#3367d6";
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
     private final String SECTION_BACKGROUND = "white";
     private final String HEADER_COLOR = "#333333";
     private final String TEXT_COLOR = "#555555";
@@ -48,7 +50,7 @@ public class BouncePage {
         });
 
         //Button to logout
-        Button logoutButton = createStyledButton("Logout",PRIMARY_COLOR,PRIMARY_DARK_COLOR);
+        Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         logoutButton.setOnAction(e -> {
             Login loginPage = new Login(stage);
             loginPage.show();

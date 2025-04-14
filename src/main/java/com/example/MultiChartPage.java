@@ -45,6 +45,8 @@ public class MultiChartPage {
     private final String SECTION_BACKGROUND = "white";
     private final String HEADER_COLOR = "#333333";
     private final String TEXT_COLOR = "#555555";
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
 
     public MultiChartPage(Stage stage, LogManager logManager, ArrayList<String> currentCharts, ArrayList<String> timeFlags,
                           ArrayList<String> genders, ArrayList<String> incomes, ArrayList<ArrayList<String>> contexts,

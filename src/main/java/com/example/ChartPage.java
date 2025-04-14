@@ -8,10 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -47,6 +44,8 @@ public class ChartPage {
     private final String SECTION_BACKGROUND = "white";
     private final String HEADER_COLOR = "#333333";
     private final String TEXT_COLOR = "#555555";
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
 
     public ChartPage(Stage stage, LogManager logManager, ChartCreator chartCreator) {
         this.stage = stage;
@@ -179,7 +178,7 @@ public class ChartPage {
         Button bounceDefinitionButton = createStyledButton("Bounce Definition", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         
         // Logout button
-        Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
+        //Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
         
         // File selection button
         Button fileSelectionButton = createStyledButton("Select Files", "#757575", "#616161");
@@ -232,10 +231,10 @@ public class ChartPage {
             multiChartPage.show();
         });
         
-        logOutButton.setOnAction(e -> {
-            Login login = new Login(stage);
-            login.show();
-        });
+        //logOutButton.setOnAction(e -> {
+          //  Login login = new Login(stage);
+            //login.show();
+       // });
         
         fileSelectionButton.setOnAction(e -> {
             InputFilesPage inputFilesPage = new InputFilesPage(stage);
@@ -257,7 +256,7 @@ public class ChartPage {
             }
         });
         
-        navBar.getChildren().addAll(title, spacer,bounceDefinitionButton, histogramButton, fileSelectionButton,saveToPdfButton, overallMetricsButton, compareChartsButton, logOutButton);
+        navBar.getChildren().addAll(title, spacer,bounceDefinitionButton, histogramButton, fileSelectionButton,saveToPdfButton, overallMetricsButton, compareChartsButton);
         return navBar;
     }
     
@@ -327,6 +326,14 @@ public class ChartPage {
         
         RadioButton weeklyButton = createStyledRadioButton("Weekly", timeToggleGroup);
         RadioButton monthlyButton = createStyledRadioButton("Monthly", timeToggleGroup);
+
+        //Button to Logout
+        Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
+        logoutButton.setOnAction(e -> {
+            Login loginPage = new Login(stage);
+            loginPage.show();
+        });
+
         
         // Set action handlers for time granularity buttons
         dailyButton.setOnAction(e -> {
@@ -343,8 +350,11 @@ public class ChartPage {
             timeFlag = "Monthly";
             updateChart(chartViewer);
         });
-        
-        timeBar.getChildren().addAll(timeLabel, dailyButton, weeklyButton, monthlyButton);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        timeBar.getChildren().addAll(timeLabel, dailyButton, weeklyButton, monthlyButton,spacer,logoutButton);
         
         return timeBar;
     }
