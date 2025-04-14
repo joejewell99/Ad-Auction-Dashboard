@@ -36,6 +36,8 @@ public class HistogramChart {
     private int weekOffset = 0; // 0 = current week
     private final String CSV_FILE = "resources/clicks_log.csv";
     private LocalDate dynamicBaseDate = null;
+    private BarChart<String, Number> barChart;
+
 
 
     // Define style constants
@@ -108,6 +110,10 @@ public class HistogramChart {
             login.show();
         });
 
+        saveToPdfButton.setOnAction(e -> {
+            saveChartToPDF(barChart);
+        });
+
 
 
         // Add to navigation bar
@@ -128,7 +134,7 @@ public class HistogramChart {
         descriptionLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         descriptionLabel.setTextFill(Color.web(TEXT_COLOR));
 
-        BarChart<String, Number> barChart = createHistogramChart();
+        barChart = createHistogramChart();
 
         // Initial update
         updateChart(barChart, weekRangeLabel);
@@ -149,6 +155,8 @@ public class HistogramChart {
             weekOffset++;
             updateChart(barChart, weekRangeLabel);
         });
+
+
 
         weekNav.getChildren().addAll(prevWeek, nextWeek);
 
@@ -273,6 +281,37 @@ public class HistogramChart {
 
         return null; // fallback if something goes wrong
     }
+
+    private void saveChartToPDF(BarChart<String, Number> chart) {
+        WritableImage image = chart.snapshot(null, null);
+        File outputFile = new File("histogram_chart.pdf");
+
+        try {
+            // Save snapshot as PNG image first
+            File tempImageFile = new File("temp_chart.png");
+            javax.imageio.ImageIO.write(javafx.embed.swing.SwingFXUtils.fromFXImage(image, null), "png", tempImageFile);
+
+            // Now create a PDF with the image
+            com.itextpdf.text.Document document = new com.itextpdf.text.Document();
+            com.itextpdf.text.pdf.PdfWriter.getInstance(document, new FileOutputStream(outputFile));
+            document.open();
+
+            com.itextpdf.text.Image chartImage = com.itextpdf.text.Image.getInstance(tempImageFile.getAbsolutePath());
+            chartImage.scaleToFit(500, 500); // Resize to fit the page
+            document.add(chartImage);
+
+            document.close();
+
+            // Optional: Delete the temp image
+            tempImageFile.delete();
+
+            System.out.println("PDF saved successfully: " + outputFile.getAbsolutePath());
+
+        } catch (IOException | com.itextpdf.text.DocumentException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 
