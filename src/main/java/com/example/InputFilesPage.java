@@ -187,7 +187,8 @@ public class InputFilesPage {
                     return;
                 }
                 System.out.println("Proceed Button clicked");
-                ChartPage chartPage = new ChartPage(stage, logManager);
+                ChartCreator chartCreator = new ChartCreator(logManager,0);
+                ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
                 chartPage.show();
             } catch(Exception ex) {
                 showAlert("Error proceeding to the chart page. Please check your input files.");

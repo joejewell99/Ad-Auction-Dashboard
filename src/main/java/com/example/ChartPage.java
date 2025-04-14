@@ -48,10 +48,10 @@ public class ChartPage {
     private final String HEADER_COLOR = "#333333";
     private final String TEXT_COLOR = "#555555";
 
-    public ChartPage(Stage stage, LogManager logManager) {
+    public ChartPage(Stage stage, LogManager logManager, ChartCreator chartCreator) {
         this.stage = stage;
         this.logManager = logManager;
-        this.chartCreator = new ChartCreator(logManager);
+        this.chartCreator = chartCreator;
         this.timeFlag = "Daily";
         this.currentChart = "Clicks";
 
@@ -186,7 +186,7 @@ public class ChartPage {
         
         // Set button actions
         overallMetricsButton.setOnAction(e -> {
-            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager);
+            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator);
             metricsPage.show();
         });
 
@@ -220,7 +220,7 @@ public class ChartPage {
             ages.add(this.age);
             ages.add(new ArrayList<>()); // Default age for second chart
             
-            MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages);
+            MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages,chartCreator);
             multiChartPage.show();
         });
         

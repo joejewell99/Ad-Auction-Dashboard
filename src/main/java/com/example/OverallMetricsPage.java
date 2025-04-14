@@ -31,6 +31,7 @@ public class OverallMetricsPage {
     private ArrayList<String[]> impressionData;
     private ArrayList<String[]> serverData;
     private OverallMetricsCalculator metricsCalculator = new OverallMetricsCalculator();
+    private ChartCreator chartCreator;
 
     // Define style constants
     private final String BACKGROUND_COLOR = "#f5f5f7";
@@ -42,12 +43,13 @@ public class OverallMetricsPage {
     private final String ERROR_COLOR = "#F44336";
     private final String SUCCESS_COLOR = "#4CAF50";
 
-    OverallMetricsPage(Stage stage, LogManager logManager) {
+    OverallMetricsPage(Stage stage, LogManager logManager,ChartCreator chartCreator) {
         this.stage = stage;
         this.logManager = logManager;
         this.clickData = logManager.getClickData();
         this.impressionData = logManager.getImpressionData();
         this.serverData = logManager.getServerData();
+        this.chartCreator = chartCreator;
         initialize();
     }
 
@@ -196,7 +198,7 @@ public class OverallMetricsPage {
         
         // Button events
         backButton.setOnAction(e -> {
-            ChartPage chartPage = new ChartPage(stage, logManager);
+            ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
             chartPage.show();
         });
         

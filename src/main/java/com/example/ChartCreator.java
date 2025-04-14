@@ -23,7 +23,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -33,13 +36,24 @@ public class ChartCreator {
     private ArrayList<String[]> impressions;
     private ArrayList<String[]> interactions;
     private Filter filter;
+    private int timeSpent;
 
-    public ChartCreator(LogManager logManager) {
+    public ChartCreator(LogManager logManager, int timeSpent) {
         this.clicks = logManager.getClickData();
         this.impressions = logManager.getImpressionData();
         this.interactions = logManager.getServerData();
         this.filter = new Filter();
+        this.timeSpent = timeSpent;
     }
+
+    /**
+     * Set time requirement for bounce
+     * @param time
+     */
+    public void setTimeSpent(int time) {
+        this.timeSpent = time;
+    }
+
 
     public void getClicks() {
         System.out.println(this.clicks);
@@ -114,11 +128,11 @@ public class ChartCreator {
         ArrayList<String[]> filteredInteractions= filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age)[2];
 
         if (timeFlag.equals("Daily")) {
-            interactionMap = getDailyBounces(filteredInteractions);
+            interactionMap = getDailyBounces(filteredInteractions,timeSpent);
         } else if (timeFlag.equals("Weekly")) {
-            interactionMap = getWeeklyBounces(filteredInteractions);
+            interactionMap = getWeeklyBounces(filteredInteractions,timeSpent);
         } else if (timeFlag.equals("Monthly")) {
-            interactionMap = getMonthlyBounces(filteredInteractions);
+            interactionMap = getMonthlyBounces(filteredInteractions,timeSpent);
         }
 
         var dataset = createIntegerDataset(interactionMap);
@@ -328,13 +342,13 @@ public class ChartCreator {
 
         if (timeFlag.equals("Daily")) {
             clickMap = getDailyClicks(filteredClicks);
-            bounceMap = getDailyBounces(filteredInteractions);
+            bounceMap = getDailyBounces(filteredInteractions,timeSpent);
         } else if (timeFlag.equals("Weekly")) {
             clickMap = getWeeklyClicks(filteredClicks);
-            bounceMap = getWeeklyBounces(filteredInteractions);
+            bounceMap = getWeeklyBounces(filteredInteractions,timeSpent);
         } else if (timeFlag.equals("Monthly")) {
             clickMap = getMonthlyClicks(filteredClicks);
-            bounceMap = getMonthlyBounces(filteredInteractions);
+            bounceMap = getMonthlyBounces(filteredInteractions,timeSpent);
         }
 
         for (String date : clickMap.keySet()) {
@@ -747,15 +761,31 @@ public class ChartCreator {
      * @param interactions
      * @return
      */
-    public Map<String,Integer> getDailyBounces(ArrayList<String[]> interactions) {
+    public Map<String,Integer> getDailyBounces(ArrayList<String[]> interactions, int time) {
         Map<String,Integer> interactionMap = new TreeMap<>();
+        if (time == 0) {
+            for (String[] interaction : interactions){
+                if (interaction[3].equals("1")) {
+                    String dateTime = interaction[0];
+                    String date = dateTime.split(" ")[0];
 
-        for (String[] interaction : interactions){
-            if (interaction[3].equals("1")) {
-                String dateTime = interaction[0];
-                String date = dateTime.split(" ")[0];
+                    interactionMap.put(date, interactionMap.getOrDefault(date, 0) + 1);
+                }
+            }
+        } else {
+            for (String[] interaction : interactions) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime entryTime = LocalDateTime.parse(interaction[0],formatter);
+                LocalDateTime exitTime = LocalDateTime.parse(interaction[2],formatter);
 
-                interactionMap.put(date, interactionMap.getOrDefault(date, 0) + 1);
+                long timeDifference = Duration.between(entryTime,exitTime).getSeconds();
+
+                if (timeDifference <= time) {
+                    String dateTime = interaction[0];
+                    String date = dateTime.split(" ")[0];
+
+                    interactionMap.put(date,interactionMap.getOrDefault(date,0) + 1);
+                }
             }
         }
         return interactionMap;
@@ -766,16 +796,33 @@ public class ChartCreator {
      * @param interactions
      * @return
      */
-    public Map<String, Integer> getWeeklyBounces(ArrayList<String[]> interactions) {
+    public Map<String, Integer> getWeeklyBounces(ArrayList<String[]> interactions,int time) {
         Map<String,Integer> bounceMap = new TreeMap<>();
 
         LocalDate earliestDate = getEarliestDate(interactions);
-        for (String[] interaction : interactions) {
-            if (interaction[3].equals("1")) {
-                LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
-                int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
-                String week = "Week " + Integer.toString(weekNumber);
-                bounceMap.put(week,bounceMap.getOrDefault(week,0) + 1);
+        if (time == 0) {
+            for (String[] interaction : interactions) {
+                if (interaction[3].equals("1")) {
+                    LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                    int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
+                    String week = "Week " + Integer.toString(weekNumber);
+                    bounceMap.put(week,bounceMap.getOrDefault(week,0) + 1);
+                }
+            }
+        } else {
+            for (String[] interaction : interactions) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime entryTime = LocalDateTime.parse(interaction[0],formatter);
+                LocalDateTime exitTime = LocalDateTime.parse(interaction[2],formatter);
+
+                long timeDifference = Duration.between(entryTime,exitTime).getSeconds();
+
+                if (timeDifference <= time) {
+                    LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                    int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
+                    String week = "Week " + Integer.toString(weekNumber);
+                    bounceMap.put(week,bounceMap.getOrDefault(week,0) + 1);
+                }
             }
         }
         return bounceMap;
@@ -786,16 +833,33 @@ public class ChartCreator {
      * @param interactions
      * @return
      */
-    public Map<String, Integer> getMonthlyBounces(ArrayList<String[]> interactions) {
+    public Map<String, Integer> getMonthlyBounces(ArrayList<String[]> interactions,int time) {
         Map<String,Integer> bounceMap = new TreeMap<>();
 
         LocalDate earliestDate = getEarliestDate(interactions);
-        for (String[] interaction : interactions) {
-            if (interaction[3].equals("1")) {
-                LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
-                int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
-                String month = "Month " + Integer.toString(monthNumber);
-                bounceMap.put(month,bounceMap.getOrDefault(month,0) + 1);
+        if (time == 0) {
+            for (String[] interaction : interactions) {
+                if (interaction[3].equals("1")) {
+                    LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                    int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+                    String month = "Month " + Integer.toString(monthNumber);
+                    bounceMap.put(month,bounceMap.getOrDefault(month,0) + 1);
+                }
+            }
+        } else {
+            for (String[] interaction : interactions) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime entryTime = LocalDateTime.parse(interaction[0],formatter);
+                LocalDateTime exitTime = LocalDateTime.parse(interaction[2],formatter);
+
+                long timeDifference = Duration.between(entryTime,exitTime).getSeconds();
+
+                if (timeDifference <= time) {
+                    LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                    int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+                    String month = "Month " + Integer.toString(monthNumber);
+                    bounceMap.put(month,bounceMap.getOrDefault(month,0) + 1);
+                }
             }
         }
         return bounceMap;

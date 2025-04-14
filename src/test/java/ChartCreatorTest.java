@@ -57,7 +57,7 @@ public class ChartCreatorTest {
         testInteractions.add(new String[]{"2015-02-05 11:30:20", "7", "n/a", "1", "No"});
 
         LogManager testLogManager = new TestLogManager(testClicks,testImpressions,testInteractions);
-        chartCreator = new ChartCreator(testLogManager);
+        chartCreator = new ChartCreator(testLogManager,0);
 
     }
 

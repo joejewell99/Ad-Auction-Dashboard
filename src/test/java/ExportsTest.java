@@ -15,7 +15,7 @@ class ExportsTest {
 
     @BeforeEach
     void setUp() {
-        chartCreator = new ChartCreator(testManager); // If you don't need LogManager for PDF
+        chartCreator = new ChartCreator(testManager,0); // If you don't need LogManager for PDF
     }
 
     @Test

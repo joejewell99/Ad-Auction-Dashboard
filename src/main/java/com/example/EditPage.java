@@ -27,6 +27,7 @@ public class EditPage{
     private ArrayList<String> income;
     private ArrayList<ArrayList<String>> context;
     private int chartNumber;
+    private ChartCreator chartCreator;
 
     private LogManager logManager;
     private Stage stage;
@@ -41,7 +42,7 @@ public class EditPage{
 
     public EditPage(Stage stage, LogManager logManager, ArrayList<String> charts,
                     ArrayList<String> timeFlag, ArrayList<String> gender, ArrayList<String> income,
-                    ArrayList<ArrayList<String>> context, ArrayList<ArrayList<String>> age, int chartNumber) {
+                    ArrayList<ArrayList<String>> context, ArrayList<ArrayList<String>> age, int chartNumber, ChartCreator chartCreator) {
         this.currentChart = charts;
         this.timeFlag = timeFlag;
         this.gender = gender;
@@ -51,6 +52,7 @@ public class EditPage{
         this.logManager = logManager;
         this.stage = stage;
         this.chartNumber = chartNumber;
+        this.chartCreator = chartCreator;
     }
     public void show() {
         // Create main layout
@@ -97,12 +99,12 @@ public class EditPage{
 
         // Set button events
         backButton.setOnAction(e -> {
-            MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentChart, timeFlag, gender, income, context, age);
+            MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentChart, timeFlag, gender, income, context, age,chartCreator);
             multiChartPage.show();
         });
 
         overallMetricsButton.setOnAction(e -> {
-            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager);
+            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator);
             metricsPage.show();
         });
 

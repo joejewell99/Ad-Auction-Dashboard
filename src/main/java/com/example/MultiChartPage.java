@@ -36,6 +36,7 @@ public class MultiChartPage {
     private HBox chartContainer = null;
     private ChartCreator chartCreator;
     private LogManager logManager;
+    private int timeSpent;
 
     // Define style constants
     private final String BACKGROUND_COLOR = "#f5f5f7";
@@ -47,10 +48,10 @@ public class MultiChartPage {
 
     public MultiChartPage(Stage stage, LogManager logManager, ArrayList<String> currentCharts, ArrayList<String> timeFlags,
                           ArrayList<String> genders, ArrayList<String> incomes, ArrayList<ArrayList<String>> contexts,
-                          ArrayList<ArrayList<String>> ages) {
+                          ArrayList<ArrayList<String>> ages,ChartCreator chartCreator) {
         this.stage = stage;
         this.logManager = logManager;
-        this.chartCreator = new ChartCreator(logManager);
+        this.chartCreator = chartCreator;
 
         this.currentCharts = currentCharts;
         this.timeFlags = timeFlags;
@@ -111,12 +112,12 @@ public class MultiChartPage {
         
         // Set button events
         backButton.setOnAction(e -> {
-            ChartPage chartPage = new ChartPage(stage, logManager);
+            ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
             chartPage.show();
         });
 
         overallMetricsButton.setOnAction(e -> {
-            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager);
+            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator);
             metricsPage.show();
         });
 
@@ -261,12 +262,12 @@ public class MultiChartPage {
         
         // Set button events
         editChart1Button.setOnAction(e -> {
-            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 0);
+            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 0,chartCreator);
             editPage.show();
         });
         
         editChart2Button.setOnAction(e -> {
-            EditPage editPage2 = new EditPage(stage,logManager, currentCharts, timeFlags, genders, incomes, contexts, ages ,1);
+            EditPage editPage2 = new EditPage(stage,logManager, currentCharts, timeFlags, genders, incomes, contexts, ages ,1,chartCreator);
             editPage2.show();
         });
 
