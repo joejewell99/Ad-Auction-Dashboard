@@ -89,7 +89,7 @@ public class HistogramChart {
         navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
 
-        Label title = new Label("Multi-Chart Comparison View");
+        Label title = new Label("Click-Histogram Chart");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         title.setTextFill(Color.web(HEADER_COLOR));
 
