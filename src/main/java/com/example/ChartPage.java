@@ -174,6 +174,9 @@ public class ChartPage {
         
         // Button to compare multiple charts
         Button compareChartsButton = createStyledButton("Compare Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
+
+        //Button to adjust bounce definition
+        Button bounceDefinitionButton = createStyledButton("Bounce Definition", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         
         // Logout button
         Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
@@ -193,6 +196,11 @@ public class ChartPage {
         histogramButton.setOnAction(e -> {
             HistogramChart histogramChart = new HistogramChart(stage,this);
             histogramChart.show();
+        });
+
+        bounceDefinitionButton.setOnAction(e -> {
+            BouncePage bouncePage = new BouncePage(stage,logManager,chartCreator);
+            bouncePage.show();
         });
         
         compareChartsButton.setOnAction(e -> {
@@ -249,7 +257,7 @@ public class ChartPage {
             }
         });
         
-        navBar.getChildren().addAll(title, spacer, histogramButton, fileSelectionButton,saveToPdfButton, overallMetricsButton, compareChartsButton, logOutButton);
+        navBar.getChildren().addAll(title, spacer,bounceDefinitionButton, histogramButton, fileSelectionButton,saveToPdfButton, overallMetricsButton, compareChartsButton, logOutButton);
         return navBar;
     }
     

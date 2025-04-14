@@ -774,6 +774,10 @@ public class ChartCreator {
             }
         } else {
             for (String[] interaction : interactions) {
+                if (interaction[2].trim().equalsIgnoreCase("n/a")) {
+                    continue;
+                }
+
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 LocalDateTime entryTime = LocalDateTime.parse(interaction[0],formatter);
                 LocalDateTime exitTime = LocalDateTime.parse(interaction[2],formatter);
@@ -811,6 +815,10 @@ public class ChartCreator {
             }
         } else {
             for (String[] interaction : interactions) {
+                if (interaction[2].trim().equalsIgnoreCase("n/a")) {
+                    continue;
+                }
+
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 LocalDateTime entryTime = LocalDateTime.parse(interaction[0],formatter);
                 LocalDateTime exitTime = LocalDateTime.parse(interaction[2],formatter);
@@ -848,6 +856,10 @@ public class ChartCreator {
             }
         } else {
             for (String[] interaction : interactions) {
+                if (interaction[2].trim().equalsIgnoreCase("n/a")) {
+                    continue;
+                }
+
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 LocalDateTime entryTime = LocalDateTime.parse(interaction[0],formatter);
                 LocalDateTime exitTime = LocalDateTime.parse(interaction[2],formatter);
