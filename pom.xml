@@ -90,6 +90,12 @@
       <version>4.11.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.eatthepath</groupId>
+      <artifactId>java-otp</artifactId>
+      <version>0.4.0</version>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
