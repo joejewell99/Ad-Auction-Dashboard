@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.security.PasswordChecker;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -14,13 +15,25 @@ import java.util.ArrayList;
 public class UserManagementPage {
     private Stage stage;
     private LoginDatabase db;
+    private User loggedInUser;
 
-    public UserManagementPage(Stage stage) {
+    public UserManagementPage(Stage stage, User currentUser) {
         this.stage = stage;
         this.db = new LoginDatabase();
+        this.loggedInUser = currentUser;
     }
 
     public void show() {
+
+        if (! "admin".equals(loggedInUser.getRole())) {
+            Alert deny = new Alert(Alert.AlertType.ERROR,
+                    "Access denied .\nOnly administrators can manage users.");
+            deny.setHeaderText("Permission error");
+            deny.showAndWait();
+
+            new Login(stage).show();
+            return;
+        }
         TabPane tabPane = new TabPane();
 
         Tab registerTab = new Tab("Register");
@@ -37,14 +50,18 @@ public class UserManagementPage {
         Label regMessage = new Label();
 
         regButton.setOnAction(e -> {
-            String username = regUsernameField.getText();
-            String password = regPasswordField.getText();
-            boolean success = db.registerUser(username, password);
-            if (success) {
-                regMessage.setText("You have been registered successfully");
-            } else {
-                regMessage.setText("Something went wrong, User may already exist or fields are empty");
+            String user = regUsernameField.getText();
+            String pass = regPasswordField.getText();
+
+            if (!PasswordChecker.validate(pass)){
+                regMessage.setText(PasswordChecker.requirements());
+                return;
             }
+
+            boolean ok = db.registerUser(user, pass);
+            regMessage.setText(ok
+                    ? "User successfully registered!"
+                    : "User not registered!");
         });
 
         registerBox.getChildren().addAll(registerLabel, regUsernameField, regPasswordField, regButton, regMessage);
@@ -65,14 +82,16 @@ public class UserManagementPage {
         Label updateMessage = new Label();
 
         updateButton.setOnAction(e -> {
-            String username = updateUsernameField.getText();
-            String password = updatePasswordField.getText();
-            boolean success = db.updateUserPassword(username, password);
-            if (success) {
-                updateMessage.setText("You have been updated successfully");
-            } else {
-                updateMessage.setText("Update failed, check if user already exist or fields are empty");
+            String user = updateUsernameField.getText();
+            String pass = updatePasswordField.getText();
+            if (!PasswordChecker.validate(pass)){
+                updateMessage.setText(PasswordChecker.requirements());
+                return;
             }
+            boolean ok = db.updateUserPassword(user, pass);
+            updateMessage.setText(ok
+            ? "Password successfully updated!"
+            : "Password not updated!");
         });
         updateBox.getChildren().addAll(updateLabel, updateUsernameField, updatePasswordField, updateButton, updateMessage);
         updateTab.setContent(updateBox);

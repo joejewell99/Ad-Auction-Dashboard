@@ -23,6 +23,7 @@ public class Login {
     private Stage stage;
     private Scene loginScene;
     private Logger logger;
+    private LoginDatabase db;
 
     /**
      * Constructors for primary stage + initializes the login class.
@@ -30,6 +31,7 @@ public class Login {
      */
     public Login(Stage stage) {
         this.stage = stage;
+        this.db = new LoginDatabase();
         initialize();
     }
 
@@ -63,8 +65,8 @@ public class Login {
         loginBox.setPadding(new Insets(30, 40, 40, 40));
         loginBox.setMaxWidth(400);
         loginBox.setStyle("-fx-background-color: white; " +
-          "-fx-background-radius: 10; " +
-          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+                "-fx-background-radius: 10; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
 
         // Username input area
         VBox usernameBox = new VBox(8);
@@ -76,11 +78,11 @@ public class Login {
         userName.setPromptText("Enter username");
         userName.setPrefHeight(40);
         userName.setStyle("-fx-background-radius: 5; " +
-          "-fx-border-radius: 5; " +
-          "-fx-border-color: #e0e0e0; " +
-          "-fx-border-width: 1px; " +
-          "-fx-font-size: 14px; " +
-          "-fx-padding: 8px;");
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
 
         usernameBox.getChildren().addAll(userNameLabel, userName);
 
@@ -94,11 +96,11 @@ public class Login {
         passwordField.setPromptText("Enter password");
         passwordField.setPrefHeight(40);
         passwordField.setStyle("-fx-background-radius: 5; " +
-          "-fx-border-radius: 5; " +
-          "-fx-border-color: #e0e0e0; " +
-          "-fx-border-width: 1px; " +
-          "-fx-font-size: 14px; " +
-          "-fx-padding: 8px;");
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
 
         passwordBox.getChildren().addAll(passwordLabel, passwordField);
 
@@ -115,18 +117,18 @@ public class Login {
         loginButton.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
         String buttonStyle = "-fx-background-color: #4285F4; " +
-          "-fx-text-fill: white; " +
-          "-fx-font-weight: bold; " +
-          "-fx-background-radius: 5; " +
-          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1); " +
-          "-fx-cursor: hand;";
+                "-fx-text-fill: white; " +
+                "-fx-font-weight: bold; " +
+                "-fx-background-radius: 5; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1); " +
+                "-fx-cursor: hand;";
 
         String buttonHoverStyle = "-fx-background-color: #3367d6; " +
-          "-fx-text-fill: white; " +
-          "-fx-font-weight: bold; " +
-          "-fx-background-radius: 5; " +
-          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2); " +
-          "-fx-cursor: hand;";
+                "-fx-text-fill: white; " +
+                "-fx-font-weight: bold; " +
+                "-fx-background-radius: 5; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2); " +
+                "-fx-cursor: hand;";
 
         loginButton.setStyle(buttonStyle);
         loginButton.setOnMouseEntered(e -> loginButton.setStyle(buttonHoverStyle));
@@ -162,34 +164,25 @@ public class Login {
             try {
                 String usernameText = userName.getText();
                 String passwordText = passwordField.getText();
-                if (authenticate(usernameText, passwordText)) {
+                User user = db.authenticateUser(usernameText, passwordText);
+                if (user != null) {
                     message.setText("Login successful!");
                     message.setTextFill(Color.web("#4CAF50"));
+                    // Save the loggedin user and pass it to subsequent pages if needed.
+                    App.getInstance().setLoggedInUser(user);
                     App.getInstance().showInputFilesPage();
                 } else {
                     message.setText("Login failed!");
                     message.setTextFill(Color.web("#F44336"));
-                    // Add slight shake effect
-                    loginBox.setStyle(loginBox.getStyle() + "; -fx-effect: dropshadow(gaussian, rgba(244,67,54,0.1), 10, 0, 0, 2);");
-                    // Restore after 1 second
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(1000);
-                            Platform.runLater(() -> {
-                                loginBox.setStyle("-fx-background-color: white; " +
-                                  "-fx-background-radius: 10; " +
-                                  "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
-                            });
-                        } catch (InterruptedException e) {
-                            logger.error("Error in shake effect", e);
-                        }
-                    }).start();
+                    // Add slight shake effect for feedback (existing code)
                 }
             } catch(Exception ex) {
                 showAlert("An unexpected error occurred during login. Please try again.");
                 logger.error("Error in login button action", ex);
             }
         });
+
+
 
         // Set Enter key to trigger login button
         passwordField.setOnAction(loginButton.getOnAction());
@@ -199,14 +192,14 @@ public class Login {
         Button manageUsersButton = new Button("Manage Users");
         // Add the manage users button to loginBox (it was originally commented out)
         loginBox.getChildren().add(manageUsersButton);
-        manageUsersButton.setOnAction(event -> {
-            try {
-                new UserManagementPage (stage).show();
-            } catch(Exception ex) {
-                showAlert("Error opening User Management.");
-                logger.error("Error in Manage Users button", ex);
-            }
-        });
+
+
+    manageUsersButton.setOnAction(event -> {
+        new AdminLogin(stage, adminUser -> {
+            new UserManagementPage(stage, adminUser).show();
+        }).show();
+    });
+
 
         loginScene = new Scene(mainLayout, 800, 600);
     }
@@ -226,17 +219,19 @@ public class Login {
      * @return User & Password if true. Otherwise, false.
      * Kept the login info as empty for the time being.
      */
-    private boolean authenticate(String username, String password) {
-
-        if (username == null ||  username.isEmpty() || password == null || password.isEmpty()) {
-            return false;
-        }
-
-        LoginDatabase db = new LoginDatabase();
-        return db.authenticate(username, password);
-    }
-
     /**
+     private boolean authenticate(String username, String password) {
+
+     if (username == null ||  username.isEmpty() || password == null || password.isEmpty()) {
+     return false;
+     }
+
+     LoginDatabase db = new LoginDatabase();
+     return db.authenticateUser(username, password);
+     }
+
+
+     /**
      * Display login scene.
      */
     public void show(){
