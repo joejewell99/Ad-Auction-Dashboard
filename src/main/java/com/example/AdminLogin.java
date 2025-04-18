@@ -84,9 +84,23 @@ public class AdminLogin {
 
         TextField userField = new TextField();
         userField.setPromptText("Username");
+        userField.setPrefHeight(40);
+        userField.setStyle("-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
+        passwordField.setPrefHeight(40);
+        passwordField.setStyle("-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
 
         Label msg = new Label();
         msg.setMinHeight(24);
@@ -115,7 +129,7 @@ public class AdminLogin {
 
 
         //Button to logout
-        Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
+        Button logoutButton = createStyledButton("Back",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         logoutButton.setOnAction(e -> {
             Login loginPage = new Login(stage);
             loginPage.show();

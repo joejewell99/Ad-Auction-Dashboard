@@ -9,6 +9,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -18,6 +21,17 @@ public class UserManagementPage {
     private Stage stage;
     private LoginDatabase db;
     private User loggedInUser;
+
+    private final String BACKGROUND_COLOR = "#f5f5f7";
+    private final String PRIMARY_COLOR = "#4285F4";
+    private final String PRIMARY_DARK_COLOR = "#3367d6";
+    private final String SECTION_BACKGROUND = "white";
+    private final String HEADER_COLOR = "#333333";
+    private final String TEXT_COLOR = "#555555";
+    private final String ERROR_COLOR = "#F44336";
+    private final String SUCCESS_COLOR = "#4CAF50";
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
 
     public UserManagementPage(Stage stage, User currentUser) {
         this.stage = stage;
@@ -38,17 +52,39 @@ public class UserManagementPage {
         }
         TabPane tabPane = new TabPane();
 
-        Tab registerTab = new Tab("Register");
+        Tab registerTab = new Tab();
+        Label registerTabLabel = new Label("Register");
+        registerTabLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        registerTabLabel.setStyle("-fx-padding: 20 20 20 20;" );
+        registerTab.setGraphic(registerTabLabel);
+
         VBox registerBox = new VBox(10);
         registerBox.setPadding(new Insets(15));
         registerBox.setAlignment(Pos.CENTER_LEFT);
 
         Label registerLabel = new Label("Register New User");
+        registerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        registerLabel.setTextFill(Color.web(HEADER_COLOR));
+
         TextField regUsernameField = new TextField();
         regUsernameField.setPromptText("Username");
+        regUsernameField.setPrefHeight(40);
+        regUsernameField.setStyle("-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
         PasswordField regPasswordField = new PasswordField();
         regPasswordField.setPromptText("Password");
-        Button regButton = new Button("Register");
+        regPasswordField.setPrefHeight(40);
+        regPasswordField.setStyle("-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
+        Button regButton = createStyledButton("Register", PRIMARY_COLOR,PRIMARY_DARK_COLOR);
         Label regMessage = new Label();
 
         regButton.setOnAction(e -> {
@@ -70,17 +106,39 @@ public class UserManagementPage {
         registerTab.setContent(registerBox);
         registerTab.setClosable(false);
 
-        Tab updateTab = new Tab("Update Password");
+        Tab updateTab = new Tab();
+        Label updateTabLabel = new Label("Update Password");
+        updateTabLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        updateTabLabel.setStyle("-fx-padding: 20 20 20 20;" );
+        updateTab.setGraphic(updateTabLabel);
+
         VBox updateBox = new VBox(10);
         updateBox.setPadding(new Insets(15));
         updateBox.setAlignment(Pos.CENTER_LEFT);
 
         Label updateLabel = new Label("Update Password");
+        updateLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        updateLabel.setTextFill(Color.web(HEADER_COLOR));
+
         TextField updateUsernameField = new TextField();
         updateUsernameField.setPromptText("Username");
+        updateUsernameField.setPrefHeight(40);
+        updateUsernameField.setStyle("-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
         PasswordField updatePasswordField = new PasswordField();
         updatePasswordField.setPromptText("New Password");
-        Button updateButton = new Button("Update");
+        updatePasswordField.setPrefHeight(40);
+        updatePasswordField.setStyle("-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
+        Button updateButton = createStyledButton("Update",PRIMARY_COLOR,PRIMARY_DARK_COLOR);
         Label updateMessage = new Label();
 
         updateButton.setOnAction(e -> {
@@ -99,15 +157,30 @@ public class UserManagementPage {
         updateTab.setContent(updateBox);
         updateTab.setClosable(false);
 
-        Tab deleteTab = new Tab("Delete User");
+        Tab deleteTab = new Tab();
+        Label deleteTabLabel = new Label("Delete User");
+        deleteTabLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        deleteTabLabel.setStyle("-fx-padding: 20 20 20 20;" );
+        deleteTab.setGraphic(deleteTabLabel);
+
         VBox deleteBox = new VBox(10);
         deleteBox.setPadding(new Insets(15));
         deleteBox.setAlignment(Pos.CENTER_LEFT);
 
         Label deleteLabel = new Label("Delete User");
+        deleteLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        deleteLabel.setTextFill(Color.web(HEADER_COLOR));
+
         TextField deleteUsernameField = new TextField();
         deleteUsernameField.setPromptText("Username");
-        Button deleteButton = new Button("Delete");
+        deleteUsernameField.setPrefHeight(40);
+        deleteUsernameField.setStyle("-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
+        Button deleteButton = createStyledButton("Delete",PRIMARY_COLOR,PRIMARY_DARK_COLOR);
         Label deleteMessage = new Label();
 
         deleteButton.setOnAction(e -> {
@@ -123,13 +196,21 @@ public class UserManagementPage {
         deleteTab.setContent(deleteBox);
         deleteTab.setClosable(false);
 
-        Tab listTab = new Tab("List Users");
+        Tab listTab = new Tab();
+        Label listTabLabel = new Label("List Users");
+        listTabLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        listTabLabel.setStyle("-fx-padding: 20 20 20 20;" );
+        listTab.setGraphic(listTabLabel);
+
         VBox listBox = new VBox(10);
         listBox.setPadding(new Insets(15));
         listBox.setAlignment(Pos.CENTER_LEFT);
 
         Label listLabel = new Label("List Users");
-        Button refreshButton = new Button("Refresh List");
+        listLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        listLabel.setTextFill(Color.web(HEADER_COLOR));
+
+        Button refreshButton = createStyledButton("Refresh List", PRIMARY_COLOR,PRIMARY_DARK_COLOR);
         ListView<String> usersListView = new ListView<>();
 
         refreshButton.setOnAction(e -> {
@@ -147,18 +228,24 @@ public class UserManagementPage {
 
         tabPane.getTabs().addAll(registerTab, updateTab, deleteTab, listTab);
 
-        Button backButton = new Button("Back");
+        Button backButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         backButton.setOnAction(e -> {
             new Login(stage).show();
         });
+        Region spacer = new Region();
+        HBox.setHgrow(spacer,Priority.ALWAYS);
 
-        HBox navBox = new HBox(10, backButton);
+
+        HBox navBox = new HBox(spacer,backButton);
         navBox.setAlignment(Pos.CENTER);
         navBox.setPadding(new Insets(10));
+        navBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
 
         BorderPane root = new BorderPane();
         root.setCenter(tabPane);
         root.setBottom(navBox);
+        BorderPane.setMargin(navBox, new Insets(0, 0, 20, 0));
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
@@ -167,6 +254,35 @@ public class UserManagementPage {
         stage.setTitle("User Management Page");
         stage.show();
 
+    }
+
+    private Button createStyledButton(String text, String bgColor, String hoverColor) {
+        Button button = new Button(text);
+        button.setPrefSize(120, 40);
+        button.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
+
+        String style = String.format(
+                "-fx-background-color: %s; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: normal; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0, 0, 1); " +
+                        "-fx-cursor: hand;", bgColor);
+
+        String hoverStyle = String.format(
+                "-fx-background-color: %s; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: normal; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 0, 2); " +
+                        "-fx-cursor: hand;", hoverColor);
+
+        button.setStyle(style);
+
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(style));
+
+        return button;
     }
 
 }
