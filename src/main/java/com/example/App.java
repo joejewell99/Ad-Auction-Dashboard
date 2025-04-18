@@ -13,7 +13,7 @@ public class App extends Application {
   private static App instance;
   static final Logger logger = LogManager.getLogger(App.class);
   private Stage stage;
-
+  private User loggedInUser;
   /**
    * Main method to enter the app.
    * @param args
@@ -60,6 +60,14 @@ public class App extends Application {
    */
   public static App getInstance() {
     return instance;
+  }
+
+  public void setLoggedInUser(User user) {
+    this.loggedInUser = user;
+  }
+
+  public User getLoggedInUser() {
+    return loggedInUser;
   }
 
 }
