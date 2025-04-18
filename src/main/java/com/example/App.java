@@ -1,8 +1,10 @@
 package com.example;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.application.Application;
 import org.apache.logging.log4j.LogManager;
@@ -32,12 +34,11 @@ public class App extends Application {
   public void start(Stage stage) throws Exception {
     instance = this;
     this.stage = stage;
-    StackPane root = new StackPane();
-    Label welcomeMessage = new Label("Ad Auction");
-    root.getChildren().add(welcomeMessage);
-    Scene scene = new Scene(root, 800, 600);
-    stage.setScene(scene);
     stage.setTitle("Login");
+    Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+    stage.setWidth(screenBounds.getWidth());
+    stage.setHeight(screenBounds.getHeight());
+    stage.setFullScreen(true);
     stage.show();
     logger.info("App started");
     Login login = new Login(stage);

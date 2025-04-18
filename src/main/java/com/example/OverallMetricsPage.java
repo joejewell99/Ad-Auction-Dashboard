@@ -2,19 +2,17 @@ package com.example;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -79,19 +77,31 @@ public class OverallMetricsPage {
         BorderPane.setMargin(bottomBar, new Insets(0, 0, 20, 0));
         
         // Create scene
-        scene = new Scene(root, 1300, 800);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
     }
     
     private HBox createTopBar() {
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER);
-        topBar.setPadding(new Insets(20, 0, 10, 0));
+        topBar.setPadding(new Insets(15, 20, 15, 20));
+        topBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         
         Label titleLabel = new Label("Overall Ad Campaign Metrics");
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         titleLabel.setTextFill(Color.web(HEADER_COLOR));
-        
-        topBar.getChildren().add(titleLabel);
+
+        Button backButton = createStyledButton("Back to Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
+        // Button events
+        backButton.setOnAction(e -> {
+            ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
+            chartPage.show();
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer,Priority.ALWAYS);
+        topBar.getChildren().addAll(titleLabel,spacer,backButton);
         
         return topBar;
     }
@@ -180,6 +190,8 @@ public class OverallMetricsPage {
             logger.error("Error calculating overall metrics", ex);
         }
 
+
+
         // Add all components to content box
         contentBox.getChildren().addAll(
           descriptionLabel,
@@ -194,23 +206,21 @@ public class OverallMetricsPage {
     private HBox createBottomBar() {
         HBox bottomBar = new HBox(15);
         bottomBar.setAlignment(Pos.CENTER);
-        
-        Button backButton = createStyledButton("Back to Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        Button logoutButton = createStyledButton("Logout", "#757575", "#616161");
-        
-        // Button events
-        backButton.setOnAction(e -> {
-            ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
-            chartPage.show();
-        });
-        
+        bottomBar.setPadding(new Insets(15, 20, 15, 20));
+        bottomBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+
+        Button logoutButton = createStyledButton("Logout", LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
+        Region rightSpacer = new Region();
+        HBox.setHgrow(rightSpacer, Priority.ALWAYS);
+
         logoutButton.setOnAction(e -> {
             System.out.println("Logout Button clicked");
             Login login = new Login(stage);
             login.show();
         });
         
-        bottomBar.getChildren().addAll(backButton, logoutButton);
+        bottomBar.getChildren().addAll(rightSpacer, logoutButton);
         
         return bottomBar;
     }
@@ -285,6 +295,7 @@ public class OverallMetricsPage {
 
     public void show() {
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.setTitle("Ad Auction Dashboard - Overall Metrics");
         stage.show();
     }

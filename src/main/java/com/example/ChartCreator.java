@@ -612,11 +612,10 @@ public class ChartCreator {
     public Map<String,Integer> getDailyConversions (ArrayList<String[]> interactions) {
         Map<String,Integer> conversionMap = new TreeMap<>();
         for (String[] interaction : interactions){
+            String date = interaction[0].split(" ")[0];
             if (interaction[4].equals("Yes")) {
-                String date = interaction[0].split(" ")[0];
                 conversionMap.put(date, conversionMap.getOrDefault(date, 0) + 1);
-            } else {
-                String date = interaction[0].split(" ")[0];
+            } else if (!conversionMap.containsKey(date)) {
                 conversionMap.put(date, 0);
             }
         }
@@ -642,7 +641,9 @@ public class ChartCreator {
                 LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
                 int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
                 String week = "Week " + Integer.toString(weekNumber);
-                conversionMap.put(week,conversionMap.getOrDefault(week,0));
+                if (!conversionMap.containsKey(week)) {
+                    conversionMap.put(week, conversionMap.getOrDefault(week, 0));
+                }
             }
         }
         return conversionMap;
@@ -667,7 +668,9 @@ public class ChartCreator {
                 LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
                 int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
                 String month = "Month " + Integer.toString(monthNumber);
-                conversionMap.put(month,conversionMap.getOrDefault(month,0));
+                if (!conversionMap.containsKey(month)) {
+                    conversionMap.put(month, conversionMap.getOrDefault(month, 0));
+                }
             }
         }
         return conversionMap;

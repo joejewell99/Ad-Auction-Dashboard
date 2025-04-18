@@ -3,6 +3,7 @@ package com.example;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -12,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.Logger;
 
@@ -24,6 +26,15 @@ public class Login {
     private Scene loginScene;
     private Logger logger;
     private LoginDatabase db;
+
+    private final String BACKGROUND_COLOR = "#f5f5f7";
+    private final String PRIMARY_COLOR = "#4285F4";
+    private final String PRIMARY_DARK_COLOR = "#3367d6";
+    private final String SECTION_BACKGROUND = "white";
+    private final String HEADER_COLOR = "#333333";
+    private final String TEXT_COLOR = "#555555";
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
 
     /**
      * Constructors for primary stage + initializes the login class.
@@ -189,7 +200,7 @@ public class Login {
         userName.setOnAction(loginButton.getOnAction());
 
         // Button to manage the users
-        Button manageUsersButton = new Button("Manage Users");
+        Button manageUsersButton = createStyledButton("Manage Users",PRIMARY_COLOR,PRIMARY_DARK_COLOR);
         // Add the manage users button to loginBox (it was originally commented out)
         loginBox.getChildren().add(manageUsersButton);
 
@@ -200,8 +211,8 @@ public class Login {
         }).show();
     });
 
-
-        loginScene = new Scene(mainLayout, 800, 600);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        loginScene = new Scene(mainLayout, screenBounds.getWidth(), screenBounds.getHeight());
     }
 
     private void showAlert(String message) {
@@ -231,12 +242,46 @@ public class Login {
      }
 
 
+
+
      /**
      * Display login scene.
      */
     public void show(){
         stage.setScene(loginScene);
+        stage.setFullScreen(true);
+        stage.setFullScreenExitHint("");
         stage.setTitle("Ad Auction Dashboard - Login");
         stage.show();
+    }
+
+
+    private Button createStyledButton(String text, String bgColor, String hoverColor) {
+        Button button = new Button(text);
+        button.setPrefSize(120, 35);
+        button.setFont(Font.font("Arial", FontWeight.NORMAL, 13));
+
+        String style = String.format(
+                "-fx-background-color: %s; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: normal; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0, 0, 1); " +
+                        "-fx-cursor: hand;", bgColor);
+
+        String hoverStyle = String.format(
+                "-fx-background-color: %s; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: normal; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 0, 2); " +
+                        "-fx-cursor: hand;", hoverColor);
+
+        button.setStyle(style);
+
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(style));
+
+        return button;
     }
 }

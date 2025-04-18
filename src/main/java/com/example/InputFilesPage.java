@@ -1,9 +1,11 @@
 package com.example;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -11,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -24,6 +27,9 @@ public class InputFilesPage {
     private File impressionLogFile;
     private File clickLogFile;
     private File serverLogFile;
+
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
 
     // Log manager to be passed around the system (Use it in constructors for new scenes), essentially containing all the files and data
     public LogManager logManager = new LogManager();
@@ -77,9 +83,9 @@ public class InputFilesPage {
         buttonBox.setPadding(new Insets(20, 0, 10, 0));
 
         Button proceedButton = createStyledButton("Proceed", "#4285F4", "#3367d6");
-        Button logoutButton = createStyledButton("Logout", "#757575", "#616161");
+        Button logoutButton = createStyledButton("Logout", LOGOUT_COLOUR, LOGOUT_HOVER_COLOUR);
 
-        buttonBox.getChildren().addAll(proceedButton, logoutButton);
+        buttonBox.getChildren().addAll(proceedButton);
 
         // Add all components to file selection box
         fileSelectionBox.getChildren().addAll(
@@ -90,8 +96,14 @@ public class InputFilesPage {
           serverRow,
           createSeparator(),
           buttonBox);
-
         mainLayout.setCenter(fileSelectionBox);
+
+        HBox logoutBox = new HBox(logoutButton);
+        logoutBox.setAlignment(Pos.BOTTOM_RIGHT);
+        logoutBox.setPadding(new Insets(10, 20, 20, 20));
+        mainLayout.setBottom(logoutBox);
+
+
 
         // File chooser
         FileChooser fileChooser = new FileChooser();
@@ -208,7 +220,8 @@ public class InputFilesPage {
             }
         });
 
-        scene = new Scene(mainLayout, 800, 600);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        scene = new Scene(mainLayout, screenBounds.getWidth(), screenBounds.getHeight());
     }
     
     // Create a file selection row
@@ -286,6 +299,7 @@ public class InputFilesPage {
 
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.initOwner(stage);
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -332,6 +346,7 @@ public class InputFilesPage {
     public void show() {
         stage.setTitle("File Selection");
         stage.setScene(scene);
-        stage.show();
+        stage.setFullScreen(true);
+        Platform.runLater(() -> stage.show());
     }
 }

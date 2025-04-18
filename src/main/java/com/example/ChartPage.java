@@ -5,6 +5,7 @@ import com.itextpdf.text.DocumentException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
@@ -12,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -135,8 +137,10 @@ public class ChartPage {
         BorderPane.setMargin(timeGranularityBar, new Insets(5, 10, 15, 10));
 
         // Create scene
-        Scene scene = new Scene(root, 1300, 800);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.setTitle("Ad Auction Dashboard - Data Charts");
         stage.show();
     }
@@ -174,16 +178,14 @@ public class ChartPage {
         // Button to compare multiple charts
         Button compareChartsButton = createStyledButton("Compare Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
 
-        //Button to adjust bounce definition
-        Button bounceDefinitionButton = createStyledButton("Bounce Definition", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        
+
         // Logout button
         //Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
         
         // File selection button
-        Button fileSelectionButton = createStyledButton("Select Files", "#757575", "#616161");
+        Button fileSelectionButton = createStyledButton("Select Files", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
 
-        Button saveToPdfButton = createStyledButton("Save To Pdf", "#757575", "#616161");
+        Button saveToPdfButton = createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
 
         
         // Set button actions
@@ -197,34 +199,30 @@ public class ChartPage {
             histogramChart.show();
         });
 
-        bounceDefinitionButton.setOnAction(e -> {
-            BouncePage bouncePage = new BouncePage(stage,logManager,chartCreator);
-            bouncePage.show();
-        });
         
         compareChartsButton.setOnAction(e -> {
             ArrayList<String> currentCharts = new ArrayList<>();
-            currentCharts.add(this.currentChart);
+            currentCharts.add("Clicks");
             currentCharts.add("Impressions"); // Default second chart
             
             ArrayList<String> timeFlags = new ArrayList<>();
-            timeFlags.add(this.timeFlag);
+            timeFlags.add("Daily");
             timeFlags.add("Daily"); // Default time flag for second chart
             
             ArrayList<String> genders = new ArrayList<>();
-            genders.add(this.gender);
+            genders.add("");
             genders.add(""); // Default gender for second chart
             
             ArrayList<String> incomes = new ArrayList<>();
-            incomes.add(this.income);
+            incomes.add("");
             incomes.add(""); // Default income for second chart
             
             ArrayList<ArrayList<String>> contexts = new ArrayList<>();
-            contexts.add(this.context);
+            contexts.add(new ArrayList<>());
             contexts.add(new ArrayList<>()); // Default context for second chart
             
             ArrayList<ArrayList<String>> ages = new ArrayList<>();
-            ages.add(this.age);
+            ages.add(new ArrayList<>());
             ages.add(new ArrayList<>()); // Default age for second chart
             
             MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages,chartCreator);
@@ -256,7 +254,7 @@ public class ChartPage {
             }
         });
         
-        navBar.getChildren().addAll(title, spacer,bounceDefinitionButton, histogramButton, fileSelectionButton,saveToPdfButton, overallMetricsButton, compareChartsButton);
+        navBar.getChildren().addAll(title, spacer,fileSelectionButton,saveToPdfButton,histogramButton,overallMetricsButton, compareChartsButton);
         return navBar;
     }
     
@@ -327,6 +325,13 @@ public class ChartPage {
         RadioButton weeklyButton = createStyledRadioButton("Weekly", timeToggleGroup);
         RadioButton monthlyButton = createStyledRadioButton("Monthly", timeToggleGroup);
 
+        //Bounce definition button
+        Button bounceDefinitionButton = createStyledButton("Bounce Definition", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
+        bounceDefinitionButton.setOnAction(e -> {
+            BouncePage bouncePage = new BouncePage(stage,logManager,chartCreator);
+            bouncePage.show();
+        });
+
         //Button to Logout
         Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         logoutButton.setOnAction(e -> {
@@ -354,7 +359,7 @@ public class ChartPage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        timeBar.getChildren().addAll(timeLabel, dailyButton, weeklyButton, monthlyButton,spacer,logoutButton);
+        timeBar.getChildren().addAll(timeLabel, dailyButton, weeklyButton, monthlyButton,bounceDefinitionButton,spacer,logoutButton);
         
         return timeBar;
     }

@@ -4,18 +4,17 @@ import com.itextpdf.text.DocumentException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.jfree.chart.fx.ChartViewer;
 
@@ -85,9 +84,11 @@ public class MultiChartPage {
         // Set margins
         BorderPane.setMargin(chartSection, new Insets(20, 20, 20, 20));
         BorderPane.setMargin(editBar, new Insets(0, 0, 30, 0));
-        
-        Scene scene = new Scene(root, 1300, 800);
+
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.setTitle("Ad Auction Dashboard - Multi-Chart View");
         stage.show();
     }
@@ -107,11 +108,11 @@ public class MultiChartPage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
         
-        Button backButton = createStyledButton("Back to Charts", "#757575", "#616161");
+        Button backButton = createStyledButton("Back to Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         Button saveToPdfButton = createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         Button overallMetricsButton = createStyledButton("Overall Metrics", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
-        
+        //Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
+
         // Set button events
         backButton.setOnAction(e -> {
             ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
@@ -123,10 +124,11 @@ public class MultiChartPage {
             metricsPage.show();
         });
 
+        /**
         logOutButton.setOnAction(e -> {
             Login login = new Login(stage);
             login.show();
-        });
+        }); */
 
         saveToPdfButton.setOnAction(e -> {
             try {
@@ -145,7 +147,7 @@ public class MultiChartPage {
         });
         
         // Add to navigation bar
-        navBar.getChildren().addAll(title, spacer, backButton,saveToPdfButton, overallMetricsButton, logOutButton);
+        navBar.getChildren().addAll(title, spacer, backButton,saveToPdfButton, overallMetricsButton);
         
         return navBar;
     }
@@ -205,10 +207,10 @@ public class MultiChartPage {
         }
 
         // Create first chart area
-        VBox chart1Box = createChartBox("Chart 1", chartViewer1);
+        VBox chart1Box = createChart1Box("Chart 1", chartViewer1);
 
         // Create second chart area
-        VBox chart2Box = createChartBox("Chart 2", chartViewer2);
+        VBox chart2Box = createChart2Box("Chart 2", chartViewer2);
 
         // Add charts to container
         chartContainer.getChildren().addAll(chart1Box, chart2Box);
@@ -231,7 +233,7 @@ public class MultiChartPage {
     }
     
     // Create single chart box
-    private VBox createChartBox(String title, ChartViewer chartViewer) {
+    private VBox createChart1Box(String title, ChartViewer chartViewer) {
         VBox chartBox = new VBox(10);
         chartBox.setAlignment(Pos.CENTER);
         chartBox.setPadding(new Insets(15));
@@ -247,9 +249,43 @@ public class MultiChartPage {
         // Set chart size
         chartViewer.setMinSize(550, 400);
         chartViewer.setMaxSize(550, 400);
+
+        Button editChart1Button = createStyledButton("Edit Chart 1", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
+        editChart1Button.setOnAction(e -> {
+            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 0,chartCreator);
+            editPage.show();
+        });
         
-        chartBox.getChildren().addAll(titleLabel, chartViewer);
+        chartBox.getChildren().addAll(titleLabel, chartViewer,editChart1Button);
         
+        return chartBox;
+    }
+
+    private VBox createChart2Box(String title, ChartViewer chartViewer) {
+        VBox chartBox = new VBox(10);
+        chartBox.setAlignment(Pos.CENTER);
+        chartBox.setPadding(new Insets(15));
+        chartBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                "-fx-background-radius: 10; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+
+        // Chart title
+        Label titleLabel = new Label(title);
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        titleLabel.setTextFill(Color.web(HEADER_COLOR));
+
+        // Set chart size
+        chartViewer.setMinSize(550, 400);
+        chartViewer.setMaxSize(550, 400);
+
+        Button editChart2Button = createStyledButton("Edit Chart 2", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
+        editChart2Button.setOnAction(e -> {
+            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 1,chartCreator);
+            editPage.show();
+        });
+
+        chartBox.getChildren().addAll(titleLabel, chartViewer,editChart2Button);
+
         return chartBox;
     }
     
@@ -257,12 +293,30 @@ public class MultiChartPage {
     private HBox createEditButtonBar() {
         HBox editBar = new HBox(20);
         editBar.setAlignment(Pos.CENTER);
-        
+        editBar.setPadding(new Insets(15, 20, 15, 20));
+
+        /**
+        HBox editButtonBox = new HBox(20);
+        editButtonBox.setAlignment(Pos.CENTER);
         Button editChart1Button = createStyledButton("Edit Chart 1", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         Button editChart2Button = createStyledButton("Edit Chart 2", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        Button saveToPdfButton = createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        
-        // Set button events
+        editButtonBox.getChildren().addAll(editChart1Button, editChart2Button);
+        */
+
+        Button logOutButton = createStyledButton("Logout", LOGOUT_COLOUR, LOGOUT_HOVER_COLOUR);
+
+        Region rightSpacer = new Region();
+        HBox.setHgrow(rightSpacer, Priority.ALWAYS);
+        Region leftSpacer = new Region();
+        HBox.setHgrow(leftSpacer,Priority.ALWAYS);
+
+
+         logOutButton.setOnAction(e -> {
+                     Login login = new Login(stage);
+                     login.show();
+                 });
+
+         /**
         editChart1Button.setOnAction(e -> {
             EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 0,chartCreator);
             editPage.show();
@@ -273,22 +327,10 @@ public class MultiChartPage {
             editPage2.show();
         });
 
-        saveToPdfButton.setOnAction(e -> {
-            try {
-                // Convert JavaFX Chart to image
-                WritableImage writableImage = chartContainer.snapshot(null, null);
+        */
 
-                // Save image as PDF
-                chartCreator.saveChartAsPdf(writableImage,stage);
-
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (DocumentException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
         
-        editBar.getChildren().addAll(editChart1Button, editChart2Button);
+        editBar.getChildren().addAll(rightSpacer,logOutButton);
         
         return editBar;
     }

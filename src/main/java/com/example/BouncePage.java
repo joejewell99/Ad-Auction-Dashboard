@@ -1,12 +1,22 @@
 package com.example;
 
+import com.itextpdf.text.DocumentException;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class BouncePage {
     private Stage stage;
@@ -35,33 +45,23 @@ public class BouncePage {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
 
-        // Field for user to input bounce definition number
-        TextField bounceInput = new TextField();
-        bounceInput.setOnAction(e ->{
-            String bounceDef = bounceInput.getText();
-            chartCreator.setTimeSpent(Integer.parseInt(bounceDef));
-        });
+        HBox navBar = createNavigationBar();
+        VBox inputBar = createInputBar();
+        HBox logoutBar = createLogoutBar();
 
-        // Button to go back to main charts
-        Button backButton = createStyledButton("Back",PRIMARY_COLOR,PRIMARY_DARK_COLOR);
-        backButton.setOnAction(e-> {
-            ChartPage chartPage = new ChartPage(stage,logManager,chartCreator);
-            chartPage.show();
-        });
+        root.setTop(navBar);
+        root.setCenter(inputBar);
+        root.setBottom(logoutBar);
 
-        //Button to logout
-        Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
-        logoutButton.setOnAction(e -> {
-            Login loginPage = new Login(stage);
-            loginPage.show();
-        });
+        BorderPane.setMargin(inputBar, new Insets(20, 20, 20, 20));
+        BorderPane.setMargin(logoutBar, new Insets(0, 0, 30, 0));
 
-        root.setCenter(bounceInput);
-        root.setTop(backButton);
-        root.setBottom(logoutButton);
 
-        Scene scene = new Scene(root, 1300, 800);
+
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.setTitle("Ad Auction Dashboard - Bounce Definition");
         stage.show();
 
@@ -97,5 +97,96 @@ public class BouncePage {
 
         return button;
     }
+
+    private HBox createNavigationBar() {
+        HBox navBar = new HBox(15);
+        navBar.setAlignment(Pos.CENTER_LEFT);
+        navBar.setPadding(new Insets(15, 20, 15, 20));
+        navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+
+        Label title = new Label("Bounce Definition");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        title.setTextFill(Color.web(HEADER_COLOR));
+
+        // Button to go back to main charts
+        Button backButton = createStyledButton("Back",PRIMARY_COLOR,PRIMARY_DARK_COLOR);
+        backButton.setOnAction(e-> {
+            ChartPage chartPage = new ChartPage(stage,logManager,chartCreator);
+            chartPage.show();
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Add to navigation bar
+        navBar.getChildren().addAll(title,spacer,backButton);
+
+        return navBar;
+    }
+
+    private VBox createInputBar() {
+        VBox inputBar = new VBox(15);
+        inputBar.setAlignment(Pos.CENTER_LEFT);
+        inputBar.setPadding(new Insets(15, 20, 15, 20));
+        inputBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+
+        // Field for user to input bounce definition number
+        TextField bounceInput = new TextField();
+        bounceInput.setPromptText("Enter bounce requirement time");
+        bounceInput.setPrefHeight(40);
+        bounceInput.setStyle("-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-width: 1px; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px;");
+        bounceInput.setOnAction(e ->{
+            String bounceDef = bounceInput.getText();
+            chartCreator.setTimeSpent(Integer.parseInt(bounceDef));
+        });
+
+        //Instruction label
+        Label instruction = new Label("Enter time limit for bounce and click enter");
+        instruction.setFont(Font.font("Arial", FontWeight.LIGHT, 14));
+        instruction.setTextFill(Color.web(HEADER_COLOR));
+
+        //Tip label
+        Label tip = new Label("Tip: Type 0 to set bounce definition to one page viewed");
+        tip.setFont(Font.font("Arial", FontWeight.LIGHT, 14));
+        tip.setTextFill(Color.web(HEADER_COLOR));
+
+        inputBar.getChildren().addAll(instruction,bounceInput,tip);
+
+        return inputBar;
+    }
+
+    private HBox createLogoutBar() {
+        HBox logoutBar = new HBox(15);
+        logoutBar.setAlignment(Pos.CENTER_LEFT);
+        logoutBar.setPadding(new Insets(15, 20, 15, 20));
+        logoutBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+
+
+        //Button to logout
+        Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
+        logoutButton.setOnAction(e -> {
+            Login loginPage = new Login(stage);
+            loginPage.show();
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+
+        // Add to navigation bar
+        logoutBar.getChildren().addAll(spacer,logoutButton);
+
+        return logoutBar;
+    }
+
+
 
 }

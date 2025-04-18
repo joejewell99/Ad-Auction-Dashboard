@@ -3,6 +3,7 @@ package com.example;
 import com.itextpdf.text.DocumentException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -18,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.chart.NumberAxis;
 
@@ -47,6 +49,8 @@ public class HistogramChart {
     private final String SECTION_BACKGROUND = "white";
     private final String HEADER_COLOR = "#333333";
     private final String TEXT_COLOR = "#555555";
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
 
     public HistogramChart(Stage stage, ChartPage chartPage) {
         this.Stage = stage;
@@ -61,18 +65,31 @@ public class HistogramChart {
         HBox navBar = createNavigationBar();
 
         // Create chart area
-
         VBox chartSection = createChartSection();
+
+        //Logout Button
+        Button logoutButton = chartPage.createStyledButton("Logout", LOGOUT_COLOUR, LOGOUT_HOVER_COLOUR);
+        logoutButton.setOnAction(e -> {
+                    Login login = new Login(Stage);
+                    login.show();
+                });
+        HBox logoutBox = new HBox(logoutButton);
+        logoutBox.setAlignment(Pos.BOTTOM_RIGHT);
+        logoutBox.setPadding(new Insets(10, 20, 20, 20));
+
+
 
         // Set layout
         root.setTop(navBar);
         root.setCenter(chartSection);
+        root.setBottom(logoutBox);
 
         // Set margins
         BorderPane.setMargin(chartSection, new Insets(20, 20, 20, 20));
-
-        Scene scene = new Scene(root, 1300, 800);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
         Stage.setScene(scene);
+        Stage.setFullScreen(true);
         Stage.setTitle("Ad Auction Dashboard - Click-Histogram View");
         Stage.show();
 
@@ -96,19 +113,20 @@ public class HistogramChart {
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        Button backButton = chartPage.createStyledButton("Back to Charts", "#757575", "#616161");
+        Button backButton = chartPage.createStyledButton("Back to Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         Button saveToPdfButton = chartPage.createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        Button logOutButton = chartPage.createStyledButton("Logout", "#757575", "#616161");
+        //Button logOutButton = chartPage.createStyledButton("Logout", "#757575", "#616161");
 
         // Set button events
         backButton.setOnAction(e -> {
             chartPage.show();
         });
 
+        /**
         logOutButton.setOnAction(e -> {
             Login login = new Login(Stage);
             login.show();
-        });
+        }); */
 
         saveToPdfButton.setOnAction(e -> {
             saveChartToPDF(barChart);
@@ -117,7 +135,7 @@ public class HistogramChart {
 
 
         // Add to navigation bar
-        navBar.getChildren().addAll(title,spacer, saveToPdfButton, backButton, logOutButton);
+        navBar.getChildren().addAll(title,spacer,backButton,saveToPdfButton);
 
         return navBar;
     }

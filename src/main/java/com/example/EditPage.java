@@ -2,17 +2,16 @@ package com.example;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.jfree.chart.fx.ChartViewer;
 
 import java.util.ArrayList;
 
@@ -39,6 +38,8 @@ public class EditPage{
     private final String SECTION_BACKGROUND = "white";
     private final String HEADER_COLOR = "#333333";
     private final String TEXT_COLOR = "#555555";
+    private final String LOGOUT_COLOUR = "#ff0000";
+    private final String LOGOUT_HOVER_COLOUR = "#8b0000";
 
     public EditPage(Stage stage, LogManager logManager, ArrayList<String> charts,
                     ArrayList<String> timeFlag, ArrayList<String> gender, ArrayList<String> income,
@@ -65,15 +66,20 @@ public class EditPage{
         // Create central content area
         GridPane contentPane = createContentPane();
 
+        //Create logoout box
+        HBox logoutBox = createLogOutBar();
+
         // Set layout
         root.setTop(navBar);
         root.setCenter(contentPane);
+        root.setBottom(logoutBox);
 
         // Set margins
         BorderPane.setMargin(contentPane, new Insets(20, 20, 20, 20));
-
-        Scene scene = new Scene(root, 1300, 800);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.setTitle("Ad Auction Dashboard - Edit Chart");
         stage.show();
     }
@@ -93,9 +99,9 @@ public class EditPage{
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        Button backButton = createStyledButton("Back to Charts", "#757575", "#616161");
+        Button backButton = createStyledButton("Back to Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         Button overallMetricsButton = createStyledButton("Overall Metrics", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
+        //Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
 
         // Set button events
         backButton.setOnAction(e -> {
@@ -108,15 +114,42 @@ public class EditPage{
             metricsPage.show();
         });
 
+        /**
         logOutButton.setOnAction(e -> {
             Login login = new Login(stage);
             login.show();
         });
+        */
 
         // Add to navigation bar
-        navBar.getChildren().addAll(title, spacer, backButton, overallMetricsButton, logOutButton);
+        navBar.getChildren().addAll(title, spacer, backButton, overallMetricsButton);
 
         return navBar;
+    }
+
+
+    private HBox createLogOutBar() {
+        HBox logoutBar = new HBox(20);
+        logoutBar.setAlignment(Pos.CENTER);
+        logoutBar.setPadding(new Insets(15, 20, 15, 20));
+        logoutBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                "-fx-background-radius: 10; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+
+
+        //Button to Logout
+        Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
+        logoutButton.setOnAction(e -> {
+            Login loginPage = new Login(stage);
+            loginPage.show();
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        logoutBar.getChildren().addAll(spacer,logoutButton);
+
+        return logoutBar;
     }
 
     // Create central content area
