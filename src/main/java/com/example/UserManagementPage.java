@@ -21,6 +21,7 @@ public class UserManagementPage {
     private Stage stage;
     private LoginDatabase db;
     private User loggedInUser;
+    private boolean darkMode;
 
     private final String BACKGROUND_COLOR = "#f5f5f7";
     private final String PRIMARY_COLOR = "#4285F4";
@@ -32,11 +33,17 @@ public class UserManagementPage {
     private final String SUCCESS_COLOR = "#4CAF50";
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
+    private final String DARKMODE_SECTION = "#2b2b2b";
+    private final String DARKMODE_BACKGROUND = "#1f1f1f";
+    private final String DARKMODE_TEXT = "#fafafa";
+    private final String SETTINGS = "#888888";
+    private final String SETTINGS_HOVER = "#555555";
 
-    public UserManagementPage(Stage stage, User currentUser) {
+    public UserManagementPage(Stage stage, User currentUser,boolean darkMode) {
         this.stage = stage;
         this.db = new LoginDatabase();
         this.loggedInUser = currentUser;
+        this.darkMode = darkMode;
     }
 
     public void show() {
@@ -47,15 +54,26 @@ public class UserManagementPage {
             deny.setHeaderText("Permission error");
             deny.showAndWait();
 
-            new Login(stage).show();
+            new Login(stage,darkMode).show();
             return;
         }
         TabPane tabPane = new TabPane();
+        if (!darkMode) {
+            tabPane.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            tabPane.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
 
         Tab registerTab = new Tab();
+        if (!darkMode) {
+            registerTab.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            registerTab.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
         Label registerTabLabel = new Label("Register");
         registerTabLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         registerTabLabel.setStyle("-fx-padding: 20 20 20 20;" );
+        registerTabLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
         registerTab.setGraphic(registerTabLabel);
 
         VBox registerBox = new VBox(10);
@@ -64,7 +82,7 @@ public class UserManagementPage {
 
         Label registerLabel = new Label("Register New User");
         registerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        registerLabel.setTextFill(Color.web(HEADER_COLOR));
+        registerLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         TextField regUsernameField = new TextField();
         regUsernameField.setPromptText("Username");
@@ -107,9 +125,15 @@ public class UserManagementPage {
         registerTab.setClosable(false);
 
         Tab updateTab = new Tab();
+        if (!darkMode) {
+            updateTab.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            updateTab.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
         Label updateTabLabel = new Label("Update Password");
         updateTabLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         updateTabLabel.setStyle("-fx-padding: 20 20 20 20;" );
+        updateTabLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
         updateTab.setGraphic(updateTabLabel);
 
         VBox updateBox = new VBox(10);
@@ -118,7 +142,7 @@ public class UserManagementPage {
 
         Label updateLabel = new Label("Update Password");
         updateLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        updateLabel.setTextFill(Color.web(HEADER_COLOR));
+        updateLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
 
         TextField updateUsernameField = new TextField();
         updateUsernameField.setPromptText("Username");
@@ -158,9 +182,15 @@ public class UserManagementPage {
         updateTab.setClosable(false);
 
         Tab deleteTab = new Tab();
+        if (!darkMode) {
+            deleteTab.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            deleteTab.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
         Label deleteTabLabel = new Label("Delete User");
         deleteTabLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         deleteTabLabel.setStyle("-fx-padding: 20 20 20 20;" );
+        deleteTabLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
         deleteTab.setGraphic(deleteTabLabel);
 
         VBox deleteBox = new VBox(10);
@@ -169,7 +199,7 @@ public class UserManagementPage {
 
         Label deleteLabel = new Label("Delete User");
         deleteLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        deleteLabel.setTextFill(Color.web(HEADER_COLOR));
+        deleteLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         TextField deleteUsernameField = new TextField();
         deleteUsernameField.setPromptText("Username");
@@ -197,9 +227,15 @@ public class UserManagementPage {
         deleteTab.setClosable(false);
 
         Tab listTab = new Tab();
+        if (!darkMode) {
+            listTab.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            listTab.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
         Label listTabLabel = new Label("List Users");
         listTabLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         listTabLabel.setStyle("-fx-padding: 20 20 20 20;" );
+        listTabLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
         listTab.setGraphic(listTabLabel);
 
         VBox listBox = new VBox(10);
@@ -208,7 +244,7 @@ public class UserManagementPage {
 
         Label listLabel = new Label("List Users");
         listLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        listLabel.setTextFill(Color.web(HEADER_COLOR));
+        listLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Button refreshButton = createStyledButton("Refresh List", PRIMARY_COLOR,PRIMARY_DARK_COLOR);
         ListView<String> usersListView = new ListView<>();
@@ -230,22 +266,67 @@ public class UserManagementPage {
 
         Button backButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         backButton.setOnAction(e -> {
-            new Login(stage).show();
+            new Login(stage,darkMode).show();
         });
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
 
 
-        HBox navBox = new HBox(spacer,backButton);
+        HBox logoutBox = new HBox(spacer,backButton);
+        logoutBox.setAlignment(Pos.CENTER);
+        logoutBox.setPadding(new Insets(10));
+        if (!darkMode) {
+            logoutBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            logoutBox.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
+
+        HBox navBox= new HBox();
         navBox.setAlignment(Pos.CENTER);
         navBox.setPadding(new Insets(10));
-        navBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            navBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            navBox.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
+
+        Button settingsButton = createStyledButton("Settings", SETTINGS,SETTINGS_HOVER);
+        settingsButton.setOnAction(e -> {
+            PageInfo pageInfo = new PageInfo();
+            pageInfo.setDarkMode(darkMode);
+            pageInfo.setLoggedInUser(loggedInUser);
+            SettingsPage settingsPage = new SettingsPage(stage,"Manage",pageInfo,darkMode);
+            settingsPage.show();
+        });
+
+        Label title = new Label("Manage Users");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
+
+        Region rightSpacer = new Region();
+        HBox.setHgrow(rightSpacer,Priority.ALWAYS);
+
+
+        navBox.getChildren().addAll(title,rightSpacer,settingsButton);
+
+
+
 
         BorderPane root = new BorderPane();
+        if (!darkMode) {
+            root.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            root.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
+        root.setTop(navBox);
         root.setCenter(tabPane);
-        root.setBottom(navBox);
-        BorderPane.setMargin(navBox, new Insets(0, 0, 20, 0));
+        root.setBottom(logoutBox);
+        BorderPane.setMargin(tabPane,new Insets(0,0,20,0));
+        BorderPane.setMargin(logoutBox, new Insets(0, 0, 20, 0));
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());

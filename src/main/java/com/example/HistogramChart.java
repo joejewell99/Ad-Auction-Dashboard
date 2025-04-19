@@ -34,11 +34,13 @@ import java.util.Map;
 
 public class HistogramChart {
     private Stage Stage;
-    private ChartPage chartPage;
     private int weekOffset = 0; // 0 = current week
     private final String CSV_FILE = "resources/clicks_log.csv";
     private LocalDate dynamicBaseDate = null;
     private BarChart<String, Number> barChart;
+    private boolean darkMode;
+    private LogManager logManager;
+    private ChartCreator chartCreator;
 
 
 
@@ -51,15 +53,26 @@ public class HistogramChart {
     private final String TEXT_COLOR = "#555555";
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
+    private final String SETTINGS = "#888888";
+    private final String SETTINGS_HOVER = "#555555";
+    private final String DARKMODE_SECTION = "#2b2b2b";
+    private final String DARKMODE_BACKGROUND = "#1f1f1f";
+    private final String DARKMODE_TEXT = "#fafafa";
 
-    public HistogramChart(Stage stage, ChartPage chartPage) {
+    public HistogramChart(Stage stage,LogManager logManager, ChartCreator chartCreator, boolean darkMode) {
         this.Stage = stage;
-        this.chartPage= chartPage;
+        this.logManager = logManager;
+        this.chartCreator = chartCreator;
+        this.darkMode = darkMode;
     }
 
     public void show() {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
+        if (!darkMode) {
+            root.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            root.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
 
         // Create top navigation bar
         HBox navBar = createNavigationBar();
@@ -68,9 +81,9 @@ public class HistogramChart {
         VBox chartSection = createChartSection();
 
         //Logout Button
-        Button logoutButton = chartPage.createStyledButton("Logout", LOGOUT_COLOUR, LOGOUT_HOVER_COLOUR);
+        Button logoutButton = createStyledButton("Logout", LOGOUT_COLOUR, LOGOUT_HOVER_COLOUR);
         logoutButton.setOnAction(e -> {
-                    Login login = new Login(Stage);
+                    Login login = new Login(Stage,darkMode);
                     login.show();
                 });
         HBox logoutBox = new HBox(logoutButton);
@@ -103,22 +116,36 @@ public class HistogramChart {
         HBox navBar = new HBox(15);
         navBar.setAlignment(Pos.CENTER_LEFT);
         navBar.setPadding(new Insets(15, 20, 15, 20));
-        navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            navBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
         Label title = new Label("Click-Histogram Chart");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        title.setTextFill(Color.web(HEADER_COLOR));
+        title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        Button backButton = chartPage.createStyledButton("Back to Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        Button saveToPdfButton = chartPage.createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
-        //Button logOutButton = chartPage.createStyledButton("Logout", "#757575", "#616161");
+        Button backButton = createStyledButton("Back to Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
+        Button saveToPdfButton = createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
+        //Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
+
+        Button settingsButton = createStyledButton("Settings", SETTINGS,SETTINGS_HOVER);
+        settingsButton.setOnAction(e -> {
+            PageInfo pageInfo = new PageInfo();
+            pageInfo.setDarkMode(darkMode);
+            SettingsPage settingsPage = new SettingsPage(Stage,"Histogram",pageInfo,darkMode);
+            settingsPage.show();
+        });
 
         // Set button events
         backButton.setOnAction(e -> {
+            ChartPage chartPage = new ChartPage(Stage,logManager,chartCreator,darkMode);
             chartPage.show();
         });
 
@@ -135,7 +162,7 @@ public class HistogramChart {
 
 
         // Add to navigation bar
-        navBar.getChildren().addAll(title,spacer,backButton,saveToPdfButton);
+        navBar.getChildren().addAll(title,spacer,backButton,saveToPdfButton,settingsButton);
 
         return navBar;
     }
@@ -146,11 +173,11 @@ public class HistogramChart {
 
         Label weekRangeLabel = new Label();
         weekRangeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        weekRangeLabel.setTextFill(Color.web(TEXT_COLOR));
+        weekRangeLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT: TEXT_COLOR));
 
         Label descriptionLabel = new Label("Click Histogram by Day of Week");
         descriptionLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        descriptionLabel.setTextFill(Color.web(TEXT_COLOR));
+        descriptionLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :TEXT_COLOR));
 
         barChart = createHistogramChart();
 
@@ -161,8 +188,8 @@ public class HistogramChart {
         HBox weekNav = new HBox(10);
         weekNav.setAlignment(Pos.CENTER);
 
-        Button prevWeek = chartPage.createStyledButton("← Previous Week", "#757575", "#616161");
-        Button nextWeek = chartPage.createStyledButton("Next Week →", "#757575", "#616161");
+        Button prevWeek = createStyledButton("← Previous Week", "#757575", "#616161");
+        Button nextWeek = createStyledButton("Next Week →", "#757575", "#616161");
 
         prevWeek.setOnAction(e -> {
             weekOffset--;
@@ -336,6 +363,33 @@ public class HistogramChart {
 
 
 
-    // Create styled button
+    public Button createStyledButton(String text, String bgColor, String hoverColor) {
+        Button button = new Button(text);
+        button.setPrefSize(140, 35);
+        button.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
+
+        String style = String.format(
+                "-fx-background-color: %s; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: normal; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0, 0, 1); " +
+                        "-fx-cursor: hand;", bgColor);
+
+        String hoverStyle = String.format(
+                "-fx-background-color: %s; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: normal; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 0, 2); " +
+                        "-fx-cursor: hand;", hoverColor);
+
+        button.setStyle(style);
+
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(style));
+
+        return button;
+    }
 
 }

@@ -30,6 +30,7 @@ public class OverallMetricsPage {
     private ArrayList<String[]> serverData;
     private OverallMetricsCalculator metricsCalculator = new OverallMetricsCalculator();
     private ChartCreator chartCreator;
+    private boolean darkMode;
 
     // Define style constants
     private final String BACKGROUND_COLOR = "#f5f5f7";
@@ -42,21 +43,31 @@ public class OverallMetricsPage {
     private final String SUCCESS_COLOR = "#4CAF50";
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
+    private final String SETTINGS = "#888888";
+    private final String SETTINGS_HOVER = "#555555";
+    private final String DARKMODE_SECTION = "#2b2b2b";
+    private final String DARKMODE_BACKGROUND = "#1f1f1f";
+    private final String DARKMODE_TEXT = "#fafafa";
 
-    OverallMetricsPage(Stage stage, LogManager logManager,ChartCreator chartCreator) {
+    OverallMetricsPage(Stage stage, LogManager logManager,ChartCreator chartCreator,boolean darkMode) {
         this.stage = stage;
         this.logManager = logManager;
         this.clickData = logManager.getClickData();
         this.impressionData = logManager.getImpressionData();
         this.serverData = logManager.getServerData();
         this.chartCreator = chartCreator;
+        this.darkMode = darkMode;
         initialize();
     }
 
     private void initialize() {
         // Create main layout
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
+        if (!darkMode) {
+            root.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            root.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
         
         // Create top title bar
         HBox topBar = createTopBar();
@@ -82,26 +93,41 @@ public class OverallMetricsPage {
     }
     
     private HBox createTopBar() {
-        HBox topBar = new HBox();
+        HBox topBar = new HBox(15);
         topBar.setAlignment(Pos.CENTER);
         topBar.setPadding(new Insets(15, 20, 15, 20));
-        topBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            topBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            topBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
         
         Label titleLabel = new Label("Overall Ad Campaign Metrics");
-        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        titleLabel.setTextFill(Color.web(HEADER_COLOR));
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        titleLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Button backButton = createStyledButton("Back to Charts", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         // Button events
         backButton.setOnAction(e -> {
-            ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
+            ChartPage chartPage = new ChartPage(stage, logManager,chartCreator,darkMode);
             chartPage.show();
+        });
+
+        Button settingsButton = createStyledButton("Settings", SETTINGS,SETTINGS_HOVER);
+        settingsButton.setOnAction(e -> {
+            PageInfo pageInfo = new PageInfo();
+            pageInfo.setDarkMode(darkMode);
+            pageInfo.setChartCreator(chartCreator);
+            pageInfo.setLogManager(logManager);
+            SettingsPage settingsPage = new SettingsPage(stage,"Overall",pageInfo,darkMode);
+            settingsPage.show();
         });
 
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
-        topBar.getChildren().addAll(titleLabel,spacer,backButton);
+        topBar.getChildren().addAll(titleLabel,spacer,backButton,settingsButton);
         
         return topBar;
     }
@@ -111,14 +137,18 @@ public class OverallMetricsPage {
         contentBox.setAlignment(Pos.TOP_CENTER);
         contentBox.setPadding(new Insets(30, 40, 30, 40));
         contentBox.setMaxWidth(700);
-        contentBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-          "-fx-background-radius: 10; " +
-          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        if (!darkMode) {
+            contentBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            contentBox.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
         // Add description text
         Label descriptionLabel = new Label("Below are the overall ad campaign metrics calculated from uploaded data files");
         descriptionLabel.setFont(Font.font("Arial", 14));
-        descriptionLabel.setTextFill(Color.web("#666666"));
+        descriptionLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : "#666666"));
         descriptionLabel.setWrapText(true);
         descriptionLabel.setTextAlignment(TextAlignment.CENTER);
 
@@ -149,7 +179,7 @@ public class OverallMetricsPage {
             // First column: Basic quantitative metrics
             Label basicMetricsTitle = new Label("Basic Quantitative Metrics");
             basicMetricsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-            basicMetricsTitle.setTextFill(Color.web(HEADER_COLOR));
+            basicMetricsTitle.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
             VBox basicMetricsBox = new VBox(12);
             basicMetricsBox.getChildren().addAll(
@@ -165,7 +195,7 @@ public class OverallMetricsPage {
             // Second column: Ratio metrics
             Label ratioMetricsTitle = new Label("Ratio and Performance Metrics");
             ratioMetricsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-            ratioMetricsTitle.setTextFill(Color.web(HEADER_COLOR));
+            ratioMetricsTitle.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
             VBox ratioMetricsBox = new VBox(12);
             ratioMetricsBox.getChildren().addAll(
@@ -207,8 +237,13 @@ public class OverallMetricsPage {
         HBox bottomBar = new HBox(15);
         bottomBar.setAlignment(Pos.CENTER);
         bottomBar.setPadding(new Insets(15, 20, 15, 20));
-        bottomBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            bottomBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            bottomBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
         Button logoutButton = createStyledButton("Logout", LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         Region rightSpacer = new Region();
@@ -216,7 +251,7 @@ public class OverallMetricsPage {
 
         logoutButton.setOnAction(e -> {
             System.out.println("Logout Button clicked");
-            Login login = new Login(stage);
+            Login login = new Login(stage,darkMode);
             login.show();
         });
         
@@ -232,23 +267,20 @@ public class OverallMetricsPage {
         
         Label metricLabel = new Label(label + ":");
         metricLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
-        metricLabel.setTextFill(Color.web(TEXT_COLOR));
+        metricLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : TEXT_COLOR));
         metricLabel.setMinWidth(150);
         
         Label valueLabel = new Label(value);
         valueLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        
-        // Set text color based on whether it's a ratio metric
-        if (isRatio) {
-            // If value contains NaN, display in red
-            if (value.contains("NaN")) {
-                valueLabel.setTextFill(Color.web(ERROR_COLOR));
-            } else {
-                valueLabel.setTextFill(Color.web(PRIMARY_COLOR));
-            }
+
+
+        // If value contains NaN, display in red
+        if (value.contains("NaN")) {
+            valueLabel.setTextFill(Color.web(ERROR_COLOR));
         } else {
-            valueLabel.setTextFill(Color.web(HEADER_COLOR));
+            valueLabel.setTextFill(Color.web(PRIMARY_COLOR));
         }
+
         
         item.getChildren().addAll(metricLabel, valueLabel);
         

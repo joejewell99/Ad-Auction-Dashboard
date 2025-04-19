@@ -49,11 +49,11 @@ public class ChartCreatorTest {
 
 
         testInteractions = new ArrayList<>();
-        testInteractions.add(new String[]{"2015-01-01 16:12:55", "1", "2015-01-01 16:29:30", "5", "Yes"});
-        testInteractions.add(new String[]{"2015-01-02 09:45:30", "2", "2015-01-02 09:50:00", "2", "No"});
+        testInteractions.add(new String[]{"2015-01-01 16:12:50", "1", "2015-01-01 16:12:59", "5", "Yes"});
+        testInteractions.add(new String[]{"2015-01-02 09:45:30", "2", "2015-01-02 09:45:41", "2", "No"});
         testInteractions.add(new String[]{"2015-01-03 14:30:10", "3", "n/a", "1", "No"});
-        testInteractions.add(new String[]{"2015-02-03 10:00:10", "5", "2015-02-03 10:15:00", "3", "Yes"});
-        testInteractions.add(new String[]{"2015-02-04 14:20:15", "6", "2015-02-04 14:40:00", "4", "No"});
+        testInteractions.add(new String[]{"2015-02-03 10:00:10", "5", "2015-02-03 10:00:21", "3", "Yes"});
+        testInteractions.add(new String[]{"2015-02-04 14:20:10", "6", "2015-02-04 14:40:11", "4", "No"});
         testInteractions.add(new String[]{"2015-02-05 11:30:20", "7", "n/a", "1", "No"});
 
         LogManager testLogManager = new TestLogManager(testClicks,testImpressions,testInteractions);
@@ -178,6 +178,64 @@ public class ChartCreatorTest {
         assertEquals(1,result.get("Month 1"));
         assertEquals(1,result.get("Month 2"));
     }
+
+    // Test bounces based on only one page viewed
+    @Test
+    public void testDefaultBounceDaily() {
+        Map<String, Integer> result = chartCreator.getDailyBounces(testInteractions,0);
+        assertEquals(0,result.get("2015-01-01"));
+        assertEquals(0,result.get("2015-01-02"));
+        assertEquals(1,result.get("2015-01-03"));
+        assertEquals(0,result.get("2015-02-03"));
+        assertEquals(0,result.get("2015-02-04"));
+        assertEquals(1,result.get("2015-02-05"));
+    }
+
+    //Test bounces based on only one page viewed
+    @Test
+    public void testDefaultBounceWeekly() {
+        Map<String, Integer> result = chartCreator.getWeeklyBounces(testInteractions,0);
+        assertEquals(1,result.get("Week 1"));
+        assertEquals(0,result.get("Week 5"));
+        assertEquals(1,result.get("Week 6"));
+    }
+
+    //Test bounces based on only one page viewed
+    @Test
+    public void testDefaultBouncesMonthly() {
+        Map<String, Integer> result = chartCreator.getMonthlyBounces(testInteractions,0);
+        assertEquals(1,result.get("Month 1"));
+        assertEquals(1,result.get("Month 2"));
+    }
+
+    // Test bounces on inside edge and outside edge
+    @Test
+    public void testEdgeBounceDaily() {
+        Map<String, Integer> result = chartCreator.getDailyBounces(testInteractions,10);
+        assertEquals(1,result.get("2015-01-01"));
+        assertEquals(0,result.get("2015-01-02"));
+        assertEquals(0,result.get("2015-02-03"));
+        assertEquals(0,result.get("2015-02-04"));
+    }
+
+    // Test bounces on inside edge and outside edge
+    @Test
+    public void testEdgeBounceWeekly() {
+        Map<String, Integer> result = chartCreator.getWeeklyBounces(testInteractions,10);
+        assertEquals(1,result.get("Week 1"));
+        assertEquals(0,result.get("Week 5"));
+    }
+
+    // Test bounces on inside edge and outside edge
+    @Test
+    public void testEdgeBounceMonthly() {
+        Map<String, Integer> result = chartCreator.getMonthlyBounces(testInteractions,10);
+        assertEquals(1,result.get("Month 1"));
+        assertEquals(0,result.get("Month 2"));
+    }
+
+
+
 
 
 

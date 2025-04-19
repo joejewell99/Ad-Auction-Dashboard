@@ -18,6 +18,7 @@ public class AdminLogin {
     private final Stage stage;
     private final LoginDatabase db = new LoginDatabase();
     private final Consumer<User> onSuccess;
+    private boolean darkMode;
 
     private final String BACKGROUND_COLOR = "#f5f5f7";
     private final String PRIMARY_COLOR = "#4285F4";
@@ -27,15 +28,26 @@ public class AdminLogin {
     private final String TEXT_COLOR = "#555555";
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
+    private final String SETTINGS = "#888888";
+    private final String SETTINGS_HOVER = "#555555";
+    private final String DARKMODE_SECTION = "#2b2b2b";
+    private final String DARKMODE_BACKGROUND = "#1f1f1f";
+    private final String DARKMODE_TEXT = "#fafafa";
 
-    public AdminLogin(Stage stage, Consumer<User> onSuccess) {
+    public AdminLogin(Stage stage, Consumer<User> onSuccess,boolean darkMode) {
         this.stage = stage;
         this.onSuccess = onSuccess;
+        this.darkMode = darkMode;
 
     }
 
     public void show() {
         BorderPane root = new BorderPane();
+        if (!darkMode) {
+            root.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            root.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
 
         HBox navBar = createNavigationBar();
         VBox loginBar = createInputBar();
@@ -60,16 +72,32 @@ public class AdminLogin {
         HBox navBar = new HBox(15);
         navBar.setAlignment(Pos.CENTER_LEFT);
         navBar.setPadding(new Insets(15, 20, 15, 20));
-        navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            navBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
         Label title = new Label("Admin Login");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        title.setTextFill(Color.web(HEADER_COLOR));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
 
+        Button settingsButton = createStyledButton("Settings", SETTINGS,SETTINGS_HOVER);
+        settingsButton.setOnAction(e -> {
+            PageInfo pageInfo = new PageInfo();
+            pageInfo.setDarkMode(darkMode);
+            pageInfo.setOnSuccess(onSuccess);
+            SettingsPage settingsPage = new SettingsPage(stage,"AdminLogin",pageInfo,darkMode);
+            settingsPage.show();
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer,Priority.ALWAYS);
 
         // Add to navigation bar
-        navBar.getChildren().addAll(title);
+        navBar.getChildren().addAll(title,spacer,settingsButton);
 
         return navBar;
     }
@@ -78,8 +106,13 @@ public class AdminLogin {
         VBox inputBar = new VBox(15);
         inputBar.setAlignment(Pos.CENTER_LEFT);
         inputBar.setPadding(new Insets(15, 20, 15, 20));
-        inputBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            inputBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            inputBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
 
         TextField userField = new TextField();
@@ -124,14 +157,19 @@ public class AdminLogin {
         HBox logoutBar = new HBox(15);
         logoutBar.setAlignment(Pos.CENTER_LEFT);
         logoutBar.setPadding(new Insets(15, 20, 15, 20));
-        logoutBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            logoutBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            logoutBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
 
         //Button to logout
         Button logoutButton = createStyledButton("Back",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         logoutButton.setOnAction(e -> {
-            Login loginPage = new Login(stage);
+            Login loginPage = new Login(stage,darkMode);
             loginPage.show();
         });
 

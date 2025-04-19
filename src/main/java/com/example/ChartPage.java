@@ -32,6 +32,7 @@ public class ChartPage {
     private ChartCreator chartCreator;
     private String timeFlag;
     private String currentChart;
+    private boolean darkMode;
     ChartViewer chartViewer = null;
 
     private String gender;
@@ -48,13 +49,19 @@ public class ChartPage {
     private final String TEXT_COLOR = "#555555";
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
+    private final String SETTINGS = "#888888";
+    private final String SETTINGS_HOVER = "#555555";
+    private final String DARKMODE_SECTION = "#2b2b2b";
+    private final String DARKMODE_BACKGROUND = "#1f1f1f";
+    private final String DARKMODE_TEXT = "#fafafa";
 
-    public ChartPage(Stage stage, LogManager logManager, ChartCreator chartCreator) {
+    public ChartPage(Stage stage, LogManager logManager, ChartCreator chartCreator,boolean darkMode) {
         this.stage = stage;
         this.logManager = logManager;
         this.chartCreator = chartCreator;
         this.timeFlag = "Daily";
         this.currentChart = "Clicks";
+        this.darkMode = darkMode;
 
         this.gender = "";
         this.age = new ArrayList<>();
@@ -65,7 +72,11 @@ public class ChartPage {
     public void show() {
         // Create main layout
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
+        if (!darkMode) {
+            root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
+        } else {
+            root.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
 
         // Chart display area
         try {
@@ -90,9 +101,13 @@ public class ChartPage {
         // Create a container for the chart, add styling
         BorderPane chartContainer = new BorderPane();
         chartContainer.setCenter(chartViewer);
-        chartContainer.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-          "-fx-background-radius: 10; " +
-          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        if (!darkMode) {
+            chartContainer.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            chartContainer.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
         chartContainer.setPadding(new Insets(15));
 
         // ===== Top navigation bar =====
@@ -159,12 +174,17 @@ public class ChartPage {
         HBox navBar = new HBox(15);
         navBar.setAlignment(Pos.CENTER_LEFT);
         navBar.setPadding(new Insets(15, 20, 15, 20));
-        navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            navBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
         
         Label title = new Label("Data Visualization");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-        title.setTextFill(Color.web(HEADER_COLOR));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
@@ -187,15 +207,25 @@ public class ChartPage {
 
         Button saveToPdfButton = createStyledButton("Save To Pdf", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
 
+        Button settingsButton = createStyledButton("Settings", SETTINGS,SETTINGS_HOVER);
+        settingsButton.setOnAction(e -> {
+            PageInfo pageInfo = new PageInfo();
+            pageInfo.setDarkMode(darkMode);
+            pageInfo.setChartCreator(chartCreator);
+            pageInfo.setLogManager(logManager);
+            SettingsPage settingsPage = new SettingsPage(stage,"Chart",pageInfo,darkMode);
+            settingsPage.show();
+        });
+
         
         // Set button actions
         overallMetricsButton.setOnAction(e -> {
-            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator);
+            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator,darkMode);
             metricsPage.show();
         });
 
         histogramButton.setOnAction(e -> {
-            HistogramChart histogramChart = new HistogramChart(stage,this);
+            HistogramChart histogramChart = new HistogramChart(stage,logManager,chartCreator,darkMode);
             histogramChart.show();
         });
 
@@ -225,7 +255,7 @@ public class ChartPage {
             ages.add(new ArrayList<>());
             ages.add(new ArrayList<>()); // Default age for second chart
             
-            MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages,chartCreator);
+            MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages,chartCreator,darkMode);
             multiChartPage.show();
         });
         
@@ -235,7 +265,7 @@ public class ChartPage {
        // });
         
         fileSelectionButton.setOnAction(e -> {
-            InputFilesPage inputFilesPage = new InputFilesPage(stage);
+            InputFilesPage inputFilesPage = new InputFilesPage(stage,darkMode);
             inputFilesPage.show();
         });
 
@@ -254,7 +284,7 @@ public class ChartPage {
             }
         });
         
-        navBar.getChildren().addAll(title, spacer,fileSelectionButton,saveToPdfButton,histogramButton,overallMetricsButton, compareChartsButton);
+        navBar.getChildren().addAll(title, spacer,fileSelectionButton,saveToPdfButton,histogramButton,overallMetricsButton, compareChartsButton,settingsButton);
         return navBar;
     }
     
@@ -262,14 +292,18 @@ public class ChartPage {
     private ScrollPane createFilterPanel(ChartViewer chartViewer) {
         VBox filterPanel = new VBox(20);
         filterPanel.setPadding(new Insets(20));
-        filterPanel.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            filterPanel.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            filterPanel.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
         
         // Title for filter panel
         Label filterTitle = new Label("Chart Settings");
         filterTitle.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        filterTitle.setTextFill(Color.web(HEADER_COLOR));
+        filterTitle.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         
         // Add different filter sections
         VBox metricsSection = createMetricsOptions(chartViewer);
@@ -309,33 +343,37 @@ public class ChartPage {
         HBox timeBar = new HBox(20);
         timeBar.setAlignment(Pos.CENTER);
         timeBar.setPadding(new Insets(15, 20, 15, 20));
-        timeBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            timeBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            timeBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
         
         Label timeLabel = new Label("Time Granularity:");
         timeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        timeLabel.setTextFill(Color.web(HEADER_COLOR));
+        timeLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
         
         ToggleGroup timeToggleGroup = new ToggleGroup();
         
-        RadioButton dailyButton = createStyledRadioButton("Daily", timeToggleGroup);
+        RadioButton dailyButton = createStyledRadioButton("Daily", timeToggleGroup,darkMode);
         dailyButton.setSelected(true);
         
-        RadioButton weeklyButton = createStyledRadioButton("Weekly", timeToggleGroup);
-        RadioButton monthlyButton = createStyledRadioButton("Monthly", timeToggleGroup);
+        RadioButton weeklyButton = createStyledRadioButton("Weekly", timeToggleGroup,darkMode);
+        RadioButton monthlyButton = createStyledRadioButton("Monthly", timeToggleGroup,darkMode);
 
         //Bounce definition button
         Button bounceDefinitionButton = createStyledButton("Bounce Definition", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         bounceDefinitionButton.setOnAction(e -> {
-            BouncePage bouncePage = new BouncePage(stage,logManager,chartCreator);
+            BouncePage bouncePage = new BouncePage(stage,logManager,chartCreator,darkMode);
             bouncePage.show();
         });
 
         //Button to Logout
         Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         logoutButton.setOnAction(e -> {
-            Login loginPage = new Login(stage);
+            Login loginPage = new Login(stage,darkMode);
             loginPage.show();
         });
 
@@ -370,18 +408,18 @@ public class ChartPage {
         
         Label metricsLabel = new Label("Metrics");
         metricsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        metricsLabel.setTextFill(Color.web(HEADER_COLOR));
+        metricsLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
         
         ToggleGroup metricsToggleGroup = new ToggleGroup();
         
-        RadioButton clicksButton = createStyledRadioButton("Total Clicks", metricsToggleGroup);
+        RadioButton clicksButton = createStyledRadioButton("Total Clicks", metricsToggleGroup,darkMode);
         clicksButton.setSelected(true);
         
-        RadioButton impressionsButton = createStyledRadioButton("Total Impressions", metricsToggleGroup);
-        RadioButton uniquesButton = createStyledRadioButton("Unique Visitors", metricsToggleGroup);
-        RadioButton bouncesButton = createStyledRadioButton("Bounces", metricsToggleGroup);
-        RadioButton conversionsButton = createStyledRadioButton("Conversions", metricsToggleGroup);
-        RadioButton costButton = createStyledRadioButton("Total Cost", metricsToggleGroup);
+        RadioButton impressionsButton = createStyledRadioButton("Total Impressions", metricsToggleGroup,darkMode);
+        RadioButton uniquesButton = createStyledRadioButton("Unique Visitors", metricsToggleGroup,darkMode);
+        RadioButton bouncesButton = createStyledRadioButton("Bounces", metricsToggleGroup,darkMode);
+        RadioButton conversionsButton = createStyledRadioButton("Conversions", metricsToggleGroup,darkMode);
+        RadioButton costButton = createStyledRadioButton("Total Cost", metricsToggleGroup,darkMode);
         
         // Create a separator for ratio metrics
         Separator separator = new Separator();
@@ -389,14 +427,14 @@ public class ChartPage {
         
         Label ratioLabel = new Label("Ratio Metrics");
         ratioLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        ratioLabel.setTextFill(Color.web(HEADER_COLOR));
+        ratioLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
         ratioLabel.setPadding(new Insets(5, 0, 5, 0));
         
-        RadioButton ctrButton = createStyledRadioButton("Click-Through Rate (CTR)", metricsToggleGroup);
-        RadioButton cpaButton = createStyledRadioButton("Cost Per Acquisition (CPA)", metricsToggleGroup);
-        RadioButton cpcButton = createStyledRadioButton("Cost Per Click (CPC)", metricsToggleGroup);
-        RadioButton cpmButton = createStyledRadioButton("Cost Per Mille (CPM)", metricsToggleGroup);
-        RadioButton bounceRateButton = createStyledRadioButton("Bounce Rate", metricsToggleGroup);
+        RadioButton ctrButton = createStyledRadioButton("Click-Through Rate (CTR)", metricsToggleGroup,darkMode);
+        RadioButton cpaButton = createStyledRadioButton("Cost Per Acquisition (CPA)", metricsToggleGroup,darkMode);
+        RadioButton cpcButton = createStyledRadioButton("Cost Per Click (CPC)", metricsToggleGroup,darkMode);
+        RadioButton cpmButton = createStyledRadioButton("Cost Per Mille (CPM)", metricsToggleGroup,darkMode);
+        RadioButton bounceRateButton = createStyledRadioButton("Bounce Rate", metricsToggleGroup,darkMode);
         
         // Set action handlers for metrics buttons
         clicksButton.setOnAction(e -> {
@@ -480,15 +518,15 @@ public class ChartPage {
         
         Label genderLabel = new Label("Gender");
         genderLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        genderLabel.setTextFill(Color.web(HEADER_COLOR));
+        genderLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         
         ToggleGroup genderToggleGroup = new ToggleGroup();
         
-        RadioButton allGenderButton = createStyledRadioButton("All", genderToggleGroup);
+        RadioButton allGenderButton = createStyledRadioButton("All", genderToggleGroup,darkMode);
         allGenderButton.setSelected(true);
         
-        RadioButton maleButton = createStyledRadioButton("Male", genderToggleGroup);
-        RadioButton femaleButton = createStyledRadioButton("Female", genderToggleGroup);
+        RadioButton maleButton = createStyledRadioButton("Male", genderToggleGroup,darkMode);
+        RadioButton femaleButton = createStyledRadioButton("Female", genderToggleGroup,darkMode);
         
         // Set action handlers for gender buttons
         allGenderButton.setOnAction(e -> {
@@ -517,16 +555,16 @@ public class ChartPage {
         
         Label incomeLabel = new Label("Income");
         incomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        incomeLabel.setTextFill(Color.web(HEADER_COLOR));
+        incomeLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         
         ToggleGroup incomeToggleGroup = new ToggleGroup();
         
-        RadioButton allIncomeButton = createStyledRadioButton("All", incomeToggleGroup);
+        RadioButton allIncomeButton = createStyledRadioButton("All", incomeToggleGroup,darkMode);
         allIncomeButton.setSelected(true);
         
-        RadioButton lowButton = createStyledRadioButton("Low", incomeToggleGroup);
-        RadioButton mediumButton = createStyledRadioButton("Medium", incomeToggleGroup);
-        RadioButton highButton = createStyledRadioButton("High", incomeToggleGroup);
+        RadioButton lowButton = createStyledRadioButton("Low", incomeToggleGroup,darkMode);
+        RadioButton mediumButton = createStyledRadioButton("Medium", incomeToggleGroup,darkMode);
+        RadioButton highButton = createStyledRadioButton("High", incomeToggleGroup,darkMode);
         
         // Set action handlers for income buttons
         allIncomeButton.setOnAction(e -> {
@@ -560,14 +598,14 @@ public class ChartPage {
         
         Label contextLabel = new Label("Context");
         contextLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        contextLabel.setTextFill(Color.web(HEADER_COLOR));
+        contextLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         
-        CheckBox newsCheck = createStyledCheckBox("News");
-        CheckBox shoppingCheck = createStyledCheckBox("Shopping");
-        CheckBox socialMediaCheck = createStyledCheckBox("Social Media");
-        CheckBox blogCheck = createStyledCheckBox("Blog");
-        CheckBox hobbyCheck = createStyledCheckBox("Hobby");
-        CheckBox travelCheck = createStyledCheckBox("Travel");
+        CheckBox newsCheck = createStyledCheckBox("News",darkMode);
+        CheckBox shoppingCheck = createStyledCheckBox("Shopping",darkMode);
+        CheckBox socialMediaCheck = createStyledCheckBox("Social Media",darkMode);
+        CheckBox blogCheck = createStyledCheckBox("Blog",darkMode);
+        CheckBox hobbyCheck = createStyledCheckBox("Hobby",darkMode);
+        CheckBox travelCheck = createStyledCheckBox("Travel",darkMode);
         
         // Button to clear all context filters
         Button clearContextButton = new Button("Clear All");
@@ -664,13 +702,13 @@ public class ChartPage {
         
         Label ageLabel = new Label("Age");
         ageLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        ageLabel.setTextFill(Color.web(HEADER_COLOR));
+        ageLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         
-        CheckBox under25Check = createStyledCheckBox("Under 25");
-        CheckBox age25to34Check = createStyledCheckBox("25-34");
-        CheckBox age35to44Check = createStyledCheckBox("35-44");
-        CheckBox age45to54Check = createStyledCheckBox("45-54");
-        CheckBox over54Check = createStyledCheckBox("Over 54");
+        CheckBox under25Check = createStyledCheckBox("Under 25",darkMode);
+        CheckBox age25to34Check = createStyledCheckBox("25-34",darkMode);
+        CheckBox age35to44Check = createStyledCheckBox("35-44",darkMode);
+        CheckBox age45to54Check = createStyledCheckBox("45-54",darkMode);
+        CheckBox over54Check = createStyledCheckBox("Over 54",darkMode);
         
         // Button to clear all age filters
         Button clearAgeButton = new Button("Clear All");
@@ -797,19 +835,19 @@ public class ChartPage {
     }
     
     // Create styled radio button
-    private RadioButton createStyledRadioButton(String text, ToggleGroup group) {
+    private RadioButton createStyledRadioButton(String text, ToggleGroup group,boolean darkMode) {
         RadioButton radioButton = new RadioButton(text);
         radioButton.setToggleGroup(group);
         radioButton.setFont(Font.font("Arial", 13));
-        radioButton.setTextFill(Color.web(TEXT_COLOR));
+        radioButton.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : TEXT_COLOR));
         return radioButton;
     }
     
     // Create styled checkbox
-    private CheckBox createStyledCheckBox(String text) {
+    private CheckBox createStyledCheckBox(String text,boolean darkMode) {
         CheckBox checkBox = new CheckBox(text);
         checkBox.setFont(Font.font("Arial", 13));
-        checkBox.setTextFill(Color.web(TEXT_COLOR));
+        checkBox.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : TEXT_COLOR));
         return checkBox;
     }
     

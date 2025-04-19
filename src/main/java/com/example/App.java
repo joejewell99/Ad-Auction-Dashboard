@@ -41,7 +41,7 @@ public class App extends Application {
     stage.setFullScreen(true);
     stage.show();
     logger.info("App started");
-    Login login = new Login(stage);
+    Login login = new Login(stage,false);
     login.show();
     logger.info("Login completed");
   }
@@ -50,8 +50,8 @@ public class App extends Application {
    * Display input files page after login.
    */
 
-  public void showInputFilesPage(){
-    InputFilesPage inputFilesPage = new InputFilesPage(stage);
+  public void showInputFilesPage(boolean darkMode){
+    InputFilesPage inputFilesPage = new InputFilesPage(stage,darkMode);
     inputFilesPage.show();
     logger.info("Input files page");
   }

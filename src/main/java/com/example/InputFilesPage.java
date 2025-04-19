@@ -23,6 +23,7 @@ import static com.example.App.logger;
 public class InputFilesPage {
     private Stage stage;
     private Scene scene;
+    private boolean darkMode;
 
     private File impressionLogFile;
     private File clickLogFile;
@@ -30,42 +31,81 @@ public class InputFilesPage {
 
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
+    private final String BACKGROUND_COLOR = "#f5f5f7";
+    private final String PRIMARY_COLOR = "#4285F4";
+    private final String PRIMARY_DARK_COLOR = "#3367d6";
+    private final String SECTION_BACKGROUND = "white";
+    private final String HEADER_COLOR = "#333333";
+    private final String TEXT_COLOR = "#555555";
+    private final String SETTINGS = "#888888";
+    private final String SETTINGS_HOVER = "#555555";
+    private final String DARKMODE_SECTION = "#2b2b2b";
+    private final String DARKMODE_BACKGROUND = "#1f1f1f";
+    private final String DARKMODE_TEXT = "#fafafa";
 
     // Log manager to be passed around the system (Use it in constructors for new scenes), essentially containing all the files and data
     public LogManager logManager = new LogManager();
 
-    InputFilesPage(Stage stage) {
+    InputFilesPage(Stage stage,boolean darkMode) {
         this.stage = stage;
+        this.darkMode = darkMode;
         initialize();
     }
 
     private void initialize() {
         // Use BorderPane as main layout
         BorderPane mainLayout = new BorderPane();
-        mainLayout.setPadding(new Insets(20));
-        mainLayout.setStyle("-fx-background-color: #f5f5f7;");
+        if (!darkMode) {
+            mainLayout.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            mainLayout.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND + ";");
+        }
 
         // Create header section
-        VBox headerBox = new VBox(15);
+        HBox headerBox = new HBox(15);
         headerBox.setAlignment(Pos.CENTER);
-        headerBox.setPadding(new Insets(20, 0, 40, 0));
+        headerBox.setPadding(new Insets(15, 20, 15, 20));
+        if (!darkMode) {
+            headerBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            headerBox.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
+
 
         Label titleLabel = new Label("Input Files");
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 28));
-        titleLabel.setTextFill(Color.web("#333333"));
+        if (!darkMode) {
+            titleLabel.setTextFill(Color.web("#333333"));
+        } else {
+            titleLabel.setTextFill(Color.web(DARKMODE_TEXT));
+        }
 
-        Label subtitleLabel = new Label("Please select data files for analysis");
-        subtitleLabel.setFont(Font.font("Arial", 14));
-        subtitleLabel.setTextFill(Color.web("#666666"));
+        Button settingsButton = createStyledButton("Settings", SETTINGS,SETTINGS_HOVER);
+        settingsButton.setOnAction(e -> {
+            PageInfo pageInfo = new PageInfo();
+            pageInfo.setDarkMode(darkMode);
+            SettingsPage settingsPage = new SettingsPage(stage,"Input",pageInfo,darkMode);
+            settingsPage.show();
+        });
 
-        headerBox.getChildren().addAll(titleLabel, subtitleLabel);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer,Priority.ALWAYS);
+
+        headerBox.getChildren().addAll(titleLabel,spacer,settingsButton);
         mainLayout.setTop(headerBox);
 
         // File selection section using VBox
         VBox fileSelectionBox = new VBox(20);
         fileSelectionBox.setAlignment(Pos.CENTER);
         fileSelectionBox.setPadding(new Insets(10, 30, 30, 30));
-        fileSelectionBox.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        if (!darkMode) {
+            fileSelectionBox.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        } else {
+            fileSelectionBox.setStyle("-fx-background-color: " + DARKMODE_SECTION + ";" +  "-fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        }
+        BorderPane.setMargin(fileSelectionBox, new Insets(20, 20, 20, 20));
 
         // Initialize properties
         StringProperty impressionProperty = new SimpleStringProperty("");
@@ -200,7 +240,7 @@ public class InputFilesPage {
                 }
                 System.out.println("Proceed Button clicked");
                 ChartCreator chartCreator = new ChartCreator(logManager,0);
-                ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
+                ChartPage chartPage = new ChartPage(stage, logManager,chartCreator,darkMode);
                 chartPage.show();
             } catch(Exception ex) {
                 showAlert("Error proceeding to the chart page. Please check your input files.");
@@ -212,7 +252,7 @@ public class InputFilesPage {
         logoutButton.setOnAction(e -> {
             try {
                 System.out.println("Logout Button clicked");
-                Login login = new Login(stage);
+                Login login = new Login(stage,darkMode);
                 login.show();
             } catch(Exception ex) {
                 showAlert("Error logging out. Please try again.");
@@ -233,7 +273,11 @@ public class InputFilesPage {
         Label label = new Label(labelText);
         label.setMinWidth(120);
         label.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
-        label.setTextFill(Color.web("#333333"));
+        if (!darkMode) {
+            label.setTextFill(Color.web("#333333"));
+        } else {
+            label.setTextFill(Color.web(DARKMODE_TEXT));
+        }
         
         Button selectButton = new Button("Select File");
         selectButton.setPrefSize(120, 35);
@@ -275,7 +319,11 @@ public class InputFilesPage {
         Label fileNameLabel = new Label();
         fileNameLabel.textProperty().bind(fileNameProperty);
         fileNameLabel.setFont(Font.font("Arial", 13));
-        fileNameLabel.setTextFill(Color.web("#666666"));
+        if (!darkMode) {
+            fileNameLabel.setTextFill(Color.web("#666666"));
+        } else {
+            fileNameLabel.setTextFill(Color.web(DARKMODE_TEXT));
+        }
         fileNameLabel.setMinWidth(200);
         fileNameLabel.setMaxWidth(300);
         

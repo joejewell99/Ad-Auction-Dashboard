@@ -27,6 +27,7 @@ public class EditPage{
     private ArrayList<ArrayList<String>> context;
     private int chartNumber;
     private ChartCreator chartCreator;
+    private boolean darkMode;
 
     private LogManager logManager;
     private Stage stage;
@@ -40,10 +41,16 @@ public class EditPage{
     private final String TEXT_COLOR = "#555555";
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
+    private final String SETTINGS = "#888888";
+    private final String SETTINGS_HOVER = "#555555";
+    private final String DARKMODE_SECTION = "#2b2b2b";
+    private final String DARKMODE_BACKGROUND = "#1f1f1f";
+    private final String DARKMODE_TEXT = "#fafafa";
+
 
     public EditPage(Stage stage, LogManager logManager, ArrayList<String> charts,
                     ArrayList<String> timeFlag, ArrayList<String> gender, ArrayList<String> income,
-                    ArrayList<ArrayList<String>> context, ArrayList<ArrayList<String>> age, int chartNumber, ChartCreator chartCreator) {
+                    ArrayList<ArrayList<String>> context, ArrayList<ArrayList<String>> age, int chartNumber, ChartCreator chartCreator,boolean darkMode) {
         this.currentChart = charts;
         this.timeFlag = timeFlag;
         this.gender = gender;
@@ -54,11 +61,16 @@ public class EditPage{
         this.stage = stage;
         this.chartNumber = chartNumber;
         this.chartCreator = chartCreator;
+        this.darkMode = darkMode;
     }
     public void show() {
         // Create main layout
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
+        if (!darkMode) {
+            root.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            root.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
 
         // Create top navigation bar
         HBox navBar = createNavigationBar();
@@ -89,12 +101,17 @@ public class EditPage{
         HBox navBar = new HBox(15);
         navBar.setAlignment(Pos.CENTER_LEFT);
         navBar.setPadding(new Insets(15, 20, 15, 20));
-        navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            navBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
         Label title = new Label("Edit Chart");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        title.setTextFill(Color.web(HEADER_COLOR));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
@@ -103,16 +120,34 @@ public class EditPage{
         Button overallMetricsButton = createStyledButton("Overall Metrics", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         //Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
 
+        Button settingsButton = createStyledButton("Settings", SETTINGS,SETTINGS_HOVER);
+        settingsButton.setOnAction(e -> {
+            PageInfo pageInfo = new PageInfo();
+            pageInfo.setDarkMode(darkMode);
+            pageInfo.setLogManager(logManager);
+            pageInfo.setChartCreator(chartCreator);
+            pageInfo.setCurrentCharts(currentChart);
+            pageInfo.setTimeFlags(timeFlag);
+            pageInfo.setGenders(gender);
+            pageInfo.setIncomes(income);
+            pageInfo.setContexts(context);
+            pageInfo.setAges(age);
+            pageInfo.setChartNumber(chartNumber);
+            SettingsPage settingsPage = new SettingsPage(stage,"Edit",pageInfo,darkMode);
+            settingsPage.show();
+        });
+
         // Set button events
         backButton.setOnAction(e -> {
-            MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentChart, timeFlag, gender, income, context, age,chartCreator);
+            MultiChartPage multiChartPage = new MultiChartPage(stage, logManager, currentChart, timeFlag, gender, income, context, age,chartCreator,darkMode);
             multiChartPage.show();
         });
 
         overallMetricsButton.setOnAction(e -> {
-            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator);
+            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator,darkMode);
             metricsPage.show();
         });
+
 
         /**
         logOutButton.setOnAction(e -> {
@@ -122,7 +157,7 @@ public class EditPage{
         */
 
         // Add to navigation bar
-        navBar.getChildren().addAll(title, spacer, backButton, overallMetricsButton);
+        navBar.getChildren().addAll(title, spacer, backButton, overallMetricsButton,settingsButton);
 
         return navBar;
     }
@@ -132,15 +167,19 @@ public class EditPage{
         HBox logoutBar = new HBox(20);
         logoutBar.setAlignment(Pos.CENTER);
         logoutBar.setPadding(new Insets(15, 20, 15, 20));
-        logoutBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            logoutBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            logoutBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
 
         //Button to Logout
         Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
         logoutButton.setOnAction(e -> {
-            Login loginPage = new Login(stage);
+            Login loginPage = new Login(stage,darkMode);
             loginPage.show();
         });
 
@@ -158,6 +197,12 @@ public class EditPage{
         contentPane.setHgap(20);
         contentPane.setVgap(20);
         contentPane.setAlignment(Pos.CENTER);
+        if (!darkMode) {
+            contentPane.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            contentPane.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
+
 
         // Create filter groups
         VBox metricsSection = createMetricsSection();
@@ -215,13 +260,17 @@ public class EditPage{
         sectionBox.setMinWidth(200);
         sectionBox.setMaxWidth(200);
         sectionBox.setMinHeight(400);
-        sectionBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            sectionBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            sectionBox.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
         Label titleLabel = new Label(title);
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        titleLabel.setTextFill(Color.web(HEADER_COLOR));
+        titleLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
 
         Separator separator = new Separator();
         separator.setStyle("-fx-opacity: 0.3;");
@@ -237,7 +286,7 @@ public class EditPage{
         ToggleGroup metricOptions = new ToggleGroup();
 
         // Create radio buttons for different metrics
-        RadioButton clickMetric = createStyledRadioButton("Total Clicks", metricOptions);
+        RadioButton clickMetric = createStyledRadioButton("Total Clicks", metricOptions,darkMode);
         clickMetric.setSelected(true);
         clickMetric.setOnAction(e -> {
             try {
@@ -248,7 +297,7 @@ public class EditPage{
             }
         });
 
-        RadioButton impressionMetric = createStyledRadioButton("Total Impressions", metricOptions);
+        RadioButton impressionMetric = createStyledRadioButton("Total Impressions", metricOptions,darkMode);
         impressionMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "Impressions");
@@ -258,7 +307,7 @@ public class EditPage{
             }
         });
 
-        RadioButton uniqueMetric = createStyledRadioButton("Unique Visitors", metricOptions);
+        RadioButton uniqueMetric = createStyledRadioButton("Unique Visitors", metricOptions,darkMode);
         uniqueMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "Uniques");
@@ -268,7 +317,7 @@ public class EditPage{
             }
         });
 
-        RadioButton bouncesMetric = createStyledRadioButton("Bounces", metricOptions);
+        RadioButton bouncesMetric = createStyledRadioButton("Bounces", metricOptions,darkMode);
         bouncesMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "Bounces");
@@ -278,7 +327,7 @@ public class EditPage{
             }
         });
 
-        RadioButton conversionMetric = createStyledRadioButton("Conversions", metricOptions);
+        RadioButton conversionMetric = createStyledRadioButton("Conversions", metricOptions,darkMode);
         conversionMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "Conversions");
@@ -288,7 +337,7 @@ public class EditPage{
             }
         });
 
-        RadioButton costMetric = createStyledRadioButton("Total Cost", metricOptions);
+        RadioButton costMetric = createStyledRadioButton("Total Cost", metricOptions,darkMode);
         costMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "Cost");
@@ -298,7 +347,7 @@ public class EditPage{
             }
         });
 
-        RadioButton ctrMetric = createStyledRadioButton("Click-Through Rate (CTR)", metricOptions);
+        RadioButton ctrMetric = createStyledRadioButton("Click-Through Rate (CTR)", metricOptions,darkMode);
         ctrMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "CTR");
@@ -308,7 +357,7 @@ public class EditPage{
             }
         });
 
-        RadioButton cpaMetric = createStyledRadioButton("Cost Per Acquisition (CPA)", metricOptions);
+        RadioButton cpaMetric = createStyledRadioButton("Cost Per Acquisition (CPA)", metricOptions,darkMode);
         cpaMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "CPA");
@@ -318,7 +367,7 @@ public class EditPage{
             }
         });
 
-        RadioButton cpcMetric = createStyledRadioButton("Cost Per Click (CPC)", metricOptions);
+        RadioButton cpcMetric = createStyledRadioButton("Cost Per Click (CPC)", metricOptions,darkMode);
         cpcMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "CPC");
@@ -328,7 +377,7 @@ public class EditPage{
             }
         });
 
-        RadioButton cpmMetric = createStyledRadioButton("Cost Per Mille (CPM)", metricOptions);
+        RadioButton cpmMetric = createStyledRadioButton("Cost Per Mille (CPM)", metricOptions,darkMode);
         cpmMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "CPM");
@@ -338,7 +387,7 @@ public class EditPage{
             }
         });
 
-        RadioButton bounceRateMetric = createStyledRadioButton("Bounce Rate", metricOptions);
+        RadioButton bounceRateMetric = createStyledRadioButton("Bounce Rate", metricOptions,darkMode);
         bounceRateMetric.setOnAction(e -> {
             try {
                 this.currentChart.set(chartNumber, "BounceRate");
@@ -363,7 +412,7 @@ public class EditPage{
         VBox content = new VBox(10);
         ToggleGroup timeOptions = new ToggleGroup();
 
-        RadioButton dailyButton = createStyledRadioButton("Daily", timeOptions);
+        RadioButton dailyButton = createStyledRadioButton("Daily", timeOptions,darkMode);
         dailyButton.setSelected(true);
         dailyButton.setOnAction(e -> {
             try {
@@ -374,7 +423,7 @@ public class EditPage{
             }
         });
 
-        RadioButton weeklyButton = createStyledRadioButton("Weekly", timeOptions);
+        RadioButton weeklyButton = createStyledRadioButton("Weekly", timeOptions,darkMode);
         weeklyButton.setOnAction(e -> {
             try {
                 this.timeFlag.set(chartNumber, "Weekly");
@@ -384,7 +433,7 @@ public class EditPage{
             }
         });
 
-        RadioButton monthlyButton = createStyledRadioButton("Monthly", timeOptions);
+        RadioButton monthlyButton = createStyledRadioButton("Monthly", timeOptions,darkMode);
         monthlyButton.setOnAction(e -> {
             try {
                 this.timeFlag.set(chartNumber, "Monthly");
@@ -404,7 +453,7 @@ public class EditPage{
         VBox content = new VBox(10);
         ToggleGroup genderOptions = new ToggleGroup();
 
-        RadioButton bothGenderButton = createStyledRadioButton("All", genderOptions);
+        RadioButton bothGenderButton = createStyledRadioButton("All", genderOptions,darkMode);
         bothGenderButton.setSelected(true);
         bothGenderButton.setOnAction(e -> {
             try {
@@ -415,7 +464,7 @@ public class EditPage{
             }
         });
 
-        RadioButton maleButton = createStyledRadioButton("Male", genderOptions);
+        RadioButton maleButton = createStyledRadioButton("Male", genderOptions,darkMode);
         maleButton.setOnAction(e -> {
             try {
                 this.gender.set(chartNumber, "Male");
@@ -425,7 +474,7 @@ public class EditPage{
             }
         });
 
-        RadioButton femaleButton = createStyledRadioButton("Female", genderOptions);
+        RadioButton femaleButton = createStyledRadioButton("Female", genderOptions,darkMode);
         femaleButton.setOnAction(e -> {
             try {
                 this.gender.set(chartNumber, "Female");
@@ -446,7 +495,7 @@ public class EditPage{
         VBox content = new VBox(10);
         ToggleGroup incomeOptions = new ToggleGroup();
 
-        RadioButton anyIncomeButton = createStyledRadioButton("All", incomeOptions);
+        RadioButton anyIncomeButton = createStyledRadioButton("All", incomeOptions,darkMode);
         anyIncomeButton.setSelected(true);
         anyIncomeButton.setOnAction(e -> {
             try {
@@ -457,7 +506,7 @@ public class EditPage{
             }
         });
 
-        RadioButton lowButton = createStyledRadioButton("Low", incomeOptions);
+        RadioButton lowButton = createStyledRadioButton("Low", incomeOptions,darkMode);
         lowButton.setOnAction(e -> {
             try {
                 this.income.set(0, "Low");
@@ -467,7 +516,7 @@ public class EditPage{
             }
         });
 
-        RadioButton mediumButton = createStyledRadioButton("Medium", incomeOptions);
+        RadioButton mediumButton = createStyledRadioButton("Medium", incomeOptions,darkMode);
         mediumButton.setOnAction(e -> {
             try {
                 this.income.set(0, "Medium");
@@ -477,7 +526,7 @@ public class EditPage{
             }
         });
 
-        RadioButton highButton = createStyledRadioButton("High", incomeOptions);
+        RadioButton highButton = createStyledRadioButton("High", incomeOptions,darkMode);
         highButton.setOnAction(e -> {
             try {
                 this.income.set(0, "High");
@@ -497,7 +546,7 @@ public class EditPage{
     private VBox createContextContent() {
         VBox content = new VBox(10);
 
-        CheckBox newsButton = createStyledCheckBox("News");
+        CheckBox newsButton = createStyledCheckBox("News",darkMode);
         newsButton.setOnAction(e -> {
             try {
                 if (newsButton.isSelected()) {
@@ -511,7 +560,7 @@ public class EditPage{
             }
         });
 
-        CheckBox shoppingButton = createStyledCheckBox("Shopping");
+        CheckBox shoppingButton = createStyledCheckBox("Shopping",darkMode);
         shoppingButton.setOnAction(e -> {
             try {
                 if (shoppingButton.isSelected()) {
@@ -525,7 +574,7 @@ public class EditPage{
             }
         });
 
-        CheckBox socialButton = createStyledCheckBox("Social Media");
+        CheckBox socialButton = createStyledCheckBox("Social Media",darkMode);
         socialButton.setOnAction(e -> {
             try {
                 if (socialButton.isSelected()) {
@@ -539,7 +588,7 @@ public class EditPage{
             }
         });
 
-        CheckBox blogButton = createStyledCheckBox("Blog");
+        CheckBox blogButton = createStyledCheckBox("Blog",darkMode);
         blogButton.setOnAction(e -> {
             try {
                 if (blogButton.isSelected()) {
@@ -553,7 +602,7 @@ public class EditPage{
             }
         });
 
-        CheckBox hobbyButton = createStyledCheckBox("Hobby");
+        CheckBox hobbyButton = createStyledCheckBox("Hobby",darkMode);
         hobbyButton.setOnAction(e -> {
             try {
                 if (hobbyButton.isSelected()) {
@@ -567,7 +616,7 @@ public class EditPage{
             }
         });
 
-        CheckBox travelButton = createStyledCheckBox("Travel");
+        CheckBox travelButton = createStyledCheckBox("Travel",darkMode);
         travelButton.setOnAction(e -> {
             try {
                 if (travelButton.isSelected()) {
@@ -591,7 +640,7 @@ public class EditPage{
     private VBox createAgeContent() {
         VBox content = new VBox(10);
 
-        CheckBox age1Button = createStyledCheckBox("Under 25");
+        CheckBox age1Button = createStyledCheckBox("Under 25",darkMode);
         age1Button.setOnAction(e -> {
             try {
                 if (age1Button.isSelected()) {
@@ -605,7 +654,7 @@ public class EditPage{
             }
         });
 
-        CheckBox age2Button = createStyledCheckBox("25-34");
+        CheckBox age2Button = createStyledCheckBox("25-34",darkMode);
         age2Button.setOnAction(e -> {
             try {
                 if (age2Button.isSelected()) {
@@ -619,7 +668,7 @@ public class EditPage{
             }
         });
 
-        CheckBox age3Button = createStyledCheckBox("35-44");
+        CheckBox age3Button = createStyledCheckBox("35-44",darkMode);
         age3Button.setOnAction(e -> {
             try {
                 if (age3Button.isSelected()) {
@@ -633,7 +682,7 @@ public class EditPage{
             }
         });
 
-        CheckBox age4Button = createStyledCheckBox("45-54");
+        CheckBox age4Button = createStyledCheckBox("45-54",darkMode);
         age4Button.setOnAction(e -> {
             try {
                 if (age4Button.isSelected()) {
@@ -647,7 +696,7 @@ public class EditPage{
             }
         });
 
-        CheckBox age5Button = createStyledCheckBox("Over 54");
+        CheckBox age5Button = createStyledCheckBox("Over 54",darkMode);
         age5Button.setOnAction(e -> {
             try {
                 if (age5Button.isSelected()) {
@@ -676,20 +725,20 @@ public class EditPage{
 
 
     // Create styled radio button
-    private RadioButton createStyledRadioButton(String text, ToggleGroup group) {
+    private RadioButton createStyledRadioButton(String text, ToggleGroup group,boolean darkMode) {
         RadioButton radioButton = new RadioButton(text);
         radioButton.setToggleGroup(group);
         radioButton.setFont(Font.font("Arial", 13));
-        radioButton.setTextFill(Color.web(TEXT_COLOR));
+        radioButton.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :TEXT_COLOR));
         radioButton.setPadding(new Insets(3, 0, 3, 0));
         return radioButton;
     }
 
     // Create styled checkbox
-    private CheckBox createStyledCheckBox(String text) {
+    private CheckBox createStyledCheckBox(String text,boolean darkMode) {
         CheckBox checkBox = new CheckBox(text);
         checkBox.setFont(Font.font("Arial", 13));
-        checkBox.setTextFill(Color.web(TEXT_COLOR));
+        checkBox.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :TEXT_COLOR));
         checkBox.setPadding(new Insets(3, 0, 3, 0));
         return checkBox;
     }

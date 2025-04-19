@@ -771,8 +771,13 @@ public class ChartCreator {
                 if (interaction[3].equals("1")) {
                     String dateTime = interaction[0];
                     String date = dateTime.split(" ")[0];
-
                     interactionMap.put(date, interactionMap.getOrDefault(date, 0) + 1);
+                } else {
+                    String dateTime = interaction[0];
+                    String date = dateTime.split(" ")[0];
+                    if (!interactionMap.containsKey(date)) {
+                        interactionMap.put(date,0);
+                    }
                 }
             }
         } else {
@@ -792,6 +797,12 @@ public class ChartCreator {
                     String date = dateTime.split(" ")[0];
 
                     interactionMap.put(date,interactionMap.getOrDefault(date,0) + 1);
+                } else {
+                    String dateTime = interaction[0];
+                    String date = dateTime.split(" ")[0];
+                    if (!interactionMap.containsKey(date)) {
+                        interactionMap.put(date,0);
+                    }
                 }
             }
         }
@@ -814,6 +825,13 @@ public class ChartCreator {
                     int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
                     String week = "Week " + Integer.toString(weekNumber);
                     bounceMap.put(week,bounceMap.getOrDefault(week,0) + 1);
+                } else {
+                    LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                    int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
+                    String week = "Week " + Integer.toString(weekNumber);
+                    if (!bounceMap.containsKey(week)) {
+                        bounceMap.put(week,0);
+                    }
                 }
             }
         } else {
@@ -833,6 +851,12 @@ public class ChartCreator {
                     int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
                     String week = "Week " + Integer.toString(weekNumber);
                     bounceMap.put(week,bounceMap.getOrDefault(week,0) + 1);
+                } else {
+                    LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                    int weekNumber = (int) ChronoUnit.WEEKS.between(earliestDate,date) + 1;
+                    String week = "Week " + Integer.toString(weekNumber);
+                    if (!bounceMap.containsKey(week))
+                    bounceMap.put(week,0);
                 }
             }
         }
@@ -855,6 +879,13 @@ public class ChartCreator {
                     int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
                     String month = "Month " + Integer.toString(monthNumber);
                     bounceMap.put(month,bounceMap.getOrDefault(month,0) + 1);
+                } else {
+                    LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                    int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+                    String month = "Month " + Integer.toString(monthNumber);
+                    if (!bounceMap.containsKey(month)) {
+                        bounceMap.put(month,0);
+                    }
                 }
             }
         } else {
@@ -874,6 +905,13 @@ public class ChartCreator {
                     int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
                     String month = "Month " + Integer.toString(monthNumber);
                     bounceMap.put(month,bounceMap.getOrDefault(month,0) + 1);
+                } else {
+                    LocalDate date = LocalDate.parse(interaction[0].split(" ")[0]);
+                    int monthNumber = (int) ChronoUnit.MONTHS.between(earliestDate,date) + 1;
+                    String month = "Month " + Integer.toString(monthNumber);
+                    if (!bounceMap.containsKey(month)) {
+                        bounceMap.put(month,0);
+                    }
                 }
             }
         }

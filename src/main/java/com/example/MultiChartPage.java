@@ -35,7 +35,7 @@ public class MultiChartPage {
     private HBox chartContainer = null;
     private ChartCreator chartCreator;
     private LogManager logManager;
-    private int timeSpent;
+    private boolean darkMode;
 
     // Define style constants
     private final String BACKGROUND_COLOR = "#f5f5f7";
@@ -46,13 +46,19 @@ public class MultiChartPage {
     private final String TEXT_COLOR = "#555555";
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
+    private final String SETTINGS = "#888888";
+    private final String SETTINGS_HOVER = "#555555";
+    private final String DARKMODE_SECTION = "#2b2b2b";
+    private final String DARKMODE_BACKGROUND = "#1f1f1f";
+    private final String DARKMODE_TEXT = "#fafafa";
 
     public MultiChartPage(Stage stage, LogManager logManager, ArrayList<String> currentCharts, ArrayList<String> timeFlags,
                           ArrayList<String> genders, ArrayList<String> incomes, ArrayList<ArrayList<String>> contexts,
-                          ArrayList<ArrayList<String>> ages,ChartCreator chartCreator) {
+                          ArrayList<ArrayList<String>> ages,ChartCreator chartCreator, boolean darkMode) {
         this.stage = stage;
         this.logManager = logManager;
         this.chartCreator = chartCreator;
+        this.darkMode = darkMode;
 
         this.currentCharts = currentCharts;
         this.timeFlags = timeFlags;
@@ -65,7 +71,11 @@ public class MultiChartPage {
     public void show() {
         // Create main layout
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
+        if (!darkMode) {
+            root.setStyle("-fx-background-color: #f5f5f7;");
+        } else {
+            root.setStyle("-fx-background-color: " + DARKMODE_BACKGROUND);
+        }
         
         // Create top navigation bar
         HBox navBar = createNavigationBar();
@@ -98,12 +108,17 @@ public class MultiChartPage {
         HBox navBar = new HBox(15);
         navBar.setAlignment(Pos.CENTER_LEFT);
         navBar.setPadding(new Insets(15, 20, 15, 20));
-        navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        if (!darkMode) {
+            navBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            navBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
         
         Label title = new Label("Multi-Chart Comparison View");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        title.setTextFill(Color.web(HEADER_COLOR));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
@@ -113,14 +128,30 @@ public class MultiChartPage {
         Button overallMetricsButton = createStyledButton("Overall Metrics", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         //Button logOutButton = createStyledButton("Logout", "#757575", "#616161");
 
+        Button settingsButton = createStyledButton("Settings", SETTINGS,SETTINGS_HOVER);
+        settingsButton.setOnAction(e -> {
+            PageInfo pageInfo = new PageInfo();
+            pageInfo.setDarkMode(darkMode);
+            pageInfo.setLogManager(logManager);
+            pageInfo.setChartCreator(chartCreator);
+            pageInfo.setCurrentCharts(currentCharts);
+            pageInfo.setTimeFlags(timeFlags);
+            pageInfo.setGenders(genders);
+            pageInfo.setIncomes(incomes);
+            pageInfo.setContexts(contexts);
+            pageInfo.setAges(ages);
+            SettingsPage settingsPage = new SettingsPage(stage,"MultiChart",pageInfo,darkMode);
+            settingsPage.show();
+        });
+
         // Set button events
         backButton.setOnAction(e -> {
-            ChartPage chartPage = new ChartPage(stage, logManager,chartCreator);
+            ChartPage chartPage = new ChartPage(stage, logManager,chartCreator,darkMode);
             chartPage.show();
         });
 
         overallMetricsButton.setOnAction(e -> {
-            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator);
+            OverallMetricsPage metricsPage = new OverallMetricsPage(stage, logManager,chartCreator,darkMode);
             metricsPage.show();
         });
 
@@ -147,7 +178,7 @@ public class MultiChartPage {
         });
         
         // Add to navigation bar
-        navBar.getChildren().addAll(title, spacer, backButton,saveToPdfButton, overallMetricsButton);
+        navBar.getChildren().addAll(title, spacer, backButton,saveToPdfButton, overallMetricsButton,settingsButton);
         
         return navBar;
     }
@@ -237,14 +268,18 @@ public class MultiChartPage {
         VBox chartBox = new VBox(10);
         chartBox.setAlignment(Pos.CENTER);
         chartBox.setPadding(new Insets(15));
-        chartBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                          "-fx-background-radius: 10; " +
-                          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        if (!darkMode) {
+            chartBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            chartBox.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
         
         // Chart title
         Label titleLabel = new Label(title);
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        titleLabel.setTextFill(Color.web(HEADER_COLOR));
+        titleLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         
         // Set chart size
         chartViewer.setMinSize(550, 400);
@@ -252,7 +287,7 @@ public class MultiChartPage {
 
         Button editChart1Button = createStyledButton("Edit Chart 1", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         editChart1Button.setOnAction(e -> {
-            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 0,chartCreator);
+            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 0,chartCreator,darkMode);
             editPage.show();
         });
         
@@ -265,14 +300,18 @@ public class MultiChartPage {
         VBox chartBox = new VBox(10);
         chartBox.setAlignment(Pos.CENTER);
         chartBox.setPadding(new Insets(15));
-        chartBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
-                "-fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        if (!darkMode) {
+            chartBox.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            chartBox.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
         // Chart title
         Label titleLabel = new Label(title);
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        titleLabel.setTextFill(Color.web(HEADER_COLOR));
+        titleLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         // Set chart size
         chartViewer.setMinSize(550, 400);
@@ -280,7 +319,7 @@ public class MultiChartPage {
 
         Button editChart2Button = createStyledButton("Edit Chart 2", PRIMARY_COLOR, PRIMARY_DARK_COLOR);
         editChart2Button.setOnAction(e -> {
-            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 1,chartCreator);
+            EditPage editPage = new EditPage(stage, logManager, currentCharts, timeFlags, genders, incomes, contexts, ages, 1,chartCreator,darkMode);
             editPage.show();
         });
 
@@ -294,6 +333,13 @@ public class MultiChartPage {
         HBox editBar = new HBox(20);
         editBar.setAlignment(Pos.CENTER);
         editBar.setPadding(new Insets(15, 20, 15, 20));
+        if (!darkMode) {
+            editBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            editBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
 
         /**
         HBox editButtonBox = new HBox(20);
@@ -312,7 +358,7 @@ public class MultiChartPage {
 
 
          logOutButton.setOnAction(e -> {
-                     Login login = new Login(stage);
+                     Login login = new Login(stage,darkMode);
                      login.show();
                  });
 
