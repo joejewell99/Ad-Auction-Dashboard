@@ -15,13 +15,22 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Base64;
+
+
 
 public class UserManagementPage {
     private Stage stage;
     private LoginDatabase db;
     private User loggedInUser;
     private boolean darkMode;
+    public static final String DB_URL = "jdbc:sqlite:login.db";
+
 
     private final String BACKGROUND_COLOR = "#f5f5f7";
     private final String PRIMARY_COLOR = "#4285F4";
@@ -118,11 +127,50 @@ public class UserManagementPage {
             regMessage.setText(ok
                     ? "User successfully registered!"
                     : "User not registered!");
+
+            if (ok) {
+                try {
+                    // 1) fetch the Base64 secret by username
+                    String encodedSecret = db.getMfaSecretForUser(user);
+                    if (encodedSecret == null) {
+                        regMessage.setText("No MFA secret found for user");
+                        return;
+                    }
+
+                    // 2) decode Base64 → raw key bytes
+                    byte[] raw = Base64.getDecoder().decode(encodedSecret);
+
+                    // 3) encode to Base32 (strip padding)
+                    String base32 = new org.apache.commons.codec.binary.Base32()
+                            .encodeToString(raw)
+                            .replace("=", "");
+                    // print for manual entry
+                    System.out.println("Your secret (enter in GA): " + base32);
+
+                    // build the otpauth URL **using** the Base32 secret
+                    String issuer      = "AdAuctionDashboard";
+                    String accountName = user;
+                    String otpAuthUrl = String.format(
+                            "otpauth://totp/%s:%s?secret=%s&issuer=%s",
+                            issuer, accountName, base32, issuer
+                    );
+
+                    // show the larger QR
+                    ShowQR qr = new ShowQR(otpAuthUrl, 400);
+                    registerBox.getChildren().add(qr.getImageView());
+
+                } catch (Exception qrEx) {
+                    qrEx.printStackTrace();
+                    regMessage.setText("Registered—but failed to generate QR");
+                }
+            }
+
         });
 
         registerBox.getChildren().addAll(registerLabel, regUsernameField, regPasswordField, regButton, regMessage);
         registerTab.setContent(registerBox);
         registerTab.setClosable(false);
+
 
         Tab updateTab = new Tab();
         if (!darkMode) {
@@ -365,6 +413,20 @@ public class UserManagementPage {
 
         return button;
     }
-
+    public String getMfaSecretForUser(String username){
+        String sql = "SELECT mfa_secret FROM users WHERE username = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("mfa_secret");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 

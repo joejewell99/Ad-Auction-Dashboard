@@ -14,6 +14,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.Logger;
+import javafx.scene.control.TextInputDialog;
+import java.util.Optional;
+
 
 public class Login {
     /**
@@ -217,26 +220,54 @@ public class Login {
 
         // Login button event handler
         loginButton.setOnAction(event -> {
+            String usernameText = userName.getText();
+            String passwordText = passwordField.getText();
+
             try {
-                String usernameText = userName.getText();
-                String passwordText = passwordField.getText();
                 User user = db.authenticateUser(usernameText, passwordText);
-                if (user != null) {
-                    message.setText("Login successful!");
-                    message.setTextFill(Color.web("#4CAF50"));
-                    // Save the loggedin user and pass it to subsequent pages if needed.
-                    App.getInstance().setLoggedInUser(user);
-                    App.getInstance().showInputFilesPage(darkMode);
-                } else {
+                if (user == null) {
                     message.setText("Login failed!");
                     message.setTextFill(Color.web("#F44336"));
-                    // Add slight shake effect for feedback (existing code)
+                    return;
                 }
-            } catch(Exception ex) {
+
+                // Bypass OTP for the built-ins
+                if (!("user".equals(usernameText) || "admin".equals(usernameText))) {
+                    // --- OTP block wrapped in its own try/catch ---
+                    try {
+                        TextInputDialog otpDialog = new TextInputDialog();
+                        otpDialog.setTitle("2FA Verification");
+                        otpDialog.setHeaderText("Enter the 6-digit code from your Authenticator");
+                        otpDialog.setContentText("Code: ");
+                        Optional<String> otpResult = otpDialog.showAndWait();
+
+                        if (otpResult.isEmpty() ||
+                                !db.verifyOtp(usernameText, otpResult.get().trim())) {
+                            message.setText("Invalid OTP");
+                            message.setTextFill(Color.web(TEXT_COLOR));
+                            return;
+                        }
+                    } catch (Exception otpEx) {
+                        // anything going wrong in OTP gen/verify
+                        showAlert("An error occurred while verifying your 2FA code.");
+                        otpEx.printStackTrace();
+                        return;
+                    }
+                }
+
+                // If we reach here, either default user or OTP passed
+                message.setText("Login successful!");
+                message.setTextFill(Color.web("#4CAF50"));
+                App.getInstance().setLoggedInUser(user);
+                App.getInstance().showInputFilesPage(darkMode);
+
+            } catch (Exception ex) {
+                // catches DB errors, unexpected NPEs, etc.
                 showAlert("An unexpected error occurred during login. Please try again.");
-                logger.error("Error in login button action", ex);
+                ex.printStackTrace();
             }
         });
+
 
 
 
