@@ -18,6 +18,7 @@ import javafx.scene.control.TextInputDialog;
 import java.util.Optional;
 
 
+
 public class Login {
     /**
      * Reference to primary stage.
@@ -281,11 +282,11 @@ public class Login {
         loginBox.getChildren().add(manageUsersButton);
 
 
-    manageUsersButton.setOnAction(event -> {
-        new AdminLogin(stage, adminUser -> {
-            new UserManagementPage(stage, adminUser,darkMode).show();
-        },darkMode).show();
-    });
+        manageUsersButton.setOnAction(event -> {
+            new AdminLogin(stage, adminUser -> {
+                new UserManagementPage(stage, adminUser,darkMode).show();
+            },darkMode).show();
+        });
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         loginScene = new Scene(mainLayout, screenBounds.getWidth(), screenBounds.getHeight());

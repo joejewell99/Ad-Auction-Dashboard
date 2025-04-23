@@ -21,7 +21,7 @@ public class LoginLogicTest {
     @BeforeEach
     public void setUp(){
         stage = mock(Stage.class);
-        loginInstance = new Login(stage);
+        loginInstance = new Login(stage,false);
     }
 
     @Test

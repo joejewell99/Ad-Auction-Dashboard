@@ -5,6 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import com.example.security.PasswordChecker;
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.util.Base64;
+import javax.crypto.spec.SecretKeySpec;
+import java.time.Instant;
+
 
 public class LoginDatabase {
     // url connection
@@ -12,12 +18,12 @@ public class LoginDatabase {
     //create a db table
     private static final String CREATE_TABLE_SQL =
             "CREATE TABLE IF NOT EXISTS users ("
-            + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + "username TEXT UNIQUE, "
-            + "password TEXT, "
-            + "role TEXT DEFAULT 'user',"
-            + "mfa_secret TEXT"
-            + ")";
+                    + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "username TEXT UNIQUE, "
+                    + "password TEXT, "
+                    + "role TEXT DEFAULT 'user',"
+                    + "mfa_secret TEXT"
+                    + ")";
 
 
     public LoginDatabase() {
@@ -123,7 +129,33 @@ public class LoginDatabase {
             System.out.println("User " + username + " already exists");
             return false;
         }
-        return addUser(username, password);
+        boolean added = addUser(username, password);
+        if (!added) {
+            return false;
+        }
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            TimeBasedOneTimePasswordGenerator totp = new TimeBasedOneTimePasswordGenerator();
+
+            KeyGenerator keyGen = KeyGenerator.getInstance(totp.getAlgorithm());
+            keyGen.init(128);
+            SecretKey secretKey = keyGen.generateKey();
+
+            String encodedSecret = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+            String updateSecretSql =
+                    "UPDATE users SET mfa_secret = ? WHERE username = ?";
+            try(PreparedStatement ps = conn.prepareStatement(updateSecretSql)) {
+                ps.setString(1, encodedSecret);
+                ps.setString(2, username);
+                ps.execute();
+            }
+            return true;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+
     }
     public boolean updateUserPassword(String username, String newPassword) {
         if (!PasswordChecker.validate(newPassword)) {
@@ -174,7 +206,74 @@ public class LoginDatabase {
         return users;
     }
 
+    public boolean verifyOtp(String username, String code) {
+        String sql = "SELECT mfa_secret FROM users WHERE username = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next() || rs.getString("mfa_secret") == null) {
+                    return false;
+                }
+
+                // 1) Get the Base64-encoded secret
+                String b64 = rs.getString("mfa_secret");
+
+                // 2) Sanitize the user’s input: strip spaces, dashes, etc.
+                String entered = code.trim().replaceAll("\\D+", "");
+                if (entered.length() != 6) {
+                    // bad format
+                    return false;
+                }
+
+                // 3) Decode to raw key
+                byte[] rawKey = Base64.getDecoder().decode(b64);
+                SecretKeySpec key = new SecretKeySpec(
+                        rawKey,
+                        TimeBasedOneTimePasswordGenerator.TOTP_ALGORITHM_HMAC_SHA1
+                );
+
+                // 4) TOTP generator & time‐step settings
+                TimeBasedOneTimePasswordGenerator totp =
+                        new TimeBasedOneTimePasswordGenerator();
+                long stepSeconds = totp.getTimeStep().getSeconds();
+                long now = Instant.now().getEpochSecond();
+
+                // 5) Check previous, current, and next window
+                for (int i = -1; i <= 1; i++) {
+                    Instant instant = Instant.ofEpochSecond(now + (i * stepSeconds));
+                    int expected = totp.generateOneTimePassword(key, instant);
+                    String expectedStr = String.format("%06d", expected);
+                    if (expectedStr.equals(entered)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    public String getMfaSecretForUser(String username){
+        String sql = "SELECT mfa_secret FROM users WHERE username = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("mfa_secret");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }
+
+
 
 

@@ -222,8 +222,8 @@ public class UserManagementPage {
             }
             boolean ok = db.updateUserPassword(user, pass);
             updateMessage.setText(ok
-            ? "Password successfully updated!"
-            : "Password not updated!");
+                    ? "Password successfully updated!"
+                    : "Password not updated!");
         });
         updateBox.getChildren().addAll(updateLabel, updateUsernameField, updatePasswordField, updateButton, updateMessage);
         updateTab.setContent(updateBox);
@@ -429,4 +429,3 @@ public class UserManagementPage {
         return null;
     }
 }
-

@@ -9,12 +9,14 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.statistics.HistogramDataset;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -23,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +47,7 @@ public class ChartCreator {
         this.interactions = logManager.getServerData();
         this.filter = new Filter();
         this.timeSpent = timeSpent;
+
     }
 
     /**
@@ -363,6 +367,49 @@ public class ChartCreator {
 
     }
 
+    public JFreeChart genClickCostHistogram(String gender,String income,ArrayList<String> context,ArrayList<String> age){
+        ArrayList<String[]> [] filteredLogs = filter.filterPipeline(clicks,impressions,interactions,gender,income,context,age);
+        ArrayList<String[]> filteredClicks = filteredLogs[0];
+
+        //Get the costs
+        ArrayList<Double> costs = new ArrayList<>();
+        for (String[] click : filteredClicks){
+            double cost = Double.parseDouble(click[2]);
+            costs.add(cost);
+        }
+        double[] costArray = new double[costs.size()];
+        for (int i = 0; i < costs.size(); i++) {
+            costArray[i] = costs.get(i);
+        }
+
+        //Create dataset
+        double binWidth = 2.0;
+        double minCost = Collections.min(costs);
+        double maxCost = Collections.max(costs);
+        double range = Math.ceil((maxCost - minCost) / binWidth) * binWidth;
+        double newMax = minCost + range;
+        int bins = (int) (range / binWidth);
+        HistogramDataset dataset = new HistogramDataset();
+        dataset.addSeries("Click Costs", costArray, bins, minCost, newMax);
+
+        //Create chart
+        JFreeChart histogram = ChartFactory.createHistogram(
+                "Click Cost Histogram",
+                "Cost",
+                "Frequency",
+                dataset,
+                PlotOrientation.VERTICAL,
+                false, false, false
+        );
+        XYPlot plot = (XYPlot) histogram.getPlot();
+        NumberAxis xAxis = (NumberAxis) plot.getDomainAxis();
+        xAxis.setTickUnit(new NumberTickUnit(2));
+
+
+        return histogram;
+
+    }
+
 
     /**
      * Reusable method for creating chart
@@ -398,6 +445,8 @@ public class ChartCreator {
 
         return chart;
     }
+
+
 
     /**
      * Creates dataset with float values
@@ -979,6 +1028,31 @@ public class ChartCreator {
         pdfImage.scaleToFit(500, 500);
         document.add(pdfImage);
         document.close();
+    }
+
+    /**
+     * Create a histogram
+     * @param dataset
+     * @return
+     */
+    public JFreeChart createHistogram(HistogramDataset dataset) {
+        JFreeChart chart = ChartFactory.createHistogram(
+                "Click Cost",
+                "Cost Range",
+                "Frequency",
+                dataset,
+                PlotOrientation.VERTICAL,
+                false,
+                true,
+                false
+        );
+        // Adjusting font
+        CategoryPlot plot = chart.getCategoryPlot();
+        CategoryAxis xAxis = plot.getDomainAxis();
+        xAxis.setTickLabelFont(new Font("Arial", Font.PLAIN, 9));  // Change font size here
+        xAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+
+        return chart;
     }
 
 

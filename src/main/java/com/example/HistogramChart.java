@@ -5,23 +5,17 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.chart.*;
+import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.scene.chart.NumberAxis;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 
 
 import java.io.*;
@@ -29,18 +23,24 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HistogramChart {
     private Stage Stage;
-    private int weekOffset = 0; // 0 = current week
-    private final String CSV_FILE = "resources/clicks_log.csv";
-    private LocalDate dynamicBaseDate = null;
-    private BarChart<String, Number> barChart;
+
     private boolean darkMode;
     private LogManager logManager;
     private ChartCreator chartCreator;
+    private ChartViewer chartViewer;
+
+    private String gender;
+    private ArrayList<String> age;
+    private String income;
+    private ArrayList<String> context;
+
+
 
 
 
@@ -64,6 +64,11 @@ public class HistogramChart {
         this.logManager = logManager;
         this.chartCreator = chartCreator;
         this.darkMode = darkMode;
+
+        this.gender = "";
+        this.age = new ArrayList<>();
+        this.income = "";
+        this.context = new ArrayList<>();
     }
 
     public void show() {
@@ -78,37 +83,30 @@ public class HistogramChart {
         HBox navBar = createNavigationBar();
 
         // Create chart area
-        VBox chartSection = createChartSection();
+        HBox chartSection = createChartSection();
 
-        //Logout Button
-        Button logoutButton = createStyledButton("Logout", LOGOUT_COLOUR, LOGOUT_HOVER_COLOUR);
-        logoutButton.setOnAction(e -> {
-                    Login login = new Login(Stage,darkMode);
-                    login.show();
-                });
-        HBox logoutBox = new HBox(logoutButton);
-        logoutBox.setAlignment(Pos.BOTTOM_RIGHT);
-        logoutBox.setPadding(new Insets(10, 20, 20, 20));
+        //Scroll pane
+        ScrollPane filters = createFilterPanel(chartViewer);
 
-
+        //Logout box
+        HBox logoutBox = createLogoutBar();
 
         // Set layout
         root.setTop(navBar);
         root.setCenter(chartSection);
+        root.setRight(filters);
         root.setBottom(logoutBox);
 
         // Set margins
         BorderPane.setMargin(chartSection, new Insets(20, 20, 20, 20));
+        BorderPane.setMargin(logoutBox,new Insets(20,20,20,20));
+        BorderPane.setMargin(filters, new Insets(10, 10, 10, 5));
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
         Stage.setScene(scene);
         Stage.setFullScreen(true);
         Stage.setTitle("Ad Auction Dashboard - Click-Histogram View");
         Stage.show();
-
-
-
-
 
     }
 
@@ -124,8 +122,8 @@ public class HistogramChart {
                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         }
 
-        Label title = new Label("Click-Histogram Chart");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        Label title = new Label("Click Cost Distribution");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Region spacer = new Region();
@@ -139,6 +137,8 @@ public class HistogramChart {
         settingsButton.setOnAction(e -> {
             PageInfo pageInfo = new PageInfo();
             pageInfo.setDarkMode(darkMode);
+            pageInfo.setChartCreator(chartCreator);
+            pageInfo.setLogManager(logManager);
             SettingsPage settingsPage = new SettingsPage(Stage,"Histogram",pageInfo,darkMode);
             settingsPage.show();
         });
@@ -149,17 +149,20 @@ public class HistogramChart {
             chartPage.show();
         });
 
-        /**
-        logOutButton.setOnAction(e -> {
-            Login login = new Login(Stage);
-            login.show();
-        }); */
-
         saveToPdfButton.setOnAction(e -> {
-            saveChartToPDF(barChart);
+            try {
+                // Convert JavaFX Chart to image
+                WritableImage writableImage = chartViewer.snapshot(null, null);
+
+                // Save image as PDF
+                chartCreator.saveChartAsPdf(writableImage,Stage);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (DocumentException ex) {
+                throw new RuntimeException(ex);
+            }
         });
-
-
 
         // Add to navigation bar
         navBar.getChildren().addAll(title,spacer,backButton,saveToPdfButton,settingsButton);
@@ -167,200 +170,392 @@ public class HistogramChart {
         return navBar;
     }
 
-    private VBox createChartSection() {
-        VBox chartSection = new VBox(20);
+    private HBox createLogoutBar() {
+        HBox logoutBar = new HBox(15);
+        logoutBar.setAlignment(Pos.CENTER_LEFT);
+        logoutBar.setPadding(new Insets(15, 20, 15, 20));
+        if (!darkMode) {
+            logoutBar.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        } else {
+            logoutBar.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        }
+
+
+        //Button to logout
+        Button logoutButton = createStyledButton("Logout",LOGOUT_COLOUR,LOGOUT_HOVER_COLOUR);
+        logoutButton.setOnAction(e -> {
+            Login loginPage = new Login(Stage,darkMode);
+            loginPage.show();
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+
+        // Add to navigation bar
+        logoutBar.getChildren().addAll(spacer,logoutButton);
+
+        return logoutBar;
+    }
+
+    private HBox createChartSection() {
+        HBox chartSection = new HBox(20);
         chartSection.setAlignment(Pos.CENTER);
 
-        Label weekRangeLabel = new Label();
-        weekRangeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        weekRangeLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT: TEXT_COLOR));
+        JFreeChart histogram = chartCreator.genClickCostHistogram(gender, income, context, age);
+        chartViewer = new ChartViewer(histogram);
+        chartViewer.setPrefSize(800, 600);
+        chartViewer.setMaxSize(800, 600);
+        chartViewer.setMinSize(800, 600);
 
-        Label descriptionLabel = new Label("Click Histogram by Day of Week");
-        descriptionLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        descriptionLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :TEXT_COLOR));
+        chartSection.getChildren().addAll(chartViewer);
 
-        barChart = createHistogramChart();
-
-        // Initial update
-        updateChart(barChart, weekRangeLabel);
-
-        // Navigation Buttons
-        HBox weekNav = new HBox(10);
-        weekNav.setAlignment(Pos.CENTER);
-
-        Button prevWeek = createStyledButton("← Previous Week", "#757575", "#616161");
-        Button nextWeek = createStyledButton("Next Week →", "#757575", "#616161");
-
-        prevWeek.setOnAction(e -> {
-            weekOffset--;
-            updateChart(barChart, weekRangeLabel);
-        });
-
-        nextWeek.setOnAction(e -> {
-            weekOffset++;
-            updateChart(barChart, weekRangeLabel);
-        });
-
-
-
-        weekNav.getChildren().addAll(prevWeek, nextWeek);
-
-        chartSection.getChildren().addAll(weekRangeLabel, descriptionLabel, barChart, weekNav);
         return chartSection;
     }
 
-    private BarChart<String, Number> createHistogramChart() {
-        CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Day of the Week");
-
-        NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Number of Clicks");
-
-        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Weekly Click Distribution");
-        barChart.setLegendVisible(false);
-        barChart.setCategoryGap(10);
-        barChart.setBarGap(5);
-        barChart.setStyle("-fx-background-color: transparent;");
-
-        // Don't update chart here — it's handled in createChartSection()
-
-        return barChart;
-    }
 
 
-    private void updateChart(BarChart<String, Number> chart, Label weekRangeLabel) {
-        chart.getData().clear();
-
-        Map<String, Integer> clickCounts = getClicksByDayOfWeek(weekOffset);
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-
-        for (DayOfWeek day : DayOfWeek.values()) {
-            String name = capitalize(day.toString().toLowerCase());
-            int count = clickCounts.getOrDefault(name, 0);
-            series.getData().add(new XYChart.Data<>(name, count));
-        }
-
-        chart.getData().add(series);
-
-        // ✅ Update the label too!
-        updateWeekRangeLabel(weekRangeLabel);
-    }
-
-
-    private Map<String, Integer> getClicksByDayOfWeek(int weekOffset) {
-        Map<String, Integer> dayCounts = new HashMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        LocalDate baseDate = LocalDate.of(2015, 1, 2); // Adjust if needed
-        LocalDate startOfWeek = baseDate.plusWeeks(weekOffset).with(DayOfWeek.MONDAY);
-        LocalDate endOfWeek = startOfWeek.plusDays(6);
-
-        try (
-                InputStream input = getClass().getClassLoader().getResourceAsStream("clicks_log.csv");
-                BufferedReader br = new BufferedReader(new InputStreamReader(input))
-        ) {
-            String line;
-            br.readLine(); // Skip header
-
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 1) {
-                    LocalDateTime dateTime = LocalDateTime.parse(parts[0].trim(), formatter);
-                    LocalDate date = dateTime.toLocalDate();
-
-                    if (!date.isBefore(startOfWeek) && !date.isAfter(endOfWeek)) {
-                        String day = capitalize(date.getDayOfWeek().toString().toLowerCase());
-                        dayCounts.put(day, dayCounts.getOrDefault(day, 0) + 1);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return dayCounts;
-    }
-
-
-    private String capitalize(String text) {
-        if (text == null || text.isEmpty()) return text;
-        return text.substring(0, 1).toUpperCase() + text.substring(1);
-    }
-
-    // Helper method to update the label with the current week range
-    private void updateWeekRangeLabel(Label weekRangeLabel) {
-        if (dynamicBaseDate == null) {
-            dynamicBaseDate = getEarliestDateFromCSV();
-        }
-
-        if (dynamicBaseDate != null) {
-            LocalDate startOfWeek = dynamicBaseDate.plusWeeks(weekOffset).with(DayOfWeek.MONDAY);
-            LocalDate endOfWeek = startOfWeek.plusDays(6);
-
-            String weekRange = startOfWeek.toString() + " to " + endOfWeek.toString();
-            weekRangeLabel.setText("Week: " + weekRange);
+    private ScrollPane createFilterPanel(ChartViewer chartViewer) {
+        VBox filterPanel = new VBox(20);
+        filterPanel.setPadding(new Insets(20));
+        if (!darkMode) {
+            filterPanel.setStyle("-fx-background-color: " + SECTION_BACKGROUND + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         } else {
-            weekRangeLabel.setText("Week: Data unavailable");
+            filterPanel.setStyle("-fx-background-color: " + DARKMODE_SECTION + "; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         }
+
+        // Title for filter panel
+        Label filterTitle = new Label("Chart Settings");
+        filterTitle.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        filterTitle.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
+
+        // Add different filter sections
+        VBox genderSection = createGenderOptions(chartViewer);
+        VBox incomeSection = createIncomeOptions(chartViewer);
+        VBox contextSection = createContextOptions(chartViewer);
+        VBox ageSection = createAgeOptions(chartViewer);
+
+        // Add sections to filter panel
+        filterPanel.getChildren().addAll(
+                filterTitle,
+                new Separator(),
+                genderSection,
+                new Separator(),
+                incomeSection,
+                new Separator(),
+                contextSection,
+                new Separator(),
+                ageSection
+        );
+
+        // Create a scroll pane to hold the filter panel
+        ScrollPane scrollPane = new ScrollPane(filterPanel);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefWidth(300);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("edge-to-edge");
+
+        return scrollPane;
     }
 
-    private LocalDate getEarliestDateFromCSV() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private VBox createGenderOptions(ChartViewer chartViewer) {
+        VBox genderBox = new VBox(10);
 
-        try (
-                InputStream input = getClass().getClassLoader().getResourceAsStream("clicks_log.csv");
-                BufferedReader br = new BufferedReader(new InputStreamReader(input))
-        ) {
-            String line = br.readLine(); // skip header
-            if ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 1) {
-                    LocalDateTime dateTime = LocalDateTime.parse(parts[0].trim(), formatter);
-                    return dateTime.toLocalDate();
-                }
+        Label genderLabel = new Label("Gender");
+        genderLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        genderLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
+
+        ToggleGroup genderToggleGroup = new ToggleGroup();
+
+        RadioButton allGenderButton = createStyledRadioButton("All", genderToggleGroup,darkMode);
+        allGenderButton.setSelected(true);
+
+        RadioButton maleButton = createStyledRadioButton("Male", genderToggleGroup,darkMode);
+        RadioButton femaleButton = createStyledRadioButton("Female", genderToggleGroup,darkMode);
+
+        // Set action handlers for gender buttons
+        allGenderButton.setOnAction(e -> {
+            gender = "";
+            updateChart(chartViewer);
+        });
+
+        maleButton.setOnAction(e -> {
+            gender = "Male";
+            updateChart(chartViewer);
+        });
+
+        femaleButton.setOnAction(e -> {
+            gender = "Female";
+            updateChart(chartViewer);
+        });
+
+        genderBox.getChildren().addAll(genderLabel, allGenderButton, maleButton, femaleButton);
+
+        return genderBox;
+    }
+
+    private VBox createIncomeOptions(ChartViewer chartViewer) {
+        VBox incomeBox = new VBox(10);
+
+        Label incomeLabel = new Label("Income");
+        incomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        incomeLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
+
+        ToggleGroup incomeToggleGroup = new ToggleGroup();
+
+        RadioButton allIncomeButton = createStyledRadioButton("All", incomeToggleGroup,darkMode);
+        allIncomeButton.setSelected(true);
+
+        RadioButton lowButton = createStyledRadioButton("Low", incomeToggleGroup,darkMode);
+        RadioButton mediumButton = createStyledRadioButton("Medium", incomeToggleGroup,darkMode);
+        RadioButton highButton = createStyledRadioButton("High", incomeToggleGroup,darkMode);
+
+        // Set action handlers for income buttons
+        allIncomeButton.setOnAction(e -> {
+            income = "";
+            updateChart(chartViewer);
+        });
+
+        lowButton.setOnAction(e -> {
+            income = "Low";
+            updateChart(chartViewer);
+        });
+
+        mediumButton.setOnAction(e -> {
+            income = "Medium";
+            updateChart(chartViewer);
+        });
+
+        highButton.setOnAction(e -> {
+            income = "High";
+            updateChart(chartViewer);
+        });
+
+        incomeBox.getChildren().addAll(incomeLabel, allIncomeButton, lowButton, mediumButton, highButton);
+
+        return incomeBox;
+    }
+
+
+    private VBox createContextOptions(ChartViewer chartViewer) {
+        VBox contextBox = new VBox(10);
+
+        Label contextLabel = new Label("Context");
+        contextLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        contextLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
+
+        CheckBox newsCheck = createStyledCheckBox("News",darkMode);
+        CheckBox shoppingCheck = createStyledCheckBox("Shopping",darkMode);
+        CheckBox socialMediaCheck = createStyledCheckBox("Social Media",darkMode);
+        CheckBox blogCheck = createStyledCheckBox("Blog",darkMode);
+        CheckBox hobbyCheck = createStyledCheckBox("Hobby",darkMode);
+        CheckBox travelCheck = createStyledCheckBox("Travel",darkMode);
+
+        // Button to clear all context filters
+        Button clearContextButton = new Button("Clear All");
+        clearContextButton.setFont(Font.font("Arial", 12));
+        clearContextButton.setStyle("-fx-background-color: #f0f0f0; -fx-text-fill: #333333;");
+        clearContextButton.setOnAction(e -> {
+            newsCheck.setSelected(false);
+            shoppingCheck.setSelected(false);
+            socialMediaCheck.setSelected(false);
+            blogCheck.setSelected(false);
+            hobbyCheck.setSelected(false);
+            travelCheck.setSelected(false);
+            context.clear();
+            updateChart(chartViewer);
+        });
+
+        // Set action handlers for context checkboxes
+        newsCheck.setOnAction(e -> {
+            if (newsCheck.isSelected()) {
+                context.add("News");
+            } else {
+                context.remove("News");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            updateChart(chartViewer);
+        });
 
-        return null; // fallback if something goes wrong
+        shoppingCheck.setOnAction(e -> {
+            if (shoppingCheck.isSelected()) {
+                context.add("Shopping");
+            } else {
+                context.remove("Shopping");
+            }
+            updateChart(chartViewer);
+        });
+
+        socialMediaCheck.setOnAction(e -> {
+            if (socialMediaCheck.isSelected()) {
+                context.add("Social Media");
+            } else {
+                context.remove("Social Media");
+            }
+            updateChart(chartViewer);
+        });
+
+        blogCheck.setOnAction(e -> {
+            if (blogCheck.isSelected()) {
+                context.add("Blog");
+            } else {
+                context.remove("Blog");
+            }
+            updateChart(chartViewer);
+        });
+
+        hobbyCheck.setOnAction(e -> {
+            if (hobbyCheck.isSelected()) {
+                context.add("Hobby");
+            } else {
+                context.remove("Hobby");
+            }
+            updateChart(chartViewer);
+        });
+
+        travelCheck.setOnAction(e -> {
+            if (travelCheck.isSelected()) {
+                context.add("Travel");
+            } else {
+                context.remove("Travel");
+            }
+            updateChart(chartViewer);
+        });
+
+        HBox clearButtonContainer = new HBox();
+        clearButtonContainer.setAlignment(Pos.CENTER_RIGHT);
+        clearButtonContainer.getChildren().add(clearContextButton);
+        clearButtonContainer.setPadding(new Insets(5, 0, 0, 0));
+
+        contextBox.getChildren().addAll(
+                contextLabel,
+                newsCheck,
+                shoppingCheck,
+                socialMediaCheck,
+                blogCheck,
+                hobbyCheck,
+                travelCheck,
+                clearButtonContainer
+        );
+
+        return contextBox;
     }
 
-    private void saveChartToPDF(BarChart<String, Number> chart) {
-        WritableImage image = chart.snapshot(null, null);
-        File outputFile = new File("histogram_chart.pdf");
+    private VBox createAgeOptions(ChartViewer chartViewer) {
+        VBox ageBox = new VBox(10);
 
-        try {
-            // Save snapshot as PNG image first
-            File tempImageFile = new File("temp_chart.png");
-            javax.imageio.ImageIO.write(javafx.embed.swing.SwingFXUtils.fromFXImage(image, null), "png", tempImageFile);
+        Label ageLabel = new Label("Age");
+        ageLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        ageLabel.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
 
-            // Now create a PDF with the image
-            com.itextpdf.text.Document document = new com.itextpdf.text.Document();
-            com.itextpdf.text.pdf.PdfWriter.getInstance(document, new FileOutputStream(outputFile));
-            document.open();
+        CheckBox under25Check = createStyledCheckBox("Under 25",darkMode);
+        CheckBox age25to34Check = createStyledCheckBox("25-34",darkMode);
+        CheckBox age35to44Check = createStyledCheckBox("35-44",darkMode);
+        CheckBox age45to54Check = createStyledCheckBox("45-54",darkMode);
+        CheckBox over54Check = createStyledCheckBox("Over 54",darkMode);
 
-            com.itextpdf.text.Image chartImage = com.itextpdf.text.Image.getInstance(tempImageFile.getAbsolutePath());
-            chartImage.scaleToFit(500, 500); // Resize to fit the page
-            document.add(chartImage);
+        // Button to clear all age filters
+        Button clearAgeButton = new Button("Clear All");
+        clearAgeButton.setFont(Font.font("Arial", 12));
+        clearAgeButton.setStyle("-fx-background-color: #f0f0f0; -fx-text-fill: #333333;");
+        clearAgeButton.setOnAction(e -> {
+            under25Check.setSelected(false);
+            age25to34Check.setSelected(false);
+            age35to44Check.setSelected(false);
+            age45to54Check.setSelected(false);
+            over54Check.setSelected(false);
+            age.clear();
+            updateChart(chartViewer);
+        });
 
-            document.close();
+        // Set action handlers for age checkboxes
+        under25Check.setOnAction(e -> {
+            if (under25Check.isSelected()) {
+                age.add("<25");
+            } else {
+                age.remove("<25");
+            }
+            updateChart(chartViewer);
+        });
 
-            // Optional: Delete the temp image
-            tempImageFile.delete();
+        age25to34Check.setOnAction(e -> {
+            if (age25to34Check.isSelected()) {
+                age.add("25-34");
+            } else {
+                age.remove("25-34");
+            }
+            updateChart(chartViewer);
+        });
 
-            System.out.println("PDF saved successfully: " + outputFile.getAbsolutePath());
+        age35to44Check.setOnAction(e -> {
+            if (age35to44Check.isSelected()) {
+                age.add("35-44");
+            } else {
+                age.remove("35-44");
+            }
+            updateChart(chartViewer);
+        });
 
-        } catch (IOException | com.itextpdf.text.DocumentException e) {
-            e.printStackTrace();
-        }
+        age45to54Check.setOnAction(e -> {
+            if (age45to54Check.isSelected()) {
+                age.add("45-54");
+            } else {
+                age.remove("45-54");
+            }
+            updateChart(chartViewer);
+        });
+
+        over54Check.setOnAction(e -> {
+            if (over54Check.isSelected()) {
+                age.add(">54");
+            } else {
+                age.remove(">54");
+            }
+            updateChart(chartViewer);
+        });
+
+        HBox clearButtonContainer = new HBox();
+        clearButtonContainer.setAlignment(Pos.CENTER_RIGHT);
+        clearButtonContainer.getChildren().add(clearAgeButton);
+        clearButtonContainer.setPadding(new Insets(5, 0, 0, 0));
+
+        ageBox.getChildren().addAll(
+                ageLabel,
+                under25Check,
+                age25to34Check,
+                age35to44Check,
+                age45to54Check,
+                over54Check,
+                clearButtonContainer
+        );
+
+        return ageBox;
+    }
+
+    public void updateChart(ChartViewer chartViewer){
+        JFreeChart histogram = chartCreator.genClickCostHistogram(gender,income,context,age);
+        chartViewer.setChart(histogram);
     }
 
 
+    private CheckBox createStyledCheckBox(String text,boolean darkMode) {
+        CheckBox checkBox = new CheckBox(text);
+        checkBox.setFont(Font.font("Arial", 13));
+        checkBox.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : TEXT_COLOR));
+        return checkBox;
+    }
 
-
-
+    private RadioButton createStyledRadioButton(String text, ToggleGroup group,boolean darkMode) {
+        RadioButton radioButton = new RadioButton(text);
+        radioButton.setToggleGroup(group);
+        radioButton.setFont(Font.font("Arial", 13));
+        radioButton.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : TEXT_COLOR));
+        return radioButton;
+    }
 
 
     public Button createStyledButton(String text, String bgColor, String hoverColor) {
