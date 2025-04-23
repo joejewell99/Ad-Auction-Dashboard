@@ -125,7 +125,7 @@ public class UserManagementPage {
 
             boolean ok = db.registerUser(user, pass);
             regMessage.setText(ok
-                    ? "User successfully registered!"
+                    ? "User successfully registered! Scan this QR code with Google Authenticator App"
                     : "User not registered!");
 
             if (ok) {

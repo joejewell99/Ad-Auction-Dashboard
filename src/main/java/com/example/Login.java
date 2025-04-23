@@ -237,6 +237,7 @@ public class Login {
                     // --- OTP block wrapped in its own try/catch ---
                     try {
                         TextInputDialog otpDialog = new TextInputDialog();
+                        otpDialog.initOwner(stage);
                         otpDialog.setTitle("2FA Verification");
                         otpDialog.setHeaderText("Enter the 6-digit code from your Authenticator");
                         otpDialog.setContentText("Code: ");
