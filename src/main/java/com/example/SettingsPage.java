@@ -80,7 +80,7 @@ public class SettingsPage {
         }
 
         Label title = new Label("Settings");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Region spacer = new Region();
@@ -151,6 +151,10 @@ public class SettingsPage {
         instruction.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         instruction.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : "#333333"));
         Button helpButton = createStyledButton("Help",PRIMARY_COLOR,PRIMARY_DARK_COLOR);
+        helpButton.setOnAction(e -> {
+            HelpPage helpPage = new HelpPage(stage,previousPage,pageInfo,darkMode);
+            helpPage.show();
+        });
 
         helpBar.getChildren().addAll(instruction,helpButton);
 
