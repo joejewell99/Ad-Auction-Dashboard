@@ -182,7 +182,7 @@ public class ChartPage {
                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         }
         
-        Label title = new Label("Data Visualization");
+        Label title = new Label("Main Chart");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
         title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT :HEADER_COLOR));
         

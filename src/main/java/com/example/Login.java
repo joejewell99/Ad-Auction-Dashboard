@@ -202,7 +202,7 @@ public class Login {
         tipLabel.setPadding(new Insets(15, 0, 0, 0));
 
         // Add all components to login box
-        loginBox.getChildren().addAll(usernameBox, passwordBox, message, loginButton, tipLabel);
+        loginBox.getChildren().addAll(usernameBox, passwordBox, message, loginButton);
 
         // Footer copyright information
         HBox footerBox = new HBox();
