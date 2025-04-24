@@ -121,10 +121,14 @@ public class SettingsPage {
         RadioButton lightButton = createStyledRadioButton("Light Mode",themeToggle,darkMode);
         lightButton.setOnAction(e -> {
             darkMode = false;
+            SettingsPage settingsPage = new SettingsPage(stage,previousPage,pageInfo,darkMode);
+            settingsPage.show();
         });
         RadioButton darkButton = createStyledRadioButton("Dark Mode",themeToggle,darkMode);
         darkButton.setOnAction(e -> {
             darkMode = true;
+            SettingsPage settingsPage = new SettingsPage(stage,previousPage,pageInfo,darkMode);
+            settingsPage.show();
         });
 
         if (darkMode) {
