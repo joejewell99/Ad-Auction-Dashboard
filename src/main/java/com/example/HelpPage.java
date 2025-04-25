@@ -119,15 +119,30 @@ public class HelpPage {
 
         //Images to be displayed (Sample images for now)
         ArrayList<Image> imageList = new ArrayList<>();
-        imageList.add(new Image(getClass().getResource("/cat1.jpg").toExternalForm()));
-        imageList.add(new Image(getClass().getResource("/cat2.jpg").toExternalForm()));
-        imageList.add(new Image(getClass().getResource("/cat3.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/LoginPageHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/AuthenticatorHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/AuthAppLoginHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/InputFilesHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/InputFilesHelp2.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/MainChartHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/SaveToPdfButtonHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/ChartSectionHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/BottomBarHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/BounceDefinitionHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/CompareMetricsHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/EditChartButtonHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/EditChartPageHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/OverallMetricsHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/BasicMetricsHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/RatioMetricsHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/ClickHistogramHelp.jpg").toExternalForm()));
+        imageList.add(new Image(getClass().getResource("/SettingsHelp.jpg").toExternalForm()));
 
         //Slideshow component
         ImageView slideshow = new ImageView(imageList.get(0));
         slideshow.setPreserveRatio(true);
-        slideshow.setFitWidth(500);
-        slideshow.setFitHeight(500);
+        slideshow.setFitWidth(1250);
+        slideshow.setFitHeight(1250);
 
         //Slideshow Counter
         Label slideShowCounter = new Label();
