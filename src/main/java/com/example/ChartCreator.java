@@ -182,7 +182,7 @@ public class ChartCreator {
         }
 
         var dataset = createFloatDataset(costMap);
-        return(createChart("Total cost","Cost",dataset));
+        return(createChart("Total cost","Cost (Pence)",dataset));
 
     }
 
@@ -395,7 +395,7 @@ public class ChartCreator {
         //Create chart
         JFreeChart histogram = ChartFactory.createHistogram(
                 "Click Cost Histogram",
-                "Cost",
+                "Cost (Pence)",
                 "Frequency",
                 dataset,
                 PlotOrientation.VERTICAL,
@@ -1038,7 +1038,7 @@ public class ChartCreator {
     public JFreeChart createHistogram(HistogramDataset dataset) {
         JFreeChart chart = ChartFactory.createHistogram(
                 "Click Cost",
-                "Cost Range",
+                "Cost Range (Pence)",
                 "Frequency",
                 dataset,
                 PlotOrientation.VERTICAL,

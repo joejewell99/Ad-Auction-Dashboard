@@ -117,7 +117,7 @@ public class HelpPage {
                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         }
 
-        //Images to be displayed (Sample images for now)
+        //Images to be displayed
         ArrayList<Image> imageList = new ArrayList<>();
         imageList.add(new Image(getClass().getResource("/LoginPageHelp.jpg").toExternalForm()));
         imageList.add(new Image(getClass().getResource("/AuthenticatorHelp.jpg").toExternalForm()));
@@ -141,8 +141,8 @@ public class HelpPage {
         //Slideshow component
         ImageView slideshow = new ImageView(imageList.get(0));
         slideshow.setPreserveRatio(true);
-        slideshow.setFitWidth(1250);
-        slideshow.setFitHeight(1250);
+        slideshow.setFitWidth(1000);
+        slideshow.setFitHeight(1000);
 
         //Slideshow Counter
         Label slideShowCounter = new Label();
