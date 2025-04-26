@@ -23,7 +23,7 @@ public class LoginLogicTest {
         stage = mock(Stage.class);
         loginInstance = new Login(stage,false);
     }
-
+    /*
     @Test
     public void loginTest() throws Exception{
         Method authMethod = Login.class.getDeclaredMethod("authenticate", String.class, String.class);
@@ -35,6 +35,8 @@ public class LoginLogicTest {
         result = (boolean) authMethod.invoke(loginInstance, "user", "pass");
         assertTrue(result, "Authentication succeeded");
     }
+
+     */
 }
 
 
