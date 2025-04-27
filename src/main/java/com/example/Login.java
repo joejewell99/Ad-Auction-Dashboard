@@ -80,7 +80,7 @@ public class Login {
         }
 
         Label titleLabel = new Label("Ad Auction Dashboard");
-        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 32));
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 28));
 
         if(!darkMode) {
             titleLabel.setTextFill(Color.web("#333333"));

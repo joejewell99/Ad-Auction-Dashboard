@@ -80,7 +80,7 @@ public class SettingsPage {
         }
 
         Label title = new Label("Settings");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
         title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Region spacer = new Region();

@@ -86,7 +86,7 @@ public class HelpPage {
         }
 
         Label title = new Label("Help");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
         title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Region spacer = new Region();

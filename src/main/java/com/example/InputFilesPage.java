@@ -28,6 +28,7 @@ public class InputFilesPage {
     private File impressionLogFile;
     private File clickLogFile;
     private File serverLogFile;
+    private File lastFolder;
 
     private final String LOGOUT_COLOUR = "#ff0000";
     private final String LOGOUT_HOVER_COLOUR = "#8b0000";
@@ -49,6 +50,7 @@ public class InputFilesPage {
     InputFilesPage(Stage stage,boolean darkMode) {
         this.stage = stage;
         this.darkMode = darkMode;
+        lastFolder = null;
         initialize();
     }
 
@@ -159,6 +161,9 @@ public class InputFilesPage {
         // Store the impression log in logManager
         impressionLogButton.setOnAction(e -> {
             try {
+                if (lastFolder != null ) {
+                    fileChooser.setInitialDirectory(lastFolder);
+                }
                 File file = fileChooser.showOpenDialog(stage);
                 if (file == null) {
                     showAlert("No file selected for Impression Log.");
@@ -169,6 +174,7 @@ public class InputFilesPage {
                     showAlert("Invalid file type, Expected input csv: impression_log.csv");
                     logger.error("Invalid file name selected for server log: " + file.getName());
                 } else {
+                    lastFolder = file.getParentFile();
                     impressionLogFile = file;
                     impressionProperty.set(impressionLogFile.getName());
                     logManager.assignImpressionLog(impressionLogFile);
@@ -184,6 +190,9 @@ public class InputFilesPage {
         // Store the click log in LogManager
         clickLogButton.setOnAction(e -> {
             try {
+                if (lastFolder != null ) {
+                    fileChooser.setInitialDirectory(lastFolder);
+                }
                 File file = fileChooser.showOpenDialog(stage);
                 if (file == null) {
                     showAlert("No file selected for Click Log.");
@@ -194,6 +203,7 @@ public class InputFilesPage {
                     showAlert("Invalid file type, Expected input csv: clicks_log.csv");
                     logger.error("Invalid file name selected for server log: " + file.getName());
                 } else {
+                    lastFolder = file.getParentFile();
                     clickLogFile = file;
                     clickProperty.set(clickLogFile.getName());
                     logManager.assignClickLog(clickLogFile);
@@ -209,6 +219,9 @@ public class InputFilesPage {
         // Store the server log in LogManager
         serverLogButton.setOnAction(e -> {
             try {
+                if (lastFolder != null ) {
+                    fileChooser.setInitialDirectory(lastFolder);
+                }
                 File file = fileChooser.showOpenDialog(stage);
                 if (file == null) {
                     showAlert("No file selected for Server Log.");
@@ -219,6 +232,7 @@ public class InputFilesPage {
                     showAlert("Invalid file type, Expected input csv: server_log.csv");
                     logger.error("Invalid file name selected for server log: " + file.getName());
                 } else {
+                    lastFolder = file.getParentFile();
                     serverLogFile = file;
                     serverProperty.set(serverLogFile.getName());
                     logManager.assignServerLog(serverLogFile);
@@ -365,12 +379,12 @@ public class InputFilesPage {
     private Button createStyledButton(String text, String bgColor, String hoverColor) {
         Button button = new Button(text);
         button.setPrefSize(120, 40);
-        button.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        button.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
         
         String style = String.format(
                 "-fx-background-color: %s; " +
                 "-fx-text-fill: white; " +
-                "-fx-font-weight: bold; " +
+                "-fx-font-weight: normal; " +
                 "-fx-background-radius: 5; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1); " +
                 "-fx-cursor: hand;", bgColor);
@@ -381,7 +395,7 @@ public class InputFilesPage {
             button.setStyle(String.format(
                 "-fx-background-color: %s; " +
                 "-fx-text-fill: white; " +
-                "-fx-font-weight: bold; " +
+                "-fx-font-weight: normal; " +
                 "-fx-background-radius: 5; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2); " +
                 "-fx-cursor: hand;", hoverColor)));

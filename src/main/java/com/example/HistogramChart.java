@@ -123,7 +123,7 @@ public class HistogramChart {
         }
 
         Label title = new Label("Click Cost Distribution");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
         title.setTextFill(Color.web(darkMode ? DARKMODE_TEXT : HEADER_COLOR));
 
         Region spacer = new Region();
