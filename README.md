@@ -28,7 +28,14 @@ The project is configured for Java 17 in `pom.xml`. Newer JDKs may work, but Jav
 
 ## Quick Start
 
-From the project root:
+Clone the repository and enter the project folder:
+
+```powershell
+git clone https://github.com/joejewell99/Ad-Auction-Dashboard.git
+cd Ad-Auction-Dashboard
+```
+
+Run the application:
 
 ```powershell
 mvn javafx:run
@@ -41,6 +48,33 @@ com.example.App
 ```
 
 The application starts in fullscreen mode on the login page.
+
+## First-Time Use
+
+1. Log in with the default user account:
+
+```text
+Username: user
+Password: pass
+```
+
+2. On the file input screen, select the bundled CSV files from:
+
+```text
+src/main/resources
+```
+
+3. Select these files when prompted:
+
+```text
+impression_log.csv
+clicks_log.csv
+server_log.csv
+```
+
+4. Click **Proceed** to open the main chart dashboard.
+
+The main dashboard lets you switch metrics, change the time granularity, filter by audience attributes, compare charts, view overall metrics, export charts to PDF, and inspect the click-cost histogram.
 
 ## Login Details
 
@@ -238,4 +272,3 @@ Important classes:
 - The app uses simple comma splitting for CSV parsing, so avoid commas inside field values.
 - The input page requires exact filenames, not just matching headers.
 - If JavaFX fails to launch, use JDK 17 and rerun `mvn javafx:run`.
-
