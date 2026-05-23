@@ -1,9 +1,16 @@
 target/
+out/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Runtime/generated files ###
+login.db
+*.pdf
+*_output.txt
+
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
